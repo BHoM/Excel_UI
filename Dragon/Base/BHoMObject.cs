@@ -18,6 +18,8 @@ namespace Dragon.Base
 
         static BHoMObject()
         {
+            BHG.Point pt = new BHG.Point();
+
             AssemblyNames = new Dictionary<string, string>();
             foreach (Assembly asm in AppDomain.CurrentDomain.GetAssemblies())
             {
