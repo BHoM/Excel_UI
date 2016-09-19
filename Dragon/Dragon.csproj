@@ -52,7 +52,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Base\BHoMObject.cs" />
-    <Compile Include="Functions.cs" />
+    <Compile Include="Excel_Resize.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -67,7 +67,8 @@
 xcopy "$(TargetDir)Dragon-AddIn.dna*" "$(TargetDir)Dragon-AddIn64.dna*" /C /Y
 xcopy "$(SolutionDir)\packages\ExcelDna.AddIn.0.33.9\tools\ExcelDna64.xll" "$(TargetDir)Dragon-AddIn64.xll*" /C /Y
 "$(SolutionDir)\packages\ExcelDna.AddIn.0.33.9\tools\ExcelDnaPack.exe" "$(TargetDir)Dragon-AddIn.dna" /Y
-"$(SolutionDir)\packages\ExcelDna.AddIn.0.33.9\tools\ExcelDnaPack.exe" "$(TargetDir)Dragon-AddIn64.dna" /Y</PostBuildEvent>
+"$(SolutionDir)\packages\ExcelDna.AddIn.0.33.9\tools\ExcelDnaPack.exe" "$(TargetDir)Dragon-AddIn64.dna" /Y
+xcopy "$(SolutionDir)Dragon\ExcelDna.IntelliSense.xll*" "$(TargetDir)ExcelDna.IntelliSense.xll*" /C /Y</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

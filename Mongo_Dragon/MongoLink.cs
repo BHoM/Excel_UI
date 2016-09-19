@@ -8,7 +8,7 @@ using MA = Mongo_Adapter;
 
 namespace Mongo_Dragon
 {
-    public static class Functions
+    public static class MongoLink
     {
         [ExcelFunction(Description = "Test function", Category = "Mongo_Dragon")]
         public static string ToMongo(string server, string database, string collection, string key, object[] objects)
@@ -39,6 +39,15 @@ namespace Mongo_Dragon
         public static string SayMongo(string name)
         {
             return "Mongo " + name;
+        }
+
+        /*****************************************************************/
+
+        [ExcelFunction(Description = "Test Array 2", Category = "Mongo_Dragon")]
+        public static object TestArray2()
+        {
+            object[,] array = new object[,] { { 3.4, 8.9 }, { "Mongo", "rules" } };
+            return XlCall.Excel(XlCall.xlUDF, "Resize", array);
         }
     }
 }
