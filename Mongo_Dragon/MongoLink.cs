@@ -5,23 +5,28 @@ using System.Text;
 using System.Threading.Tasks;
 using ExcelDna.Integration;
 using MA = Mongo_Adapter;
+using BHB = BHoM.Base;
+using BHG = BHoM.Global;
+
 
 namespace Mongo_Dragon
 {
     public static class MongoLink
     {
+        /*****************************************************************/
+
         [ExcelFunction(Description = "Test function", Category = "Mongo_Dragon")]
-        public static string ToMongo(string server, string database, string collection, string key, object[] objects)
+        public static string ToMongo(
+            [ExcelArgument(Name = "objects")] object[] objects,
+            [ExcelArgument(Name = "key")] string key,
+            [ExcelArgument(Name = "server address")] string server,
+            [ExcelArgument(Name = "database name")] string database,
+            [ExcelArgument(Name = "collection name")] string collection)
         {
             MA.MongoLink link = new MA.MongoLink(server, database, collection);
 
-            List<string> json = new List<string>();
-            foreach (string obj in objects)
-            {
-                json.Add(obj);
-            }
-
-            link.SaveJson(json, key);
+            List<BHB.BHoMObject> toSend = objects.Select(x => BHG.Project.ActiveProject.GetObject(x as string)).ToList();
+            link.SaveObjects(toSend, key);
 
             return "ToMongo";
         }
@@ -29,16 +34,17 @@ namespace Mongo_Dragon
         /*****************************************************************/
 
         [ExcelFunction(Description = "Test function", Category = "Mongo_Dragon")]
-        public static object[] FromMongo(string server, string database, string collection, string query)
+        public static object FromMongo(
+            [ExcelArgument(Name = "query")] string query,
+            [ExcelArgument(Name = "server address")] string server,
+            [ExcelArgument(Name = "database name")] string database,
+            [ExcelArgument(Name = "collection name")] string collection)
         {
             MA.MongoLink link = new MA.MongoLink(server, database, collection);
-            return link.GetJson(query).ToArray();
-        }
+            IEnumerable<BHB.BHoMObject> objects = link.GetObjects(query);
 
-        [ExcelFunction(Description = "Test function", Category = "Dragon")]
-        public static string SayMongo(string name)
-        {
-            return "Mongo " + name;
+            object[] array = objects.Select(x => x.BHoM_Guid.ToString()).ToArray();
+            return XlCall.Excel(XlCall.xlUDF, "Resize", array);
         }
 
         /*****************************************************************/
