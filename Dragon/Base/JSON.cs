@@ -18,7 +18,8 @@ namespace Dragon.Base
             [ExcelArgument(Name = "objects")] object[] objectIds,
             [ExcelArgument(Name = "password (optional)")] string password = "")
         {
-            List<BHB.BHoMObject> list = objectIds.Select(x => BHG.Project.ActiveProject.GetObject(x as string)).ToList();
+            Guid guid;
+            List<BHB.BHoMObject> list = objectIds.Select(x =>  Guid.TryParse(x as string, out guid)? BHG.Project.ActiveProject.GetObject(guid): null).Where(x=> x!= null).ToList();
             return BHB.BHoMJSON.WritePackage(list, password);
         }
 
