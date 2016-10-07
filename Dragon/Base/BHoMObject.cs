@@ -71,7 +71,7 @@ namespace Dragon.Base
         {
             BHB.BHoMObject oldObject = BHG.Project.ActiveProject.GetObject(objectId);
 
-            BHB.BHoMObject newObject = oldObject.ShallowClone();
+            BHB.BHoMObject newObject = oldObject.ShallowClone(true);
 
             int nb = Math.Min(propNames.Length, propValues.Length);
             for (int i = 0; i < nb; i++)
@@ -113,7 +113,7 @@ namespace Dragon.Base
             [ExcelArgument(Name = "Custom data value")] object val)
         {
             BHB.BHoMObject oblObj = BHG.Project.ActiveProject.GetObject(objectId);
-            BHB.BHoMObject newObj = oblObj.ShallowClone();
+            BHB.BHoMObject newObj = oblObj.ShallowClone(true);
 
             newObj.CustomData[key] = val;
 
