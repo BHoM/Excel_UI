@@ -103,6 +103,46 @@ namespace Dragon.Base
             return obj.ToString();
         }
 
+        /*****************************************************************/
+
+        [ExcelFunction(Description = "Get a definition of all the BhoM objects", Category = "Dragon")]
+        public static object GetAllObjectModels()
+        {
+
+            List<string[]> data = new List<string[]>();
+            foreach (KeyValuePair<string, Type> kvp in  BHB.BHoMJSON.TypeDictionary)
+            {
+                if (!kvp.Key.Contains('.')) continue; // Need a better way to access each type only once
+
+                string[] trow = new string[3];
+                trow[0] = kvp.Key;
+                trow[1] = "";
+                trow[2] = "";
+                data.Add(trow);
+
+                foreach (PropertyInfo prop in kvp.Value.GetProperties())
+                {
+                    if (prop.CanRead && prop.CanWrite)
+                    {
+                        string[] row = new string[3];
+                        row[0] = "";
+                        row[1] = prop.Name;
+                        row[2] = prop.PropertyType.ToString();
+                        data.Add(row);
+                    }
+                }
+            }
+
+            int nb = data.Count;
+            object[,] array = new object[nb, 3];
+            for (int i = 0; i < nb; i++)
+            {
+                for (int j = 0; j < 3; j++)
+                    array[i, j] = data[i][j];
+            }
+
+            return XlCall.Excel(XlCall.xlUDF, "Resize", array);
+        }
 
         /*****************************************************************/
 
