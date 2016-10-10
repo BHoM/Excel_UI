@@ -53,7 +53,12 @@ namespace Dragon.Base
             if (propInfo == null)
                 return null;
 
-            return propInfo.GetValue(obj).ToString();
+            object prop = propInfo.GetValue(obj);
+
+            if (prop is BHB.BHoMObject)
+                return ((BHB.BHoMObject)prop).BHoM_Guid.ToString();
+                
+            return prop.ToString();
         }
 
         /*****************************************************************/
@@ -64,11 +69,9 @@ namespace Dragon.Base
             [ExcelArgument(Name = "property name")] object[] propNames,
             [ExcelArgument(Name = "property value")] object[] propValues)
         {
-            object newObject = BHG.Project.ActiveProject.GetObject(objectId);
-            System.Reflection.MethodInfo inst = newObject.GetType().GetMethod("MemberwiseClone", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-            if (inst != null)
-                newObject = inst.Invoke(newObject, null);
+            BHB.BHoMObject oldObject = BHG.Project.ActiveProject.GetObject(objectId);
 
+            BHB.BHoMObject newObject = oldObject.ShallowClone(true);
 
             int nb = Math.Min(propNames.Length, propValues.Length);
             for (int i = 0; i < nb; i++)
@@ -85,7 +88,19 @@ namespace Dragon.Base
                     prop.SetValue(newObject, propValues[i]);
             }
 
-            return ((BHB.BHoMObject)newObject).BHoM_Guid.ToString();
+            BHG.Project.ActiveProject.AddObject(newObject);
+            return newObject.BHoM_Guid.ToString();
+        }
+
+        /*****************************************************************/
+
+        [ExcelFunction(Description = "Call the ToString() method from an object", Category = "Dragon")]
+        public static object ToString(
+            [ExcelArgument(Name = "object id")] string objectId)
+        {
+            BHB.BHoMObject obj = BHG.Project.ActiveProject.GetObject(objectId);
+
+            return obj.ToString();
         }
 
         /*****************************************************************/
@@ -128,5 +143,42 @@ namespace Dragon.Base
 
             return XlCall.Excel(XlCall.xlUDF, "Resize", array);
         }
+
+        /*****************************************************************/
+
+        [ExcelFunction(Description = "Adds a custom data to an object", Category = "Dragon")]
+        public static object AddCustomData(
+            [ExcelArgument(Name = "object id")] string objectId,
+            [ExcelArgument(Name = "Custom data key")] string key,
+            [ExcelArgument(Name = "Custom data value")] object val)
+        {
+            BHB.BHoMObject oblObj = BHG.Project.ActiveProject.GetObject(objectId);
+            BHB.BHoMObject newObj = oblObj.ShallowClone(true);
+
+            newObj.CustomData[key] = val;
+
+            BHG.Project.ActiveProject.AddObject(newObj);
+            return newObj.BHoM_Guid.ToString();
+        }
+
+        /*****************************************************************/
+
+        [ExcelFunction(Description = "Adds a custom data to an object", Category = "Dragon")]
+        public static object GetCustomData(
+            [ExcelArgument(Name = "object id")] string objectId,
+            [ExcelArgument(Name = "Custom data key")] string key)
+        {
+            BHB.BHoMObject obj = BHG.Project.ActiveProject.GetObject(objectId);
+
+            object val;
+            if (!obj.CustomData.TryGetValue(key, out val))
+                return null;
+
+            if (val is BHB.BHoMObject)
+                return ((BHB.BHoMObject)val).BHoM_Guid.ToString();
+
+            return val.ToString();
+        }
+
     }
 }

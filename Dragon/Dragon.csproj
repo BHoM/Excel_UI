@@ -55,6 +55,8 @@
     <Compile Include="Base\JSON.cs" />
     <Compile Include="Excel_Resize.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Structural\Loads\Loads.cs" />
+    <Compile Include="Structural\Properties\SectionProperty.cs" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Dragon-AddIn.dna">
