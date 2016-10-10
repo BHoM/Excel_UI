@@ -75,13 +75,15 @@ namespace Dragon.Structural.Loads
             return comb.BHoM_Guid.ToString();
         }
 
-        [ExcelFunction(Description = "Create a Load combination", Category = "Dragon.Structural")]
+        [ExcelFunction(Description = "Create a Load combination. Assumed units are [kN]/[kNm]/[m]/[°C]", Category = "Dragon.Structural")]
         public static object CreateLoad(
         [ExcelArgument(Name = "Load Case")]  object caseId,
         [ExcelArgument(Name = "Load Type")]  string loadType,
         [ExcelArgument(Name = "Magnitude x-y-z-mx-my-mz")]  double[] magnitude,
         [ExcelArgument(Name = "Group name")]  string groupName)
         {
+
+            double sFac = 1000;
 
             BHL.Loadcase loadCase = (BHL.Loadcase)BHG.Project.ActiveProject.GetObject(caseId.ToString());
             BHB.IGroup group;
@@ -114,10 +116,10 @@ namespace Dragon.Structural.Loads
                     group = new BHB.Group<BHE.Bar>();
                     group.Name = groupName;
                     udlLoad.Objects = (BHB.Group<BHE.Bar>)group;
-                    udlLoad.ForceVector = force;
+                    udlLoad.ForceVector = force* sFac;
 
                     if (moment != null)
-                        udlLoad.MomentVector = moment;
+                        udlLoad.MomentVector = moment* sFac;
                     load = udlLoad;
                     break;
                 case "NodeDisplacement":
@@ -140,10 +142,10 @@ namespace Dragon.Structural.Loads
                     group = new BHB.Group<BHE.Node>();
                     group.Name = groupName;
                     ptForce.Objects = (BHB.Group<BHE.Node>)group;
-                    ptForce.SetForce(force.X, force.Y, force.Z);
+                    ptForce.Force = force * sFac;
 
                     if (moment != null)
-                        ptForce.SetMoment(moment.X,moment.Y,moment.Z);
+                        ptForce.Moment = moment * sFac;
                     load = ptForce;
                     break;
 
@@ -164,7 +166,9 @@ namespace Dragon.Structural.Loads
                 case "SurfaceUDL":
                     if (force == null)
                         return "Surface Load needs force vector";
-                    BHL.AreaUniformalyDistributedLoad areaLoad = new BHL.AreaUniformalyDistributedLoad(force.X,force.Y,force.Z);
+                    BHL.AreaUniformalyDistributedLoad areaLoad = new BHL.AreaUniformalyDistributedLoad();
+
+                    areaLoad.Pressure = force * sFac;
 
                     group = new BHB.Group<BHE.Panel>();
                     group.Name = groupName;
