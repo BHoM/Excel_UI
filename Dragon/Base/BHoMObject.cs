@@ -110,7 +110,7 @@ namespace Dragon.Base
         {
 
             List<string[]> data = new List<string[]>();
-            foreach (KeyValuePair<string, Type> kvp in  BHB.BHoMJSON.TypeDictionary)
+            foreach (KeyValuePair<string, Type> kvp in  BHB.BHoMObject.TypeDictionary)
             {
                 if (!kvp.Key.Contains('.')) continue; // Need a better way to access each type only once
 

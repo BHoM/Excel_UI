@@ -157,9 +157,9 @@ namespace Dragon.Structural.Loads
                     gravLoad.Objects = (BHB.Group<BHB.BHoMObject>)group;
 
                     if (force != null)
-                        gravLoad.GravityDriection = force;
+                        gravLoad.GravityDirection = force;
                     else
-                        gravLoad.GravityDriection *= mag;
+                        gravLoad.GravityDirection *= mag;
 
                     load = gravLoad;
                     break;
