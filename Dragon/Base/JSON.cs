@@ -26,7 +26,7 @@ namespace Dragon.Base
         /*****************************************************************/
 
         [ExcelFunction(Description = "Read package comming from Flux", Category = "Dragon")]
-        public static object ReadPackage(
+        public static object ReadPackageJson(
             [ExcelArgument(Name = "package")] string package,
             [ExcelArgument(Name = "password (optional)")] string password = "")
         {
@@ -46,5 +46,18 @@ namespace Dragon.Base
             else
                 return obj.ToJSON();
         }
+
+        [ExcelFunction(Description = "Read package comming from Flux", Category = "Dragon")]
+        public static object ReadBHoMPackage(
+            [ExcelArgument(Name = "package")] string package,
+            [ExcelArgument(Name = "password (optional)")] string password = "")
+        {
+            List<BHB.BHoMObject> objects = BHB.BHoMJSON.ReadPackage(package, password);
+            BHG.Project.ActiveProject.AddObjects(objects);
+
+            object[] guids = objects.Select(x => x.BHoM_Guid.ToString()).ToArray();
+            return XlCall.Excel(XlCall.xlUDF, "Resize", guids);
+        }
+
     }
 }

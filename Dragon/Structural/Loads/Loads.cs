@@ -80,7 +80,9 @@ namespace Dragon.Structural.Loads
         [ExcelArgument(Name = "Load Case")]  object caseId,
         [ExcelArgument(Name = "Load Type")]  string loadType,
         [ExcelArgument(Name = "Magnitude x-y-z-mx-my-mz")]  double[] magnitude,
-        [ExcelArgument(Name = "Group name")]  string groupName)
+        [ExcelArgument(Name = "Group name")]  string groupName,
+        [ExcelArgument(Name = "Global or local axis. N=Global, Y = Local")]  string axis = null,
+        [ExcelArgument(Name = "Global or local axis. Y = yes, N = No")]  string projected = null)
         {
 
             double sFac = 1000;
@@ -200,6 +202,18 @@ namespace Dragon.Structural.Loads
                 return "Unable to create load";
 
             load.Loadcase = loadCase;
+
+            if (axis == "Y")
+                load.Axis = BHL.LoadAxis.Local;
+            else
+                load.Axis = BHL.LoadAxis.Global;
+
+            if (projected == "Y")
+                load.Projected = true;
+            else
+                load.Projected = false;
+
+
 
             BHG.Project.ActiveProject.AddObject((BHB.BHoMObject)group);
             BHG.Project.ActiveProject.AddObject((BHB.BHoMObject)load);
