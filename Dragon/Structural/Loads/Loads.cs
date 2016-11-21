@@ -172,10 +172,10 @@ namespace Dragon.Structural.Loads
 
                     areaLoad.Pressure = force * sFac;
 
-                    group = new BHB.Group<BHE.Panel>();
+                    group = new BHB.Group<BHE.IAreaElement>();
                     group.Name = groupName;
 
-                    areaLoad.Objects = (BHB.Group<BHE.Panel>)group;
+                    areaLoad.Objects = (BHB.Group<BHE.IAreaElement>)group;
 
                     load = areaLoad;
                     break;
