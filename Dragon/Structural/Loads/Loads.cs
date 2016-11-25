@@ -35,6 +35,7 @@ namespace Dragon.Structural.Loads
 
         [ExcelFunction(Description = "Create a Load combination", Category = "Dragon.Structural")]
         public static object CreateLoadCombination(
+            [ExcelArgument(Name = "Load combination number")]  int combNo,
             [ExcelArgument(Name = "Name of the load case")] string name,
             [ExcelArgument(Name = "Load Cases")]  object[] caseIds,
             [ExcelArgument(Name = "Load Factors")]  object[] loadFactors)
@@ -70,6 +71,7 @@ namespace Dragon.Structural.Loads
                 return "";
 
             BHL.LoadCombination comb = new BHL.LoadCombination(name, cases, factors);
+            comb.Number = combNo;
 
             BHG.Project.ActiveProject.AddObject(comb);
             return comb.BHoM_Guid.ToString();
