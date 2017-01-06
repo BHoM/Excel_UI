@@ -25,7 +25,19 @@ namespace Mongo_Dragon
         {
             MA.MongoLink link = new MA.MongoLink(server, database, collection);
 
-            List<BHB.BHoMObject> toSend = objects.Select(x => BHG.Project.ActiveProject.GetObject(x as string)).ToList();
+            List<BHB.BHoMObject> toSend = new List<BHoM.Base.BHoMObject>();
+
+            for (int i = 0; i < objects.Length; i++)
+            {
+                if (objects[i] is string)
+                {
+                     BHB.BHoMObject obj = BHG.Project.ActiveProject.GetObject(objects[i] as string);
+                        if (obj != null)
+                            toSend.Add(obj);
+                }
+            }
+
+            
             link.SaveObjects(toSend, key);
 
             return "ToMongo";
