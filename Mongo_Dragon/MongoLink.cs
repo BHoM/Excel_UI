@@ -32,13 +32,12 @@ namespace Mongo_Dragon
                 if (objects[i] is string)
                 {
                      BHB.BHoMObject obj = BHG.Project.ActiveProject.GetObject(objects[i] as string);
-                        if (obj != null)
-                            toSend.Add(obj);
+                     if (obj != null)
+                        toSend.Add(obj);
                 }
             }
 
-            
-            link.SaveObjects(toSend, key);
+            link.Push(toSend, key);
 
             return "ToMongo";
         }
@@ -53,9 +52,9 @@ namespace Mongo_Dragon
             [ExcelArgument(Name = "collection name")] string collection)
         {
             MA.MongoLink link = new MA.MongoLink(server, database, collection);
-            IEnumerable<BHB.BHoMObject> objects = link.GetObjects(query);
+            IEnumerable<object> objects = link.Pull(query);
 
-            object[] array = objects.Select(x => x.BHoM_Guid.ToString()).ToArray();
+            object[] array = objects.Select(x => (x as BHB.BHoMObject).BHoM_Guid.ToString()).ToArray();
             return XlCall.Excel(XlCall.xlUDF, "Resize", array);
         }
 
