@@ -84,6 +84,8 @@ namespace Dragon.Base
 
                 if (prop.PropertyType.IsSubclassOf(typeof(BHB.BHoMObject)))
                     prop.SetValue(newObject, BHG.Project.ActiveProject.GetObject(propValues[i] as string));
+                else if (prop.PropertyType.IsEnum)
+                    prop.SetValue(newObject, Enum.Parse(prop.PropertyType, propValues[i] as string));
                 else
                     prop.SetValue(newObject, propValues[i]);
             }
@@ -93,6 +95,7 @@ namespace Dragon.Base
         }
 
         /*****************************************************************/
+
 
         [ExcelFunction(Description = "Call the ToString() method from an object", Category = "Dragon")]
         public static object ToString(

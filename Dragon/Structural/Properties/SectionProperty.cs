@@ -26,8 +26,10 @@ namespace Dragon.Structural.Properties
         [ExcelFunction(Description = "Load a cable section from DB based on diameter", Category = "Dragon.Structural")]
         public static object CableSectionFromDBDiameter(
         [ExcelArgument(Name = "Section diameter in [mm]")] double diameter,
-        [ExcelArgument(Name = "Number of cables in the section")] int nb = 1)
+        [ExcelArgument(Name = "Number of cables in the section")] int nb = 1,
+        [ExcelArgument(Name = "Table name. Currently implemented PfeiferFullLocked and BridonFullLocked")] string tableName = "PfeiferFullLocked")
         {
+            BHG.Project.ActiveProject.Config.CableDataBase = tableName;
             diameter = diameter / 1000;
             BHP.SectionProperty prop = BHP.SectionProperty.LoadFromCableSectionDBDiameter(diameter, nb);
 
