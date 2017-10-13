@@ -55,13 +55,25 @@ namespace Mongo_Dragon
 
             string json = "{";
 
-            for (int i = 0; i < objects.GetLength(0); i++)
+            for (int i = 0; i < objects.GetLength(1); i++)
             {
-                for (int j = 0; j < objects.GetLength(1); j++)
-                {
+                string header = objects[0, i].ToString();
+                string valJson = "[";
 
+                for (int j = 1; j < objects.GetLength(0); j++)
+                {
+                    valJson += ItemToMongo(objects[j, i]) + ",";
                 }
+                valJson = valJson.TrimEnd(',');
+                valJson += "]";
+
+                json += "\"" + header + "\":" + valJson + ",";
             }
+            json = json.TrimEnd(',') + "}";
+
+            MA.MongoLink link = new MA.MongoLink(server, database, collection);
+
+            link.Push(new string[] { json }, key);
 
             return "ToMongo";
         }
