@@ -61,7 +61,7 @@ namespace BH.UI.Dragon
             Guid guid = obj.BHoM_Guid;
             m_objects.Add(guid, obj);
 
-            foreach (object o in obj.GetPropertyObjects())
+            foreach (object o in obj.PropertyObjects())
             {
                 if (o is BHoMObject)
                 {
