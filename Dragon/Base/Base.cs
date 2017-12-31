@@ -86,7 +86,7 @@ namespace BH.UI.Dragon.Base
             [ExcelArgument(Name = "property name")] string property)
         {
 
-            object obj = Project.ActiveProject.GetObject(objectId).GetPropertyValue(property);
+            object obj = Project.ActiveProject.GetObject(objectId).PropertyValue(property);
 
             if (obj == null)
                 return "Failed to get property";
