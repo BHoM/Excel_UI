@@ -116,15 +116,15 @@ namespace BH.UI.Dragon.Base
             [ExcelArgument(Name = "object id")] string objectId,
             [ExcelArgument(Name = "property name")] object[] propNames,
             [ExcelArgument(Name = "property value")] object[] propValues)
-        { 
+        {
 
 
-            BHoMObject obj = Project.ActiveProject.GetObject(objectId);
+            IObject obj = Project.ActiveProject.GetObject(objectId);
 
             if (obj == null)
                 return "Failed to get BHoMObject";
 
-            BHoMObject clone = obj.GetShallowClone(true);
+            IObject clone = obj.GetShallowClone(true);
 
             string message;
             if (!SetPropertyHelper(clone, propNames, propValues, out message))
@@ -161,7 +161,7 @@ namespace BH.UI.Dragon.Base
 
         /*****************************************************************/
 
-        public static bool SetPropertyHelper(BHoMObject obj, object[] propNames, object[] propValues, out string message)
+        public static bool SetPropertyHelper(IObject obj, object[] propNames, object[] propValues, out string message)
         {
             message = "";
             for (int i = 0; i < propNames.Length; i++)
@@ -194,7 +194,7 @@ namespace BH.UI.Dragon.Base
         public static object ToString(
             [ExcelArgument(Name = "object id")] string objectId)
         {
-            BHoMObject obj = Project.ActiveProject.GetObject(objectId);
+            IObject obj = Project.ActiveProject.GetObject(objectId);
 
             return obj.ToString();
         }
@@ -248,8 +248,8 @@ namespace BH.UI.Dragon.Base
             [ExcelArgument(Name = "Custom data key")] string key,
             [ExcelArgument(Name = "Custom data value")] object val)
         {
-            BHoMObject oblObj = Project.ActiveProject.GetObject(objectId);
-            BHoMObject newObj = oblObj.GetShallowClone(true);
+            IObject oblObj = Project.ActiveProject.GetObject(objectId);
+            IObject newObj = oblObj.GetShallowClone(true);
 
             newObj.CustomData[key] = val;
 
@@ -264,14 +264,14 @@ namespace BH.UI.Dragon.Base
             [ExcelArgument(Name = "object id")] string objectId,
             [ExcelArgument(Name = "Custom data key")] string key)
         {
-            BHoMObject obj = Project.ActiveProject.GetObject(objectId);
+            IObject obj = Project.ActiveProject.GetObject(objectId);
 
             object val;
             if (!obj.CustomData.TryGetValue(key, out val))
                 return null;
 
-            if (val is BHoMObject)
-                return ((BHoMObject)val).BHoM_Guid.ToString();
+            if (val is IObject)
+                return ((IObject)val).BHoM_Guid.ToString();
 
             return val.ToString();
         }

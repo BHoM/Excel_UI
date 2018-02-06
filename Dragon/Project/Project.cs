@@ -17,7 +17,7 @@ namespace BH.UI.Dragon
         /**** Data fields               **********/
         /*****************************************/
 
-        private Dictionary<Guid, BHoMObject> m_objects;
+        private Dictionary<Guid, IObject> m_objects;
 
         /*****************************************/
         /**** Static singleton instance **********/
@@ -31,7 +31,7 @@ namespace BH.UI.Dragon
 
         private Project()
         {
-            m_objects = new Dictionary<Guid, BHoMObject>();
+            m_objects = new Dictionary<Guid, IObject>();
         }
 
         /*****************************************/
@@ -53,7 +53,7 @@ namespace BH.UI.Dragon
         /**** Public methods            **********/
         /*****************************************/
 
-        public void AddObject(BHoMObject obj)
+        public void AddObject(IObject obj)
         {
             if (m_objects.ContainsKey(obj.BHoM_Guid))
                 return;
@@ -72,9 +72,9 @@ namespace BH.UI.Dragon
 
         /*****************************************/
 
-        public BHoMObject GetObject(Guid guid)
+        public IObject GetObject(Guid guid)
         {
-            BHoMObject obj;
+            IObject obj;
             if (m_objects.TryGetValue(guid, out obj))
                 return obj;
             else
@@ -83,7 +83,7 @@ namespace BH.UI.Dragon
 
         /*****************************************/
 
-        public BHoMObject GetObject(string str)
+        public IObject GetObject(string str)
         {
             Guid guid;
             return Guid.TryParse(str, out guid) ? GetObject(guid) : null;
