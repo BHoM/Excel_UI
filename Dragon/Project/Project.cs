@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BH.oM.Base;
+using BH.oM.Geometry;
 using BH.Engine.Reflection;
 
 namespace BH.UI.Dragon
@@ -18,6 +19,7 @@ namespace BH.UI.Dragon
         /*****************************************/
 
         private Dictionary<Guid, IObject> m_objects;
+        private Dictionary<Guid, IBHoMGeometry> m_geometry;
 
         /*****************************************/
         /**** Static singleton instance **********/
@@ -32,6 +34,7 @@ namespace BH.UI.Dragon
         private Project()
         {
             m_objects = new Dictionary<Guid, IObject>();
+            m_geometry = new Dictionary<Guid, IBHoMGeometry>();
         }
 
         /*****************************************/
@@ -61,11 +64,20 @@ namespace BH.UI.Dragon
             Guid guid = obj.BHoM_Guid;
             m_objects.Add(guid, obj);
 
+            //Recurively add the objects dependecies
             foreach (object o in obj.PropertyObjects())
             {
                 if (o is BHoMObject)
                 {
                     AddObject(o as BHoMObject);
+                }
+            }
+            //Add all objects in the custom data
+            foreach (KeyValuePair<string, object> kvp in obj.CustomData)
+            {
+                if (kvp.Value is BHoMObject)
+                {
+                    AddObject(kvp.Value as BHoMObject);
                 }
             }
         }
@@ -89,5 +101,56 @@ namespace BH.UI.Dragon
             return Guid.TryParse(str, out guid) ? GetObject(guid) : null;
         }
 
+        /*****************************************/
+
+        public Guid AddGeometry(IBHoMGeometry geom)
+        {
+            Guid guid = Guid.NewGuid();
+            m_geometry[guid] = geom;
+            return guid;
+        }
+
+        /*****************************************/
+
+        public IBHoMGeometry GetGeometry(Guid guid)
+        {
+            IBHoMGeometry obj;
+            if (m_geometry.TryGetValue(guid, out obj))
+                return obj;
+            else
+                return null;
+        }
+
+        /*****************************************/
+
+        public IBHoMGeometry GetGeometry(string str)
+        {
+            Guid guid;
+            return Guid.TryParse(str, out guid) ? GetGeometry(guid) : null;
+        }
+
+        /*****************************************/
+
+        public object GetAny(Guid guid)
+        {
+            IObject obj;
+            IBHoMGeometry geom;
+            if (m_objects.TryGetValue(guid, out obj))
+                return obj;
+            else if (m_geometry.TryGetValue(guid, out geom))
+                return geom;
+            else
+                return null;
+        }
+
+        /*****************************************/
+
+        public object GetAny(string str)
+        {
+            Guid guid;
+            return Guid.TryParse(str, out guid) ? GetAny(guid) : null;
+        }
+
+        /*****************************************/
     }
 }
