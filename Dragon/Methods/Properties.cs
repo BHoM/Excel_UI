@@ -148,7 +148,12 @@ namespace BH.UI.Dragon
                 return "Failed to get object";
 
             //Get the property dictionary for the object
-            Dictionary<string, object> props = obj.PropertyDictionary();
+            Dictionary<string, object> props;
+            if (obj is IExcelObject)
+                props = ((IExcelObject)obj).PropertyDictionary();
+            else
+                props = obj.PropertyDictionary();
+            
 
             if (includePropertyNames)
             {
