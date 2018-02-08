@@ -8,11 +8,14 @@ using System.Reflection;
 using BH.oM.Base;
 using BH.Engine.Reflection;
 using BH.oM.Geometry;
+using ExcelDna.Integration;
 
 namespace BH.UI.Dragon
 {
     public static class InOutHelp
     {
+        /*****************************************************************/
+        /******* Public methods                             **************/
         /*****************************************************************/
 
         public static object CheckAndGetObjectOrGeometry(this object obj)
@@ -62,7 +65,7 @@ namespace BH.UI.Dragon
         }
 
         /*****************************************************************/
-        public static bool SetPropertyHelper(IObject obj, object[] propNames, object[] propValues, out string message)
+        public static bool SetPropertyHelper(this IObject obj, object[] propNames, object[] propValues, out string message)
         {
             message = "";
             for (int i = 0; i < propNames.Length; i++)
@@ -83,7 +86,7 @@ namespace BH.UI.Dragon
 
         /*****************************************************************/
 
-        public static bool SetPropertyHelper(CustomObject obj, object[] propNames, object[] propValues, out string message)
+        public static bool SetPropertyHelper(this CustomObject obj, object[] propNames, object[] propValues, out string message)
         {
             message = "";
             for (int i = 0; i < propNames.Length; i++)
@@ -112,7 +115,7 @@ namespace BH.UI.Dragon
 
         /*****************************************************************/
 
-        public static bool SetPropertyHelper(IBHoMGeometry obj, object[] propNames, object[] propValues, out string message)
+        public static bool SetPropertyHelper(this IBHoMGeometry obj, object[] propNames, object[] propValues, out string message)
         {
             message = "";
             for (int i = 0; i < propNames.Length; i++)
@@ -155,7 +158,7 @@ namespace BH.UI.Dragon
 
         /*****************************************************************/
 
-        public static bool IsNumeric(object obj)
+        public static bool IsNumeric(this object obj)
         {
             if (obj is double)
                 return true;
@@ -169,6 +172,22 @@ namespace BH.UI.Dragon
                 return true;
 
             return false;
+        }
+
+        /*****************************************************************/
+
+        public static bool IsValidArray(object[] arr)
+        {
+            if (arr == null)
+                return false;
+
+            if (arr.Length < 1)
+                return false;
+
+            if (arr.Length == 1 && arr[0] == ExcelMissing.Value)
+                return false;
+
+            return true;
         }
 
         /*****************************************************************/

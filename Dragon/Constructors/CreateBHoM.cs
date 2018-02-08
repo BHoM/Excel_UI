@@ -64,7 +64,7 @@ namespace BH.UI.Dragon
         public static object ToString(
             [ExcelArgument(Name = "object id")] string objectId)
         {
-            IObject obj = Project.ActiveProject.GetObject(objectId);
+            object obj = Project.ActiveProject.GetAny(objectId);
 
             return obj.ToString();
         }
