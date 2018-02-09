@@ -8,7 +8,6 @@ using System.Reflection;
 using BH.oM.Base;
 using BH.Engine.Reflection;
 using BH.oM.Geometry;
-using ExcelDna.Integration;
 
 namespace BH.UI.Dragon
 {
@@ -65,7 +64,7 @@ namespace BH.UI.Dragon
         }
 
         /*****************************************************************/
-        public static bool SetPropertyHelper(this IObject obj, object[] propNames, object[] propValues, out string message)
+        public static bool SetPropertyHelper(this object obj, object[] propNames, object[] propValues, out string message)
         {
             message = "";
             for (int i = 0; i < propNames.Length; i++)
@@ -74,6 +73,8 @@ namespace BH.UI.Dragon
                     continue;
 
                 object val = propValues[i].CheckAndGetObjectOrGeometry();
+                val = val is IExcelObject ? ((IExcelObject)val).InnerObject : val;
+
                 //Set the properties
                 if (!obj.SetPropertyValue(propNames[i] as string, val))
                 {
@@ -95,6 +96,9 @@ namespace BH.UI.Dragon
                     continue;
 
                 object val = propValues[i].CheckAndGetObjectOrGeometry();
+
+                val = val is IExcelObject ? ((IExcelObject)val).InnerObject : val;
+
                 //Set the properties
                 if (propNames[i] as string == "Name")
                 {
@@ -115,24 +119,24 @@ namespace BH.UI.Dragon
 
         /*****************************************************************/
 
-        public static bool SetPropertyHelper(this IBHoMGeometry obj, object[] propNames, object[] propValues, out string message)
-        {
-            message = "";
-            for (int i = 0; i < propNames.Length; i++)
-            {
-                if ((propNames[i] is ExcelMissing) || (propValues[i] is ExcelMissing))
-                    continue;
+        //public static bool SetPropertyHelper(this IBHoMGeometry obj, object[] propNames, object[] propValues, out string message)
+        //{
+        //    message = "";
+        //    for (int i = 0; i < propNames.Length; i++)
+        //    {
+        //        if ((propNames[i] is ExcelMissing) || (propValues[i] is ExcelMissing))
+        //            continue;
 
-                object val = propValues[i].CheckAndGetGeometry();
+        //        object val = propValues[i].CheckAndGetObjectOrGeometry();
 
-                if (!obj.SetPropertyValue(propNames[i] as string, val))
-                {
-                    message = propNames[i].ToString() + " is not a valid property for the type";
-                    return false;
-                }
-            }
-            return true;
-        }
+        //        if (!obj.SetPropertyValue(propNames[i] as string, val))
+        //        {
+        //            message = propNames[i].ToString() + " is not a valid property for the type";
+        //            return false;
+        //        }
+        //    }
+        //    return true;
+        //}
 
         /*****************************************************************/
 
