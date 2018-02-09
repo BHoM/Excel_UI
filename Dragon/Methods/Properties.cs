@@ -138,33 +138,49 @@ namespace BH.UI.Dragon
 
         [ExcelFunction(Description = "Get all properties from an object. WARNING This is an array formula and will take up more than one cell!", Category = "Dragon")]
         public static object Explode(
-                [ExcelArgument(Name = "object id")] string objectId,
+                [ExcelArgument(Name = "object ids")] object[] objectIds,
                  [ExcelArgument(Name = "Include the name of the properties")] bool includePropertyNames = false)
         {
             //Get the object
-            object obj = Project.ActiveProject.GetAny(objectId);
+            List<object> objs = objectIds.Select(x => Project.ActiveProject.GetAny(x as string)).ToList();
 
-            if (obj == null)
+            if (objs == null)
                 return "Failed to get object";
 
             //Get the property dictionary for the object
-            Dictionary<string, object> props;
-            if (obj is IExcelObject)
-                props = ((IExcelObject)obj).PropertyDictionary();
-            else
-                props = obj.PropertyDictionary();
-            
+            List<Dictionary<string, object>> props = new List<Dictionary<string, object>>();
+            foreach (object obj in objs)
+            {
+                if (obj is IExcelObject)
+                    props.Add(((IExcelObject)obj).PropertyDictionary());
+                else
+                    props.Add(obj.PropertyDictionary());
+            }
+
+            if (props.Count < 1)
+                return "Failed to get properties";
 
             if (includePropertyNames)
             {
                 //Create an 2d array to contain property names and values
-                object[,] outArr = new object[2, props.Count];
+                object[,] outArr = new object[props.Count +1 , props[0].Count];
                 int counter = 0;
-                foreach (KeyValuePair<string, object> kvp in props)
+
+                foreach (KeyValuePair<string, object> kvp in props[0])
                 {
                     outArr[0, counter] = kvp.Key;
                     outArr[1, counter] = kvp.Value.ReturnTypeHelper();
                     counter++;
+                }
+
+                for (int i = 1; i < props.Count; i++)
+                {
+                    counter = 0;
+                    foreach (KeyValuePair<string, object> kvp in props[i])
+                    {
+                        outArr[i+1, counter] = kvp.Value.ReturnTypeHelper();
+                        counter++;
+                    }
                 }
 
                 //Output the values as an array
@@ -173,12 +189,17 @@ namespace BH.UI.Dragon
             else
             {
                 //Create an object array to contain the property values
-                object[] outArr = new object[props.Count];
-                int counter = 0;
-                foreach (KeyValuePair<string, object> kvp in props)
+                object[,] outArr = new object[props.Count, props[0].Count];
+
+
+                for (int i = 0; i < props.Count; i++)
                 {
-                    outArr[counter] = kvp.Value.ReturnTypeHelper();
-                    counter++;
+                    int counter = 0;
+                    foreach (KeyValuePair<string, object> kvp in props[i])
+                    {
+                        outArr[i, counter] = kvp.Value.ReturnTypeHelper();
+                        counter++;
+                    }
                 }
 
                 return XlCall.Excel(XlCall.xlUDF, "Resize", outArr);

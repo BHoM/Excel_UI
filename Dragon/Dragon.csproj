@@ -72,6 +72,7 @@
     <Compile Include="Adapters\Adapter.cs" />
     <Compile Include="Adapters\Queries.cs" />
     <Compile Include="AddIn.cs" />
+    <Compile Include="ArrayResizer.cs" />
     <Compile Include="Constructors\CreateBHoM.cs" />
     <Compile Include="Constructors\CreateGeometry.cs" />
     <Compile Include="Constructors\CreateSpecial.cs" />
@@ -85,6 +86,7 @@
     <Compile Include="Objects\IExcelObject.cs" />
     <Compile Include="Project\Project.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="ReflectionExtra.cs" />
     <Compile Include="Structural\Loads\Loads.cs" />
     <Compile Include="Structural\Properties\SectionProperty.cs" />
   </ItemGroup>

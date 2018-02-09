@@ -136,22 +136,24 @@ namespace BH.UI.Dragon
 
         private static bool CheckMatch(ParameterInfo pInfo, object obj, out object match)
         {
+            //Check for empty cell
+            if (obj is ExcelMissing)
+            {
+                match = null;
+                return false;
+            }
+
+            //Get target parameter
             Type pType = pInfo.ParameterType;
+
+            //Get inner object from custom excel object
+            obj = obj is IExcelObject ? ((IExcelObject)obj).InnerObject : obj;
 
             //Check if same type
             if (pType == obj.GetType())
             {
                 match = obj;
                 return true;
-            }
-
-            if (obj is IExcelObject)
-            {
-                if (pType == (obj as IExcelObject).InnerObject.GetType())
-                {
-                    match = (obj as IExcelObject).InnerObject;
-                    return true;
-                }
             }
 
             //Check for string
