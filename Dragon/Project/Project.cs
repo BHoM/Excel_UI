@@ -62,10 +62,10 @@ namespace BH.UI.Dragon
         /**** Public methods            **********/
         /*****************************************/
 
-        public void AddObject(IObject obj)
+        public Guid AddObject(IObject obj)
         {
             if (m_objects.ContainsKey(obj.BHoM_Guid))
-                return;
+                return obj.BHoM_Guid;
 
             Guid guid = obj.BHoM_Guid;
             m_objects.Add(guid, obj);
@@ -86,6 +86,7 @@ namespace BH.UI.Dragon
                     AddObject(kvp.Value as BHoMObject);
                 }
             }
+            return obj.BHoM_Guid;
         }
 
         /*****************************************/
