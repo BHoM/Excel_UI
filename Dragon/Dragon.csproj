@@ -71,7 +71,9 @@
   <ItemGroup>
     <Compile Include="Adapters\Adapter.cs" />
     <Compile Include="Adapters\Queries.cs" />
-    <Compile Include="AddIn.cs" />
+    <Compile Include="Addin\AddIn.cs" />
+    <Compile Include="Addin\ConvertExpressions.cs" />
+    <Compile Include="Addin\Registrations.cs" />
     <Compile Include="ArrayResizer.cs" />
     <Compile Include="Constructors\CreateBHoM.cs" />
     <Compile Include="Constructors\CreateGeometry.cs" />
