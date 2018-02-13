@@ -22,6 +22,11 @@ namespace BH.UI.Dragon
         {
             LoadBHomAssemblies();
             RegisterBHoMMethods();
+            //ExcelDna.Logging.LogDisplay.Clear();
+            
+            //Hide error box showing methods not working properly
+            if(!Config.ShowExcelDNALog)
+                ExcelDna.Logging.LogDisplay.Hide();
         }
 
         /*****************************************************************/
@@ -45,6 +50,7 @@ namespace BH.UI.Dragon
         private void RegisterBHoMMethods()
         {
             var conversionConfig = GetParameterConversionConfig();
+            var functionHandlerConfig = GetFunctionExecutionHandlerConfig();
 
             //List<string> toLoad = new List<string>() { "BHoM_Engine", "Structure_Engine", "Geometry_Engine", "Aucoustics_Engine" };
             List<string> toNotLoad = new List<string>() { "Rhinoceros_Engine", "GSA_Engine", "Reflection_Engine", "Mongo_Engine", "Robot_Engine" };
@@ -54,15 +60,17 @@ namespace BH.UI.Dragon
             Type adapterType = typeof(BHoMAdapter);
             List<ConstructorInfo> adapterConstructors = Query.AdapterTypeList().Where(x => x.IsSubclassOf(adapterType)).SelectMany(x => x.GetConstructors()).ToList();
 
-            IEnumerable<ExcelFunctionRegistration> registrations = Registrations(list).Concat(Registrations(adapterConstructors, "Adapter."));
+            IEnumerable<ExcelFunctionRegistration> registrations = list.Registrations().Concat(adapterConstructors.Registrations("Adapter."));
 
-            //IEnumerable<ExcelFunctionRegistration>  registrations = Registrations(typeof(Tests).GetMethods().Where(x => x.IsStatic));
+            //IEnumerable<ExcelFunctionRegistration>  registrations = typeof(Tests).GetMethods().Where(x => x.IsStatic).Registrations();
 
             registrations
                 //.ProcessMapArrayFunctions(conversionConfig)
-                .ProcessParamsRegistrations()
                 .ProcessParameterConversions(conversionConfig)
-                .RegisterFunctions();
+                //.ProcessParamsRegistrations()
+                .ProcessFunctionExecutionHandlers(functionHandlerConfig)
+                
+                .RegisterBHFunctions();
         }
 
         /*****************************************************************/
@@ -93,8 +101,10 @@ namespace BH.UI.Dragon
             //           Type2 -> string
             //       
 
-            ParameterConversionConfiguration paramConversionConfig = new ParameterConversionConfiguration()
-                                .AddParameterConversion(ParameterConversions.GetOptionalConversion(treatEmptyAsMissing: true));
+            ParameterConversionConfiguration paramConversionConfig = new ParameterConversionConfiguration();
+            //                    .AddParameterConversion(ParameterConversions.GetOptionalConversion(treatEmptyAsMissing: true));
+
+
 
 
             //Add conversion config for valuetypes such as ints, doubles and obejcts as well as for lists of these types
@@ -117,6 +127,12 @@ namespace BH.UI.Dragon
                 .AddReturnConversion((Enum value) => value.ToString(), handleSubTypes: true)
                 .AddParameterConversion(ParameterConversions.GetEnumStringConversion());
 
+
+            // Register the Standard Parameter Conversions (with the optional switch on how to treat references to empty cells)
+            paramConversionConfig
+                .AddParameterConversion(ParameterConversions.GetOptionalConversion(treatEmptyAsMissing: true, treatNAErrorAsMissing: true));
+                //.AddParameterConversion(ParameterConversions.GetNullableConversion(treatEmptyAsMissing: true, treatNAErrorAsMissing: true));
+
             //.AddParameterConversion((object[] input) => new Complex(TypeConversion.ConvertToDouble(input[0]), TypeConversion.ConvertToDouble(input[1])))
             //.AddNullableConversion(treatEmptyAsMissing: true, treatNAErrorAsMissing: true);
 
@@ -128,9 +144,6 @@ namespace BH.UI.Dragon
 
         private static ParameterConversionConfiguration AddStandardInputConfigurations(ParameterConversionConfiguration paramConversionConfig)
         {
-
-            // Register the Standard Parameter Conversions (with the optional switch on how to treat references to empty cells)
-            paramConversionConfig.AddParameterConversion(ParameterConversions.GetOptionalConversion(treatEmptyAsMissing: true));
 
             //Conversions for standard inputs
             paramConversionConfig.AddParameterConversion((object input) => Convert.ToInt32(input))
@@ -157,10 +170,10 @@ namespace BH.UI.Dragon
 
             //Some configurations for hwo to deal with lists of strings,ints,object and doubles
             paramConversionConfig
-                .AddReturnConversion((List<string> value) => Project.ActiveProject.AddObject(new ExcelList<string>() { Data = value }))
-                .AddReturnConversion((List<int> value) => Project.ActiveProject.AddObject(new ExcelList<int>() { Data = value }))
-                .AddReturnConversion((List<object> value) => Project.ActiveProject.AddObject(new ExcelList<object>() { Data = value }))
-                .AddReturnConversion((List<double> value) => Project.ActiveProject.AddObject(new ExcelList<double>() { Data = value }));
+                .AddReturnConversion((List<string> value) => Project.ActiveProject.AddBHoM(new ExcelList<string>() { Data = value }))
+                .AddReturnConversion((List<int> value) => Project.ActiveProject.AddBHoM(new ExcelList<int>() { Data = value }))
+                .AddReturnConversion((List<object> value) => Project.ActiveProject.AddBHoM(new ExcelList<object>() { Data = value }))
+                .AddReturnConversion((List<double> value) => Project.ActiveProject.AddBHoM(new ExcelList<double>() { Data = value }));
 
 
             return paramConversionConfig;
@@ -172,7 +185,7 @@ namespace BH.UI.Dragon
         {
 
             //Register IObject and IBHoMGeometry
-            paramConversionConfig.AddParameterConversion((Guid value) => Project.ActiveProject.GetObject(value))
+            paramConversionConfig.AddParameterConversion((Guid value) => Project.ActiveProject.GetBHoM(value))
             .AddParameterConversion((Guid value) => Project.ActiveProject.GetGeometry(value));
 
 
@@ -221,12 +234,12 @@ namespace BH.UI.Dragon
             paramConversionConfig
 
                 // Register some type conversions for simple lists)        
-                .AddParameterConversion((Guid value) => ((ExcelList<string>)Project.ActiveProject.GetObject(value)).Data)
-                .AddParameterConversion((Guid value) => ((ExcelList<object>)Project.ActiveProject.GetObject(value)).Data)
-                .AddParameterConversion((Guid value) => ((ExcelList<int>)Project.ActiveProject.GetObject(value)).Data)
-                .AddParameterConversion((Guid value) => ((ExcelList<double>)Project.ActiveProject.GetObject(value)).Data)
+                .AddParameterConversion((Guid value) => (value == Guid.Empty ? null :(ExcelList<string>)Project.ActiveProject.GetBHoM(value)).Data)
+                .AddParameterConversion((Guid value) => (value == Guid.Empty ? null : (ExcelList<object>)Project.ActiveProject.GetBHoM(value)).Data)
+                .AddParameterConversion((Guid value) => (value == Guid.Empty ? null : (ExcelList<int>)Project.ActiveProject.GetBHoM(value)).Data)
+                .AddParameterConversion((Guid value) => (value == Guid.Empty ? null : (ExcelList<double>)Project.ActiveProject.GetBHoM(value)).Data)
                 //Register type conversion from string to Guid. Needs to happend after all the bhOMtypes have been registered
-                .AddParameterConversion((string value) => Guid.Parse(value));
+                .AddParameterConversion((string value) => value == null ? Guid.Empty : Guid.Parse(value));
 
             return paramConversionConfig;
         }
@@ -247,7 +260,7 @@ namespace BH.UI.Dragon
 
             //Register type coversions for all IObjects from guid to BHoMObjects
             paramConversionConfig
-                .AddReturnConversion((IObject value) => Project.ActiveProject.AddObject(value), true)
+                .AddReturnConversion((IObject value) => Project.ActiveProject.AddBHoM(value), true)
                 .AddReturnConversion((IBHoMGeometry value) => Project.ActiveProject.AddGeometry(value), true);
 
             //Register type coversions for all bhom objects from guid to BHoMObjects
@@ -305,6 +318,15 @@ namespace BH.UI.Dragon
 
 
         /***************************************************/
+
+        static FunctionExecutionConfiguration GetFunctionExecutionHandlerConfig()
+        {
+            return new FunctionExecutionConfiguration()
+                .AddFunctionExecutionHandler(DragonFunctionExecutionHandler.LoggingHandlerSelector);
+        }
+
+        /***************************************************/
+
         public void AutoClose()
         {
         }

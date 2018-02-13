@@ -39,7 +39,7 @@ namespace BH.UI.Dragon
             if (obj is string && Guid.TryParse(obj as string, out guid))
             {
                 //Get out object or geometry
-                return Project.ActiveProject.GetObject(guid);
+                return Project.ActiveProject.GetBHoM(guid);
             }
             else
             {
@@ -147,7 +147,7 @@ namespace BH.UI.Dragon
             else if (obj is IObject)
             {
                 IObject iObj = (IObject)obj;
-                Project.ActiveProject.AddObject(iObj);
+                Project.ActiveProject.AddBHoM(iObj);
                 return iObj.BHoM_Guid.ToString();
             }
             else if (obj is IBHoMGeometry)

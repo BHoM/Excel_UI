@@ -41,6 +41,10 @@
       <HintPath>..\packages\ExcelDna.Integration.0.34.6\lib\ExcelDna.Integration.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="ExcelDna.IntelliSense, Version=1.0.5.38759, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelDna.IntelliSense.1.0.6\lib\net40\ExcelDna.IntelliSense.dll</HintPath>
+      <Private>True</Private>
+    </Reference>
     <Reference Include="ExcelDna.Registration, Version=0.34.6455.41786, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ExcelDna.Registration.0.34.7\lib\net40\ExcelDna.Registration.dll</HintPath>
       <Private>True</Private>
@@ -49,7 +53,8 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\Mongo_Toolkit\Build\Mongo_Adapter.dll</HintPath>
     </Reference>
-    <Reference Include="Reflection_Engine">
+    <Reference Include="Reflection_Engine, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\BHoM_Engine\Build\Reflection_Engine.dll</HintPath>
     </Reference>
     <Reference Include="Serialiser_Engine, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -73,9 +78,11 @@
     <Compile Include="Adapters\Queries.cs" />
     <Compile Include="Addin\AddIn.cs" />
     <Compile Include="Addin\ConvertExpressions.cs" />
+    <Compile Include="Addin\DragonFunctionExecutionHandler.cs" />
     <Compile Include="Addin\Registrations.cs" />
     <Compile Include="Addin\Tests.cs" />
     <Compile Include="ArrayResizer.cs" />
+    <Compile Include="Config.cs" />
     <Compile Include="Constructors\CreateBHoM.cs" />
     <Compile Include="Constructors\CreateGeometry.cs" />
     <Compile Include="Constructors\CreateSpecial.cs" />
