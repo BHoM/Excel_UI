@@ -54,9 +54,13 @@ namespace BH.UI.Dragon
             Type adapterType = typeof(BHoMAdapter);
             List<ConstructorInfo> adapterConstructors = Query.AdapterTypeList().Where(x => x.IsSubclassOf(adapterType)).SelectMany(x => x.GetConstructors()).ToList();
 
+            IEnumerable<ExcelFunctionRegistration> registrations = Registrations(list).Concat(Registrations(adapterConstructors, "Adapter."));
 
-            Registrations(list).Concat(Registrations(adapterConstructors, "Adapter."))
+            //IEnumerable<ExcelFunctionRegistration>  registrations = Registrations(typeof(Tests).GetMethods().Where(x => x.IsStatic));
+
+            registrations
                 //.ProcessMapArrayFunctions(conversionConfig)
+                .ProcessParamsRegistrations()
                 .ProcessParameterConversions(conversionConfig)
                 .RegisterFunctions();
         }
@@ -89,7 +93,9 @@ namespace BH.UI.Dragon
             //           Type2 -> string
             //       
 
-            ParameterConversionConfiguration paramConversionConfig = new ParameterConversionConfiguration();
+            ParameterConversionConfiguration paramConversionConfig = new ParameterConversionConfiguration()
+                                .AddParameterConversion(ParameterConversions.GetOptionalConversion(treatEmptyAsMissing: true));
+
 
             //Add conversion config for valuetypes such as ints, doubles and obejcts as well as for lists of these types
             paramConversionConfig = AddStandardInputConfigurations(paramConversionConfig);
@@ -109,10 +115,10 @@ namespace BH.UI.Dragon
             paramConversionConfig
                 // This is a pair of very generic conversions for Enum types
                 .AddReturnConversion((Enum value) => value.ToString(), handleSubTypes: true)
-                .AddParameterConversion(ParameterConversions.GetEnumStringConversion())
+                .AddParameterConversion(ParameterConversions.GetEnumStringConversion());
 
             //.AddParameterConversion((object[] input) => new Complex(TypeConversion.ConvertToDouble(input[0]), TypeConversion.ConvertToDouble(input[1])))
-            .AddNullableConversion(treatEmptyAsMissing: true, treatNAErrorAsMissing: true);
+            //.AddNullableConversion(treatEmptyAsMissing: true, treatNAErrorAsMissing: true);
 
             return paramConversionConfig;
         }
