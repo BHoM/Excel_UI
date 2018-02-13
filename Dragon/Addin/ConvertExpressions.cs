@@ -15,16 +15,16 @@ namespace BH.UI.Dragon
         /*****************************************************************/
         /******* Converter expressions                      **************/
         /*****************************************************************/
-        public static Expression<Func<Guid, T>> GuidToBHom<T>() where T : IObject
+        public static Expression<Func<Guid, T>> GuidToBHom<T>() where T : class, IObject
         {
-            return x => (T)Project.ActiveProject.GetObject(x);
+            return x => x == Guid.Empty ? null : (T)Project.ActiveProject.GetBHoM(x);
         }
 
         /*****************************************************************/
 
         public static Expression<Func<T, Guid>> BHoMToGuid<T>() where T : IObject
         {
-            return x => Project.ActiveProject.AddObject(x);
+            return x => Project.ActiveProject.AddBHoM(x);
         }
 
         /*****************************************************************/
@@ -43,9 +43,9 @@ namespace BH.UI.Dragon
 
         /*****************************************************************/
 
-        public static Expression<Func<Guid, T>> GuidToGeom<T>() where T : IBHoMGeometry
+        public static Expression<Func<Guid, T>> GuidToGeom<T>() where T :class, IBHoMGeometry
         {
-            return x => (T)Project.ActiveProject.GetGeometry(x);
+            return x => x == Guid.Empty ? null : (T)Project.ActiveProject.GetGeometry(x);
         }
 
         /*****************************************************************/
@@ -59,7 +59,7 @@ namespace BH.UI.Dragon
 
         public static Expression<Func<object[], List<T>>> ArrayToObjectList<T>() where T : IObject
         {
-            return x => x.Select(y => (T)Project.ActiveProject.GetObject(y as string)).ToList();
+            return x => x.Select(y => (T)Project.ActiveProject.GetBHoM(y as string)).ToList();
         }
 
         /*****************************************************************/
@@ -73,14 +73,14 @@ namespace BH.UI.Dragon
 
         public static Expression<Func<List<T>, Guid>> ListToGuid<T>()
         {
-            return x => Project.ActiveProject.AddObject(new ExcelList<T>() { Data = x });
+            return x => Project.ActiveProject.AddBHoM(new ExcelList<T>() { Data = x });
         }
 
         /*****************************************************************/
 
         public static Expression<Func<IEnumerable<T>, Guid>> IEnumerableToGuid<T>()
         {
-            return x => Project.ActiveProject.AddObject(new ExcelList<T>() { Data = x.ToList() });
+            return x => Project.ActiveProject.AddBHoM(new ExcelList<T>() { Data = x.ToList() });
         }
 
         /*****************************************************************/
@@ -93,14 +93,14 @@ namespace BH.UI.Dragon
         /*****************************************************************/
         public static Expression<Func<Guid, BHoMGroup<T>>> GuidToBHoMGroup<T>() where T : IObject
         {
-            return x => (BHoMGroup<T>)Project.ActiveProject.GetObject(x);
+            return x => (BHoMGroup<T>)Project.ActiveProject.GetBHoM(x);
         }
 
         /*****************************************************************/
 
         public static Expression<Func<BHoMGroup<T>, Guid>> BHoMGroupToGuid<T>() where T : IObject
         {
-            return x => Project.ActiveProject.AddObject(x);
+            return x => Project.ActiveProject.AddBHoM(x);
         }
 
         /*****************************************************************/

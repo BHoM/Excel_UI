@@ -107,7 +107,7 @@ namespace BH.UI.Dragon.Adapter
                 Guid guid;
                 if (obj is string && Guid.TryParse(obj as string, out guid))
                 {
-                    IObject iOb = Project.ActiveProject.GetObject(guid);
+                    IObject iOb = Project.ActiveProject.GetBHoM(guid);
                     if (iOb != null)
                         iObjs.Add(iOb);
                 }

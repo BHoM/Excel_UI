@@ -49,7 +49,7 @@ namespace BH.UI.Dragon
             [ExcelArgument(Name = "property value")] object[] propValues)
         {
 
-            IObject obj = Project.ActiveProject.GetObject(objectId);
+            IObject obj = Project.ActiveProject.GetBHoM(objectId);
 
             if (obj == null)
                 return "Failed to get BHoMObject";
@@ -61,7 +61,7 @@ namespace BH.UI.Dragon
             if (!InOutHelp.SetPropertyHelper(clone, propNames, propValues, out message))
                 return message;
 
-            Project.ActiveProject.AddObject(clone);
+            Project.ActiveProject.AddBHoM(clone);
             return clone.BHoM_Guid.ToString();
         }
 
@@ -74,7 +74,7 @@ namespace BH.UI.Dragon
             [ExcelArgument(Name = "property value")] object[] propValues)
         {
 
-            IObject obj = Project.ActiveProject.GetObject(objectId);
+            IObject obj = Project.ActiveProject.GetBHoM(objectId);
 
             if (obj == null)
                 return "Failed to get BHoMObject";
@@ -86,7 +86,7 @@ namespace BH.UI.Dragon
             if (!InOutHelp.SetPropertyHelper(clone, propName, propValues, out message))
                 return message;
 
-            Project.ActiveProject.AddObject(clone);
+            Project.ActiveProject.AddBHoM(clone);
             return clone.BHoM_Guid.ToString();
         }
 
@@ -98,12 +98,12 @@ namespace BH.UI.Dragon
             [ExcelArgument(Name = "Custom data key")] string key,
             [ExcelArgument(Name = "Custom data value")] object val)
         {
-            IObject oblObj = Project.ActiveProject.GetObject(objectId);
+            IObject oblObj = Project.ActiveProject.GetBHoM(objectId);
             IObject newObj = oblObj.GetShallowClone(true);
 
             newObj.CustomData[key] = val;
 
-            Project.ActiveProject.AddObject(newObj);
+            Project.ActiveProject.AddBHoM(newObj);
             return newObj.BHoM_Guid.ToString();
         }
 
@@ -114,7 +114,7 @@ namespace BH.UI.Dragon
             [ExcelArgument(Name = "object id")] string objectId,
             [ExcelArgument(Name = "Custom data key")] string key)
         {
-            IObject obj = Project.ActiveProject.GetObject(objectId);
+            IObject obj = Project.ActiveProject.GetBHoM(objectId);
 
             object val;
             if (!obj.CustomData.TryGetValue(key, out val))
