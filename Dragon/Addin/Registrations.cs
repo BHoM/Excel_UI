@@ -109,7 +109,9 @@ namespace BH.UI.Dragon
 
             IEnumerable<ExcelParameterRegistration> parameterRegistrations = method.GetParameters().Select(pi => new ExcelParameterRegistration(pi)).ToList();
 
-            return new ExcelFunctionRegistration(lambda, functionAttribute, parameterRegistrations);
+            ExcelFunctionRegistration funcReg = new ExcelFunctionRegistration(lambda, functionAttribute, parameterRegistrations);
+            funcReg.ReturnRegistration.CustomAttributes.AddRange(GetCustomReturnAttributes(method as dynamic));
+            return funcReg;
         }
 
         /*****************************************************************/
@@ -124,6 +126,21 @@ namespace BH.UI.Dragon
         {
             NewExpression expression = Expression.New(info, paramExpres);
             return Expression.Lambda(expression, name, paramExpres);
+        }
+
+        /*****************************************************************/
+
+        private static object[] GetCustomReturnAttributes(MethodInfo info)
+        {
+            return info.ReturnParameter.GetCustomAttributes(true);
+        }
+
+        /*****************************************************************/
+
+        private static object[] GetCustomReturnAttributes(ConstructorInfo info)
+        {
+            //TODO: figure out what to return here
+            return new object[] { };
         }
 
         /*****************************************************************/

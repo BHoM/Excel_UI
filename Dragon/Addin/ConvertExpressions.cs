@@ -1,12 +1,7 @@
 ﻿using System;
-using System.IO;
-using System.Reflection;
 using System.Linq;
 using ExcelDna.Integration;
 using System.Collections.Generic;
-using System.Collections;
-using BH.Engine.Reflection;
-using ExcelDna.Registration;
 using BH.oM.Base;
 using BH.oM.Geometry;
 using System.Linq.Expressions;
