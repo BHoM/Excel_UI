@@ -20,10 +20,8 @@ namespace BH.UI.Dragon
         /**** Data fields               **********/
         /*****************************************/
 
-        private Dictionary<Guid, IObject> m_objects;
-        private Dictionary<Guid, IBHoMGeometry> m_geometry;
-        private Dictionary<Guid, BHoMAdapter> m_adapters;
-        private Dictionary<Guid, IQuery> m_queries;
+        private Dictionary<Guid, object> m_objects;
+
 
         /*****************************************/
         /**** Static singleton instance **********/
@@ -37,10 +35,7 @@ namespace BH.UI.Dragon
 
         private Project()
         {
-            m_objects = new Dictionary<Guid, IObject>();
-            m_geometry = new Dictionary<Guid, IBHoMGeometry>();
-            m_adapters = new Dictionary<Guid, BHoMAdapter>();
-            m_queries = new Dictionary<Guid, IQuery>();
+            m_objects = new Dictionary<Guid, object>();
         }
 
         /*****************************************/
@@ -62,7 +57,7 @@ namespace BH.UI.Dragon
         /**** Public methods            **********/
         /*****************************************/
 
-        public Guid AddObject(IObject obj)
+        public Guid AddBHoM(IObject obj)
         {
             if (m_objects.ContainsKey(obj.BHoM_Guid))
                 return obj.BHoM_Guid;
@@ -75,7 +70,7 @@ namespace BH.UI.Dragon
             {
                 if (o is BHoMObject)
                 {
-                    AddObject(o as BHoMObject);
+                    AddBHoM(o as BHoMObject);
                 }
             }
             //Add all objects in the custom data
@@ -83,7 +78,7 @@ namespace BH.UI.Dragon
             {
                 if (kvp.Value is BHoMObject)
                 {
-                    AddObject(kvp.Value as BHoMObject);
+                    AddBHoM(kvp.Value as BHoMObject);
                 }
             }
             return obj.BHoM_Guid;
@@ -91,21 +86,21 @@ namespace BH.UI.Dragon
 
         /*****************************************/
 
-        public IObject GetObject(Guid guid)
+        public IObject GetBHoM(Guid guid)
         {
-            IObject obj;
+            object obj;
             if (m_objects.TryGetValue(guid, out obj))
-                return obj;
+                return (IObject)obj;
             else
                 return null;
         }
 
         /*****************************************/
 
-        public IObject GetObject(string str)
+        public IObject GetBHoM(string str)
         {
             Guid guid;
-            return Guid.TryParse(str, out guid) ? GetObject(guid) : null;
+            return Guid.TryParse(str, out guid) ? GetBHoM(guid) : null;
         }
 
         /*****************************************/
@@ -113,7 +108,7 @@ namespace BH.UI.Dragon
         public Guid AddGeometry(IBHoMGeometry geom)
         {
             Guid guid = Guid.NewGuid();
-            m_geometry[guid] = geom;
+            m_objects[guid] = geom;
             return guid;
         }
 
@@ -121,9 +116,9 @@ namespace BH.UI.Dragon
 
         public IBHoMGeometry GetGeometry(Guid guid)
         {
-            IBHoMGeometry obj;
-            if (m_geometry.TryGetValue(guid, out obj))
-                return obj;
+            object obj;
+            if (m_objects.TryGetValue(guid, out obj))
+                return (IBHoMGeometry)obj;
             else
                 return null;
         }
@@ -140,12 +135,9 @@ namespace BH.UI.Dragon
 
         public object GetAny(Guid guid)
         {
-            IObject obj;
-            IBHoMGeometry geom;
+            object obj;
             if (m_objects.TryGetValue(guid, out obj))
                 return obj;
-            else if (m_geometry.TryGetValue(guid, out geom))
-                return geom;
             else
                 return null;
         }
@@ -162,10 +154,10 @@ namespace BH.UI.Dragon
 
         public Guid AddAdapter(BHoMAdapter adapter)
         {
-            if (m_adapters.ContainsKey(adapter.BHoM_Guid))
+            if (m_objects.ContainsKey(adapter.BHoM_Guid))
                 return adapter.BHoM_Guid;
 
-            m_adapters[adapter.BHoM_Guid] = adapter;
+            m_objects[adapter.BHoM_Guid] = adapter;
             return adapter.BHoM_Guid;
         }
 
@@ -173,9 +165,9 @@ namespace BH.UI.Dragon
 
         public BHoMAdapter GetAdapter(Guid guid)
         {
-            BHoMAdapter obj;
-            if (m_adapters.TryGetValue(guid, out obj))
-                return obj;
+            object obj;
+            if (m_objects.TryGetValue(guid, out obj))
+                return (BHoMAdapter)obj;
             else
                 return null;
         }
@@ -194,7 +186,7 @@ namespace BH.UI.Dragon
         public Guid AddQuery(IQuery query)
         {
             Guid guid = Guid.NewGuid();
-            m_queries[guid] = query;
+            m_objects[guid] = query;
             return guid;
         }
 
@@ -202,9 +194,9 @@ namespace BH.UI.Dragon
 
         public IQuery GetQuery(Guid guid)
         {
-            IQuery obj;
-            if (m_queries.TryGetValue(guid, out obj))
-                return obj;
+            object obj;
+            if (m_objects.TryGetValue(guid, out obj))
+                return (IQuery)obj;
             else
                 return null;
         }

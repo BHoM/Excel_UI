@@ -15,12 +15,45 @@ using BH.Adapter;
 
 namespace BH.UI.Dragon
 {
-    public partial class AddIn : IExcelAddIn
+    public static class Registration
     {
+
+        /*****************************************************************/
+
+        /// <summary>
+        /// Registers the given functions with Excel-DNA.
+        /// </summary>
+        /// <param name="registrationEntries"></param>
+        public static void RegisterBHFunctions(this IEnumerable<ExcelFunctionRegistration> registrationEntries)
+        {
+            var delList = new List<Delegate>();
+            var attList = new List<object>();
+            var argAttList = new List<List<object>>();
+            foreach (var entry in registrationEntries)
+            {
+                try
+                {
+                    var del = entry.FunctionLambda.Compile();
+                    var att = entry.FunctionAttribute;
+                    var argAtt = new List<object>(entry.ParameterRegistrations.Select(pr => pr.ArgumentAttribute));
+
+                    delList.Add(del);
+                    attList.Add(att);
+                    argAttList.Add(argAtt);
+                }
+                catch (Exception ex)
+                {
+                    //Logging.LogDisplay.WriteLine("Exception while registering method {0} - {1}", entry.FunctionAttribute.Name, ex.ToString());
+                }
+            }
+
+            ExcelIntegration.RegisterDelegates(delList, attList, argAttList);
+        }
+
         /*****************************************************************/
 
         //Creates a function registratiosn for excel from a list of methods
-        private static List<ExcelFunctionRegistration> Registrations(IEnumerable<MethodBase> methods, string prefix = "BH.")
+        public static List<ExcelFunctionRegistration> Registrations(this IEnumerable<MethodBase> methods, string prefix = "BH.")
         {
 
             List<ExcelFunctionRegistration> regs = new List<ExcelFunctionRegistration>();

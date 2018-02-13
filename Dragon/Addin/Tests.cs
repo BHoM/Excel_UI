@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using BH.oM.Structural.Loads;
 using BH.oM.Structural.Elements;
 using BH.oM.Geometry;
+using BH.oM.Structural.Properties;
 
 namespace BH.UI.Dragon
 {

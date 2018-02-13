@@ -68,7 +68,7 @@ namespace BH.UI.Dragon
                     add.Invoke(data, new object[] { item });
                 }
 
-                Project.ActiveProject.AddObject(exlist as IObject);
+                Project.ActiveProject.AddBHoM(exlist as IObject);
                 return (exlist as IObject).BHoM_Guid.ToString();
             }
             else
@@ -77,7 +77,7 @@ namespace BH.UI.Dragon
 
                 list.Data = objects;
 
-                Project.ActiveProject.AddObject(list);
+                Project.ActiveProject.AddBHoM(list);
                 return list.BHoM_Guid.ToString();
             }
 
@@ -106,7 +106,7 @@ namespace BH.UI.Dragon
             var specificType = type.MakeGenericType(t1, t2);
             var exTuple = Activator.CreateInstance(specificType, item1, item2);
 
-            Project.ActiveProject.AddObject(exTuple as IObject);
+            Project.ActiveProject.AddBHoM(exTuple as IObject);
             return (exTuple as IObject).BHoM_Guid.ToString();
         }
 
