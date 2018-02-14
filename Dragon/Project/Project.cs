@@ -54,36 +54,7 @@ namespace BH.UI.Dragon
         }
 
         /*****************************************/
-        /**** Public methods            **********/
-        /*****************************************/
-
-        public Guid AddBHoM(IObject obj)
-        {
-            if (m_objects.ContainsKey(obj.BHoM_Guid))
-                return obj.BHoM_Guid;
-
-            Guid guid = obj.BHoM_Guid;
-            m_objects.Add(guid, obj);
-
-            //Recurively add the objects dependecies
-            foreach (object o in obj.PropertyObjects())
-            {
-                if (o is BHoMObject)
-                {
-                    AddBHoM(o as BHoMObject);
-                }
-            }
-            //Add all objects in the custom data
-            foreach (KeyValuePair<string, object> kvp in obj.CustomData)
-            {
-                if (kvp.Value is BHoMObject)
-                {
-                    AddBHoM(kvp.Value as BHoMObject);
-                }
-            }
-            return obj.BHoM_Guid;
-        }
-
+        /**** Public get methods        **********/
         /*****************************************/
 
         public IObject GetBHoM(Guid guid)
@@ -101,15 +72,6 @@ namespace BH.UI.Dragon
         {
             Guid guid;
             return Guid.TryParse(str, out guid) ? GetBHoM(guid) : null;
-        }
-
-        /*****************************************/
-
-        public Guid AddGeometry(IBHoMGeometry geom)
-        {
-            Guid guid = Guid.NewGuid();
-            m_objects[guid] = geom;
-            return guid;
         }
 
         /*****************************************/
@@ -152,17 +114,6 @@ namespace BH.UI.Dragon
 
         /*****************************************/
 
-        public Guid AddAdapter(BHoMAdapter adapter)
-        {
-            if (m_objects.ContainsKey(adapter.BHoM_Guid))
-                return adapter.BHoM_Guid;
-
-            m_objects[adapter.BHoM_Guid] = adapter;
-            return adapter.BHoM_Guid;
-        }
-
-        /*****************************************/
-
         public BHoMAdapter GetAdapter(Guid guid)
         {
             object obj;
@@ -182,16 +133,6 @@ namespace BH.UI.Dragon
 
         /*****************************************/
 
-
-        public Guid AddQuery(IQuery query)
-        {
-            Guid guid = Guid.NewGuid();
-            m_objects[guid] = query;
-            return guid;
-        }
-
-        /*****************************************/
-
         public IQuery GetQuery(Guid guid)
         {
             object obj;
@@ -207,6 +148,94 @@ namespace BH.UI.Dragon
         {
             Guid guid;
             return Guid.TryParse(str, out guid) ? GetQuery(guid) : null;
+        }
+
+        /*****************************************/
+        /****** "Interface" Add method     *******/
+        /*****************************************/
+        public Guid IAdd(object obj)
+        {
+            return Add(obj as dynamic);
+        }
+
+        /*****************************************/
+        /***** Add methods             ***********/
+        /*****************************************/
+
+        public Guid Add(IObject obj)
+        {
+            if (m_objects.ContainsKey(obj.BHoM_Guid))
+                return obj.BHoM_Guid;
+
+            Guid guid = obj.BHoM_Guid;
+            m_objects.Add(guid, obj);
+
+            //Recurively add the objects dependecies
+            foreach (object o in obj.PropertyObjects())
+            {
+                if (o is BHoMObject)
+                {
+                    Add(o as BHoMObject);
+                }
+            }
+            //Add all objects in the custom data
+            foreach (KeyValuePair<string, object> kvp in obj.CustomData)
+            {
+                if (kvp.Value is BHoMObject)
+                {
+                    Add(kvp.Value as BHoMObject);
+                }
+            }
+            return obj.BHoM_Guid;
+        }
+
+        /*****************************************/
+
+        public Guid Add(BHoMAdapter adapter)
+        {
+            if (m_objects.ContainsKey(adapter.BHoM_Guid))
+                return adapter.BHoM_Guid;
+
+            m_objects[adapter.BHoM_Guid] = adapter;
+            return adapter.BHoM_Guid;
+        }
+
+        /*****************************************/
+
+        public Guid Add(IExcelObject excelObj)
+        {
+            if (m_objects.ContainsKey(excelObj.BHoM_Guid))
+                return excelObj.BHoM_Guid;
+
+            m_objects[excelObj.BHoM_Guid] = excelObj;
+            return excelObj.BHoM_Guid;
+        }
+
+        /*****************************************/
+
+        public Guid Add(IQuery query)
+        {
+            Guid guid = Guid.NewGuid();
+            m_objects[guid] = query;
+            return guid;
+        }
+
+        /*****************************************/
+
+        public Guid Add(IBHoMGeometry geom)
+        {
+            Guid guid = Guid.NewGuid();
+            m_objects[guid] = geom;
+            return guid;
+        }
+
+        /*****************************************/
+
+        private Guid Add(object obj)
+        {
+            Guid guid = Guid.NewGuid();
+            m_objects[guid] = obj;
+            return guid;
         }
 
         /*****************************************/

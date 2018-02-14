@@ -55,7 +55,7 @@ namespace BH.UI.Dragon.Adapters
 
             FilterQuery query = new FilterQuery() { Tag = tag, Type = type, Equalities = equalities };
 
-            return Project.ActiveProject.AddQuery(query).ToString();
+            return Project.ActiveProject.Add(query).ToString();
         }
 
         /*****************************************************************/

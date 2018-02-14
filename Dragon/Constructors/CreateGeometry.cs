@@ -34,8 +34,8 @@ namespace BH.UI.Dragon
             if (!InOutHelp.SetPropertyHelper(geom, propNames, propValues, out message))
                 return message;
 
-            Project.ActiveProject.AddGeometry(geom);
-            return Project.ActiveProject.AddGeometry(geom).ToString();
+            Project.ActiveProject.Add(geom);
+            return Project.ActiveProject.Add(geom).ToString();
         }
     }
 }

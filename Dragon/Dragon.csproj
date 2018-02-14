@@ -91,6 +91,7 @@
     <Compile Include="Methods\GenericMethodCall.cs" />
     <Compile Include="Methods\JSON.cs" />
     <Compile Include="Methods\Properties.cs" />
+    <Compile Include="Objects\ExcelDictionary.cs" />
     <Compile Include="Objects\ExcelList.cs" />
     <Compile Include="Objects\ExcelTuple.cs" />
     <Compile Include="Objects\IExcelObject.cs" />

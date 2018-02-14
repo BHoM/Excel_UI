@@ -1,22 +1,20 @@
 ﻿using System;
 using System.Collections.Generic;
+using BH.oM.Base;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BH.oM.Base;
 
 namespace BH.UI.Dragon
 {
-
-    //Class used to store objects in a tuple
-    public class ExcelTuple<T1,T2> :  IExcelObject
+    public class ExcelDictionary<TKey,TValue> : IExcelObject
     {
 
         /*****************************************************************/
         /******* Public properties                          **************/
         /*****************************************************************/
 
-        public Tuple<T1, T2> Data { get; set; } = null;
+        public Dictionary<TKey,TValue> Data { get; set; } = new Dictionary<TKey, TValue>();
 
         /*****************************************************************/
         public Guid BHoM_Guid { get; set; } = Guid.NewGuid();
@@ -24,15 +22,6 @@ namespace BH.UI.Dragon
         /*****************************************************************/
 
         public object InnerObject { get { return Data; } }
-
-        /*****************************************************************/
-        /******* Constructors                               **************/
-        /*****************************************************************/
-
-        public ExcelTuple(T1 item1, T2 item2)
-        {
-            Data = new Tuple<T1, T2>(item1, item2);
-        }
 
         /*****************************************************************/
         /******* Public methods                          **************/
@@ -43,8 +32,10 @@ namespace BH.UI.Dragon
         {
             Dictionary<string, object> props = new Dictionary<string, object>();
 
-            props["Item1"] = Data.Item1;
-            props["Item2"] = Data.Item2;
+            foreach (KeyValuePair<TKey,TValue> kvp in Data)
+            {
+                props[kvp.Key.ToString()] = kvp.Value;
+            }
             return props;
         }
 
@@ -52,9 +43,10 @@ namespace BH.UI.Dragon
         /******* Casting                                    **************/
         /*****************************************************************/
 
-        public static implicit operator Tuple<T1,T2>(ExcelTuple<T1,T2> tuple)
+        public static implicit operator Dictionary<TKey,TValue>(ExcelDictionary<TKey,TValue> list)
         {
-            return tuple.Data;
+            return list.Data;
         }
     }
 }
+
