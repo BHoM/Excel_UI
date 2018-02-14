@@ -61,7 +61,7 @@ namespace BH.UI.Dragon
             if (!InOutHelp.SetPropertyHelper(clone, propNames, propValues, out message))
                 return message;
 
-            Project.ActiveProject.AddBHoM(clone);
+            Project.ActiveProject.Add(clone);
             return clone.BHoM_Guid.ToString();
         }
 
@@ -86,7 +86,7 @@ namespace BH.UI.Dragon
             if (!InOutHelp.SetPropertyHelper(clone, propName, propValues, out message))
                 return message;
 
-            Project.ActiveProject.AddBHoM(clone);
+            Project.ActiveProject.Add(clone);
             return clone.BHoM_Guid.ToString();
         }
 
@@ -103,7 +103,7 @@ namespace BH.UI.Dragon
 
             newObj.CustomData[key] = val;
 
-            Project.ActiveProject.AddBHoM(newObj);
+            Project.ActiveProject.Add(newObj);
             return newObj.BHoM_Guid.ToString();
         }
 
@@ -139,7 +139,8 @@ namespace BH.UI.Dragon
         [ExcelFunction(Description = "Get all properties from an object. WARNING This is an array formula and will take up more than one cell!", Category = "Dragon")]
         public static object Explode(
                 [ExcelArgument(Name = "object ids")] object[] objectIds,
-                 [ExcelArgument(Name = "Include the name of the properties")] bool includePropertyNames = false)
+                [ExcelArgument(Name = "Include the name of the properties")] bool includePropertyNames = false,
+                [ExcelArgument(Name = "Explode inner objects")] bool goDeep = false)
         {
             //Get the object
             List<object> objs = objectIds.Select(x => Project.ActiveProject.GetAny(x as string)).ToList();
@@ -148,14 +149,7 @@ namespace BH.UI.Dragon
                 return "Failed to get object";
 
             //Get the property dictionary for the object
-            List<Dictionary<string, object>> props = new List<Dictionary<string, object>>();
-            foreach (object obj in objs)
-            {
-                if (obj is IExcelObject)
-                    props.Add(((IExcelObject)obj).PropertyDictionary());
-                else
-                    props.Add(obj.PropertyDictionary());
-            }
+            List<Dictionary<string, object>> props = GetPropertyDictionaries(objs, goDeep);
 
             if (props.Count < 1)
                 return "Failed to get properties";
@@ -207,8 +201,62 @@ namespace BH.UI.Dragon
         }
 
         /*****************************************************************/
+        /******* Private methods                            **************/
+        /*****************************************************************/
+
+        private static List<Dictionary<string, object>> GetPropertyDictionaries(List<object> objs, bool goDeep = false)
+        {
+            //Get the property dictionary for the object
+            List<Dictionary<string, object>> props = new List<Dictionary<string, object>>();
+            foreach (object obj in objs)
+            {
+                Dictionary<string, object> dict = new Dictionary<string, object>();
+                GetPropertyDictionary(ref dict, obj, goDeep);
+
+                props.Add(dict);
+            }
+
+            return props;
+        }
 
 
-        
+        /*****************************************************************/
+
+        private static void GetPropertyDictionary(ref Dictionary<string,object> dict, object obj, bool goDeep = false, string parentType = "")
+        {
+            if (!goDeep)
+            {
+                if (obj is IExcelObject)
+                    dict = ((IExcelObject)obj).PropertyDictionary();
+                else
+                    dict = obj.PropertyDictionary();
+                return;
+            }
+            else
+            {
+                Dictionary<string, object> baseDict;
+
+                if (obj is IExcelObject)
+                    baseDict = ((IExcelObject)obj).PropertyDictionary();
+                else
+                    baseDict = obj.PropertyDictionary();
+
+                foreach (KeyValuePair<string,object> kvp in baseDict)
+                {
+                    object value = kvp.Value.ReturnTypeHelper();
+                    object innerObj = Project.ActiveProject.GetAny(value.ToString());
+
+                    if (innerObj == null || kvp.Key == "BHoM_Guid")
+                        dict[parentType + kvp.Key] = value;
+                    else
+                    {
+                        GetPropertyDictionary(ref dict, innerObj, true, parentType + kvp.Key + ": ");
+                    }
+                }
+            }
+        }
+
+        /*****************************************************************/
+
     }
 }

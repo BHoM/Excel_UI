@@ -17,6 +17,6 @@ namespace BH.UI.Dragon
     public static class Config
     {
         public const ErrorMessageHandling ErrorHandling = ErrorMessageHandling.ErrorValue;
-        public const bool ShowExcelDNALog = false;
+        public const bool ShowExcelDNALog = true;
     }
 }

@@ -22,7 +22,6 @@ namespace BH.UI.Dragon
         {
             LoadBHomAssemblies();
             RegisterBHoMMethods();
-            //ExcelDna.Logging.LogDisplay.Clear();
             
             //Hide error box showing methods not working properly
             if(!Config.ShowExcelDNALog)
@@ -65,18 +64,19 @@ namespace BH.UI.Dragon
             //IEnumerable<ExcelFunctionRegistration>  registrations = typeof(Tests).GetMethods().Where(x => x.IsStatic).Registrations();
 
             registrations
-                //.ProcessMapArrayFunctions(conversionConfig)
                 .ProcessParameterConversions(conversionConfig)
                 //.ProcessParamsRegistrations()
                 .ProcessFunctionExecutionHandlers(functionHandlerConfig)
                 
-                .RegisterBHFunctions();
+                .RegisterFunctions();
         }
 
         /*****************************************************************/
 
         static ParameterConversionConfiguration GetParameterConversionConfig()
         {
+            //Note below taken from the excel registration samples. The order in which the convert methods are added is very sensitive. Take greate care if modifying any of the below
+            //
             // NOTE: The parameter conversion list is processed once per parameter.
             //       Parameter conversions will apply from most inside, to most outside.
             //       So to apply a conversion chain like
@@ -123,7 +123,7 @@ namespace BH.UI.Dragon
             paramConversionConfig = AddStandardReturnConfigurations(paramConversionConfig);
 
             paramConversionConfig
-                // This is a pair of very generic conversions for Enum types
+                //Enum types using methods allready implemented in ExcelDNA.Registration for to and from string
                 .AddReturnConversion((Enum value) => value.ToString(), handleSubTypes: true)
                 .AddParameterConversion(ParameterConversions.GetEnumStringConversion());
 
@@ -133,8 +133,6 @@ namespace BH.UI.Dragon
                 .AddParameterConversion(ParameterConversions.GetOptionalConversion(treatEmptyAsMissing: true, treatNAErrorAsMissing: true));
                 //.AddParameterConversion(ParameterConversions.GetNullableConversion(treatEmptyAsMissing: true, treatNAErrorAsMissing: true));
 
-            //.AddParameterConversion((object[] input) => new Complex(TypeConversion.ConvertToDouble(input[0]), TypeConversion.ConvertToDouble(input[1])))
-            //.AddNullableConversion(treatEmptyAsMissing: true, treatNAErrorAsMissing: true);
 
             return paramConversionConfig;
         }
@@ -170,10 +168,10 @@ namespace BH.UI.Dragon
 
             //Some configurations for hwo to deal with lists of strings,ints,object and doubles
             paramConversionConfig
-                .AddReturnConversion((List<string> value) => Project.ActiveProject.AddBHoM(new ExcelList<string>() { Data = value }))
-                .AddReturnConversion((List<int> value) => Project.ActiveProject.AddBHoM(new ExcelList<int>() { Data = value }))
-                .AddReturnConversion((List<object> value) => Project.ActiveProject.AddBHoM(new ExcelList<object>() { Data = value }))
-                .AddReturnConversion((List<double> value) => Project.ActiveProject.AddBHoM(new ExcelList<double>() { Data = value }));
+                .AddReturnConversion((List<string> value) => Project.ActiveProject.Add(new ExcelList<string>() { Data = value }))
+                .AddReturnConversion((List<int> value) => Project.ActiveProject.Add(new ExcelList<int>() { Data = value }))
+                .AddReturnConversion((List<object> value) => Project.ActiveProject.Add(new ExcelList<object>() { Data = value }))
+                .AddReturnConversion((List<double> value) => Project.ActiveProject.Add(new ExcelList<double>() { Data = value }));
 
 
             return paramConversionConfig;
@@ -188,46 +186,39 @@ namespace BH.UI.Dragon
             paramConversionConfig.AddParameterConversion((Guid value) => Project.ActiveProject.GetBHoM(value))
             .AddParameterConversion((Guid value) => Project.ActiveProject.GetGeometry(value));
 
-
-            //MethodIfo corresponding to methods creating Expressions for the conversions
-            MethodInfo guidToBhom = methods.Single(m => m.Name == "GuidToBHom");
-            MethodInfo guidToGeom = methods.Single(m => m.Name == "GuidToGeom");
+            MethodInfo guidToObject = methods.Single(m => m.Name == "GuidToObject");
             MethodInfo arrToObjList = methods.Single(m => m.Name == "ArrayToObjectList");
-            MethodInfo arrToGeomList = methods.Single(m => m.Name == "ArrayToGeometryList");
-            MethodInfo guidToAdapter = methods.Single(m => m.Name == "GuidToAdapter");
-            MethodInfo adapterToGuid = methods.Single(m => m.Name == "AdapterToGuid");
             MethodInfo guidToBHoMGroup = methods.Single(m => m.Name == "GuidToBHoMGroup");
 
 
             //Register type coversions for all bhom objects and BHoMGeometries from guid to BHoMObjects
             foreach (Type type in ReflectionExtra.BHoMTypeList())
             {
-                if (typeof(IObject).IsAssignableFrom(type))
+                //TODO: switch all these type checks to only check for the empty interface once it has been implemented
+                if (typeof(IObject).IsAssignableFrom(type) || typeof(IBHoMGeometry).IsAssignableFrom(type) || typeof(BH.oM.Queries.IQuery).IsAssignableFrom(type) || typeof(BH.oM.Common.IResult).IsAssignableFrom(type))
                 {
-                    paramConversionConfig.AddParameterConversion(GetParameterConversion(type, guidToBhom), type);
+                    //Conversion for single objects
+                    paramConversionConfig.AddParameterConversion(GetParameterConversion(type, guidToObject), type);
+
+                    //COnversion for lists and IEnumerables
                     var listParam = GetParameterConversion(type, arrToObjList);
                     paramConversionConfig.AddParameterConversion(listParam, typeof(List<>).MakeGenericType(new Type[] { type }));
                     paramConversionConfig.AddParameterConversion(listParam, typeof(IEnumerable<>).MakeGenericType(new Type[] { type }));
 
-                    paramConversionConfig.AddParameterConversion(GetParameterConversion(type, guidToBHoMGroup), typeof(BHoMGroup<>).MakeGenericType(new Type[] { type }));
-
-                }
-                else if (typeof(IBHoMGeometry).IsAssignableFrom(type))
-                {
-                    paramConversionConfig.AddParameterConversion(GetParameterConversion(type, guidToGeom), type);
-                    var listParam = GetParameterConversion(type, arrToGeomList);
-                    paramConversionConfig.AddParameterConversion(listParam, typeof(List<>).MakeGenericType(new Type[] { type }));
-                    paramConversionConfig.AddParameterConversion(listParam, typeof(IEnumerable<>).MakeGenericType(new Type[] { type }));
+                    if (typeof(IObject).IsAssignableFrom(type))
+                    {
+                        //Conversion for BHoMGroup
+                        paramConversionConfig.AddParameterConversion(GetParameterConversion(type, guidToBHoMGroup), typeof(BHoMGroup<>).MakeGenericType(new Type[] { type }));
+                    }
                 }
             }
 
 
             //Add adapter converts
             Type adapterType = typeof(BHoMAdapter);
-
             foreach (Type type in Query.AdapterTypeList().Where(x => x.IsSubclassOf(adapterType)))
             {
-                paramConversionConfig.AddParameterConversion(GetParameterConversion(type, guidToAdapter), type);
+                paramConversionConfig.AddParameterConversion(GetParameterConversion(type, guidToObject), type);
             }
 
 
@@ -250,46 +241,45 @@ namespace BH.UI.Dragon
         {
 
             //MethodIfo corresponding to methods creating Expressions for the conversions
-            MethodInfo bhomToGuid = methods.Single(m => m.Name == "BHoMToGuid");
-            MethodInfo geomToGuid = methods.Single(m => m.Name == "GeomToGuid");
+            MethodInfo objectToGuid = methods.Single(m => m.Name == "ObjectToGuid");
+            //MethodInfo geomToGuid = methods.Single(m => m.Name == "GeomToGuid");
             MethodInfo listToGuid = methods.Single(m => m.Name == "ListToGuid");
             MethodInfo iEnumerableToGuid = methods.Single(m => m.Name == "IEnumerableToGuid");
-            MethodInfo adapterToGuid = methods.Single(m => m.Name == "AdapterToGuid");
+            //MethodInfo adapterToGuid = methods.Single(m => m.Name == "AdapterToGuid");
             MethodInfo bhomGroupToGuid = methods.Single(m => m.Name == "BHoMGroupToGuid");
 
 
             //Register type coversions for all IObjects from guid to BHoMObjects
             paramConversionConfig
-                .AddReturnConversion((IObject value) => Project.ActiveProject.AddBHoM(value), true)
-                .AddReturnConversion((IBHoMGeometry value) => Project.ActiveProject.AddGeometry(value), true);
+                .AddReturnConversion((IObject value) => Project.ActiveProject.Add(value), true)
+                .AddReturnConversion((IBHoMGeometry value) => Project.ActiveProject.Add(value), true);
 
             //Register type coversions for all bhom objects from guid to BHoMObjects
             foreach (Type type in ReflectionExtra.BHoMTypeList())
             {
-                if (typeof(IObject).IsAssignableFrom(type))
-                {
-                    paramConversionConfig.AddReturnConversion(GetReturnConversion(type, bhomToGuid), type);
-                    paramConversionConfig.AddReturnConversion(GetReturnConversion(type, bhomGroupToGuid), typeof(BHoMGroup<>).MakeGenericType(new Type[] { type }));
-                }
-                else if (typeof(IBHoMGeometry).IsAssignableFrom(type))
-                {
-                    paramConversionConfig.AddReturnConversion(GetReturnConversion(type, geomToGuid), type);
-                }
+                //Conversion for single object
+                paramConversionConfig.AddReturnConversion(GetReturnConversion(type, objectToGuid), type);
 
+                //Conversion for List<T>
                 var retParamList = GetReturnConversion(type, listToGuid);
-
                 paramConversionConfig.AddReturnConversion(retParamList, typeof(List<>).MakeGenericType(new Type[] { type }));
 
+                //Conversion for IEnumerable<T>
                 var retParamIEnum = GetReturnConversion(type, iEnumerableToGuid);
-
                 paramConversionConfig.AddReturnConversion(retParamIEnum, typeof(IEnumerable<>).MakeGenericType(new Type[] { type }));
+
+                //COnversion for BHoMGroup<T>
+                if (typeof(IObject).IsAssignableFrom(type))
+                {
+                    paramConversionConfig.AddReturnConversion(GetReturnConversion(type, bhomGroupToGuid), typeof(BHoMGroup<>).MakeGenericType(new Type[] { type }));
+                }
             }
 
             //Register conversions for the adapters
             Type adapterType = typeof(BHoMAdapter);
             foreach (Type type in Query.AdapterTypeList().Where(x => x.IsSubclassOf(adapterType)))
             {
-                paramConversionConfig.AddReturnConversion(GetReturnConversion(type, adapterToGuid), type);
+                paramConversionConfig.AddReturnConversion(GetReturnConversion(type, objectToGuid), type);
             }
 
             //Add conversion from Guid to string. Needs be added after all BHoM types have been added

@@ -79,7 +79,7 @@ namespace BH.UI.Dragon.Adapter
                 return "Failed creating adapter. Please check your arguments. Error message: " + e.Message;
             }
 
-            return Project.ActiveProject.AddAdapter(adapter).ToString();
+            return Project.ActiveProject.Add(adapter).ToString();
         }
 
         /*****************************************************************/

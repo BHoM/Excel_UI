@@ -9,14 +9,16 @@ namespace BH.UI.Dragon
 {
 
     //Class used to store objects in a list in a cell. Can be list of anything, thereby slightly different from BHoMGroup.
-    public class ExcelList<T> : BHoMObject, IExcelObject
+    public class ExcelList<T> : IExcelObject
     {
-
         /*****************************************************************/
         /******* Public properties                          **************/
         /*****************************************************************/
 
         public List<T> Data { get; set; } = new List<T>();
+
+        /*****************************************************************/
+        public Guid BHoM_Guid { get; set; } = Guid.NewGuid();
 
         /*****************************************************************/
 

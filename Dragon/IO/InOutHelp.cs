@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -147,12 +148,29 @@ namespace BH.UI.Dragon
             else if (obj is IObject)
             {
                 IObject iObj = (IObject)obj;
-                Project.ActiveProject.AddBHoM(iObj);
+                Project.ActiveProject.Add(iObj);
                 return iObj.BHoM_Guid.ToString();
             }
             else if (obj is IBHoMGeometry)
             {
-                return Project.ActiveProject.AddGeometry(obj as IBHoMGeometry).ToString();
+                return Project.ActiveProject.Add(obj as IBHoMGeometry).ToString();
+            }
+            else if (obj is IDictionary)
+            {
+                
+                //Special case for the dictionary of <string,object> to avoid using reflection for this common type
+                if (obj is Dictionary<string, object>)
+                    return Project.ActiveProject.Add(new ExcelDictionary<string, object>() { Data = (Dictionary<string, object>)obj }).ToString();
+
+                //Use reflection to instansiate any other type of dictionary
+                Type type = typeof(ExcelDictionary<,>).MakeGenericType(obj.GetType().GetGenericParameterConstraints());
+                var prop = type.GetProperty("Data");
+
+                var dict = Activator.CreateInstance(type);
+                prop.SetValue(dict, obj);
+
+                return Project.ActiveProject.IAdd(dict).ToString();
+
             }
             else if (IsNumeric(obj))
                 return obj;
