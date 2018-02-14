@@ -33,7 +33,7 @@ namespace BH.UI.Dragon
             if (!InOutHelp.SetPropertyHelper(obj, propNames, propValues, out message))
                 return message;
 
-            Project.ActiveProject.AddBHoM(obj);
+            Project.ActiveProject.Add(obj);
             return obj.BHoM_Guid.ToString();
         }
 
@@ -54,7 +54,7 @@ namespace BH.UI.Dragon
             if (!InOutHelp.SetPropertyHelper(obj, propNames, propValues, out message))
                 return message;
 
-            Project.ActiveProject.AddBHoM(obj);
+            Project.ActiveProject.Add(obj);
             return obj.BHoM_Guid.ToString();
         }
 

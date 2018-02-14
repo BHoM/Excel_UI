@@ -10,5 +10,7 @@ namespace BH.UI.Dragon
     {
         Dictionary<string, object> PropertyDictionary();
         object InnerObject { get; }
+
+        Guid BHoM_Guid { get; set; }
     }
 }

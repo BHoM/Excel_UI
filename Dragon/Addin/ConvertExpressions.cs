@@ -15,80 +15,40 @@ namespace BH.UI.Dragon
         /*****************************************************************/
         /******* Converter expressions                      **************/
         /*****************************************************************/
-        public static Expression<Func<Guid, T>> GuidToBHom<T>() where T : class, IObject
+        public static Expression<Func<Guid, T>> GuidToObject<T>() 
         {
-            return x => x == Guid.Empty ? null : (T)Project.ActiveProject.GetBHoM(x);
+            return x => x == Guid.Empty ? default(T) : (T)Project.ActiveProject.GetAny(x);
         }
 
         /*****************************************************************/
 
-        public static Expression<Func<T, Guid>> BHoMToGuid<T>() where T : IObject
+        public static Expression<Func<T, Guid>> ObjectToGuid<T>()
         {
-            return x => Project.ActiveProject.AddBHoM(x);
+            return x => Project.ActiveProject.IAdd(x);
+        }
+
+        ///*****************************************************************/
+
+        public static Expression<Func<object[], List<T>>> ArrayToObjectList<T>()
+        {
+            return x => x.Select(y => (T)Project.ActiveProject.GetAny(y as string)).ToList();
         }
 
         /*****************************************************************/
 
-        public static Expression<Func<Guid, T>> GuidToAdapter<T>() where T : BHoMAdapter
-        {
-            return x => (T)Project.ActiveProject.GetAdapter(x);
-        }
-
-        /*****************************************************************/
-
-        public static Expression<Func<T, Guid>> AdapterToGuid<T>() where T : BHoMAdapter
-        {
-            return x => Project.ActiveProject.AddAdapter(x);
-        }
-
-        /*****************************************************************/
-
-        public static Expression<Func<Guid, T>> GuidToGeom<T>() where T :class, IBHoMGeometry
-        {
-            return x => x == Guid.Empty ? null : (T)Project.ActiveProject.GetGeometry(x);
-        }
-
-        /*****************************************************************/
-
-        public static Expression<Func<T, Guid>> GeomToGuid<T>() where T : IBHoMGeometry
-        {
-            return x => Project.ActiveProject.AddGeometry(x);
-        }
-
-        /*****************************************************************/
-
-        public static Expression<Func<object[], List<T>>> ArrayToObjectList<T>() where T : IObject
-        {
-            return x => x.Select(y => (T)Project.ActiveProject.GetBHoM(y as string)).ToList();
-        }
-
-        /*****************************************************************/
-
-        public static Expression<Func<object[], List<T>>> ArrayToGeometryList<T>() where T : IBHoMGeometry
-        {
-            return x => x.Select(y => (T)Project.ActiveProject.GetGeometry(y as string)).ToList();
-        }
-
-        /*****************************************************************/
 
         public static Expression<Func<List<T>, Guid>> ListToGuid<T>()
         {
-            return x => Project.ActiveProject.AddBHoM(new ExcelList<T>() { Data = x });
+            return x => Project.ActiveProject.Add(new ExcelList<T>() { Data = x });
         }
 
         /*****************************************************************/
 
         public static Expression<Func<IEnumerable<T>, Guid>> IEnumerableToGuid<T>()
         {
-            return x => Project.ActiveProject.AddBHoM(new ExcelList<T>() { Data = x.ToList() });
+            return x => Project.ActiveProject.Add(new ExcelList<T>() { Data = x.ToList() });
         }
 
-        /*****************************************************************/
-
-        public static Expression<Func<string, T>> StringToEnum<T>(Type type)
-        {
-            return x => (T)Enum.Parse(type, x);
-        }
 
         /*****************************************************************/
         public static Expression<Func<Guid, BHoMGroup<T>>> GuidToBHoMGroup<T>() where T : IObject
@@ -100,7 +60,7 @@ namespace BH.UI.Dragon
 
         public static Expression<Func<BHoMGroup<T>, Guid>> BHoMGroupToGuid<T>() where T : IObject
         {
-            return x => Project.ActiveProject.AddBHoM(x);
+            return x => Project.ActiveProject.Add(x);
         }
 
         /*****************************************************************/
