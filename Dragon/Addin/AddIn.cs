@@ -11,6 +11,7 @@ using BH.oM.Base;
 using BH.oM.Geometry;
 using System.Linq.Expressions;
 using BH.Adapter;
+using ExcelDna.Integration;
 
 
 namespace BH.UI.Dragon
@@ -20,6 +21,8 @@ namespace BH.UI.Dragon
         /*****************************************************************/
         public void AutoOpen()
         {
+            RegisterDragonMethods();
+
             LoadBHomAssemblies();
             RegisterBHoMMethods();
             
@@ -46,6 +49,32 @@ namespace BH.UI.Dragon
         }
 
         /*****************************************************************/
+        private void RegisterDragonMethods()
+        {
+            //Get out all the methods marked with the excel attributes
+            IEnumerable<MethodInfo> allDragonMethods = ExcelIntegration.GetExportedAssemblies()
+                .SelectMany(x => x.GetTypes().SelectMany(y => y.GetMethods(BindingFlags.Public | BindingFlags.Static)))
+                .Where(x => x.GetCustomAttribute<ExcelFunctionAttribute>() != null);
+
+            List<MethodInfo> adapterMethods = new List<MethodInfo>();
+            List<MethodInfo> otherMethods = new List<MethodInfo>();
+
+            Type adapterType = typeof(Dragon.Adapter.Adapter);
+
+            foreach (MethodInfo mi in allDragonMethods)
+            {
+                if (mi.DeclaringType == adapterType)
+                    adapterMethods.Add(mi);
+                else
+                    otherMethods.Add(mi);
+            }
+
+            adapterMethods.Registrations("Adapter.", false).RegisterFunctions();
+            otherMethods.Registrations("Dragon.", false).RegisterFunctions();
+        }
+
+
+        /*****************************************************************/
         private void RegisterBHoMMethods()
         {
             var conversionConfig = GetParameterConversionConfig();
@@ -56,12 +85,11 @@ namespace BH.UI.Dragon
 
             List<MethodInfo> list = Query.BHoMMethodList().Where(x => x.IsStatic).Where(x => !x.IsGenericMethod).Where(x => !toNotLoad.Contains(x.DeclaringType.Assembly.GetName().Name)).ToList();
 
+
             Type adapterType = typeof(BHoMAdapter);
             List<ConstructorInfo> adapterConstructors = Query.AdapterTypeList().Where(x => x.IsSubclassOf(adapterType)).SelectMany(x => x.GetConstructors()).ToList();
 
             IEnumerable<ExcelFunctionRegistration> registrations = list.Registrations().Concat(adapterConstructors.Registrations("Adapter."));
-
-            //IEnumerable<ExcelFunctionRegistration>  registrations = typeof(Tests).GetMethods().Where(x => x.IsStatic).Registrations();
 
             registrations
                 .ProcessParameterConversions(conversionConfig)
@@ -177,6 +205,11 @@ namespace BH.UI.Dragon
             return paramConversionConfig;
         }
 
+        public static bool Test()
+        {
+            return true;
+        }
+
         /*****************************************************************/
 
         private static ParameterConversionConfiguration AddConversionToBHom(ParameterConversionConfiguration paramConversionConfig, IEnumerable<MethodInfo> methods)
@@ -186,6 +219,7 @@ namespace BH.UI.Dragon
             paramConversionConfig.AddParameterConversion((Guid value) => Project.ActiveProject.GetBHoM(value))
             .AddParameterConversion((Guid value) => Project.ActiveProject.GetGeometry(value));
 
+            
             MethodInfo guidToObject = methods.Single(m => m.Name == "GuidToObject");
             MethodInfo arrToObjList = methods.Single(m => m.Name == "ArrayToObjectList");
             MethodInfo guidToBHoMGroup = methods.Single(m => m.Name == "GuidToBHoMGroup");
@@ -242,10 +276,8 @@ namespace BH.UI.Dragon
 
             //MethodIfo corresponding to methods creating Expressions for the conversions
             MethodInfo objectToGuid = methods.Single(m => m.Name == "ObjectToGuid");
-            //MethodInfo geomToGuid = methods.Single(m => m.Name == "GeomToGuid");
             MethodInfo listToGuid = methods.Single(m => m.Name == "ListToGuid");
             MethodInfo iEnumerableToGuid = methods.Single(m => m.Name == "IEnumerableToGuid");
-            //MethodInfo adapterToGuid = methods.Single(m => m.Name == "AdapterToGuid");
             MethodInfo bhomGroupToGuid = methods.Single(m => m.Name == "BHoMGroupToGuid");
 
 

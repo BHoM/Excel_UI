@@ -1,6 +1,7 @@
 <DnaLibrary Name="Dragon Add-In" RuntimeVersion="v4.0">
-  <ExternalLibrary Path="Dragon.dll" LoadFromBytes="true" Pack="true" />
+  <ExternalLibrary Path="Dragon.dll" LoadFromBytes="true" Pack="true" ExplicitRegistration="true" />
   <!-- 
+  ExplicitExports="true"
        The RuntimeVersion attribute above allows two settings:
        * RuntimeVersion="v2.0" - for .NET 2.0, 3.0 and 3.5
        * RuntimeVersion="v4.0" - for .NET 4 and 4.5

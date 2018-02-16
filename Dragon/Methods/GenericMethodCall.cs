@@ -29,7 +29,7 @@ namespace BH.UI.Dragon
                 methodNames = Query.BHoMMethodList().Where(x => x.DeclaringType.Name == type).Select(x => x.Name).ToArray();
 
 
-            return XlCall.Excel(XlCall.xlUDF, "Resize", methodNames);
+            return ArrayResizer.Resize( methodNames);
         }
 
         /*****************************************************************/
@@ -66,7 +66,7 @@ namespace BH.UI.Dragon
             if (result is IEnumerable)
             {
                 object[] arr = (result as IEnumerable<object>).Select(x => x.ReturnTypeHelper()).ToArray();
-                return XlCall.Excel(XlCall.xlUDF, "Resize", arr);
+                return ArrayResizer.Resize( arr);
             }
             else
                 return result.ReturnTypeHelper();

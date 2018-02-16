@@ -23,9 +23,9 @@ namespace BH.UI.Dragon.Adapter
         public static object GetAdapterTypes()
         {
             Type adapterType = typeof(BHoMAdapter);
-            string[] adapterNames = Query.AdapterTypeList().Where(x => x.IsSubclassOf(adapterType)).Select(x => x.Name).ToArray();
+            object[] adapterNames = Query.AdapterTypeList().Where(x => x.IsSubclassOf(adapterType)).Select(x => x.Name).ToArray();
 
-            return XlCall.Excel(XlCall.xlUDF, "Resize", adapterNames);
+            return ArrayResizer.Resize(adapterNames);
         }
 
         /*****************************************************************/
@@ -45,7 +45,7 @@ namespace BH.UI.Dragon.Adapter
             if (constrs.Length < 1)
                 return "No constructors found for the adapter";
 
-            return XlCall.Excel(XlCall.xlUDF, "Resize", constrs.OrderByDescending(x => x.GetParameters().Length).First().GetParameters().Select(x => x.Name).ToArray());
+            return ArrayResizer.Resize( constrs.OrderByDescending(x => x.GetParameters().Length).First().GetParameters().Select(x => x.Name).ToArray());
         }
 
         /*****************************************************************/
@@ -83,7 +83,7 @@ namespace BH.UI.Dragon.Adapter
         }
 
         /*****************************************************************/
-        [ExcelFunction(Description = "Create an adapter", Category = "Dragon")]
+        [ExcelFunction(Name ="Adapter.Push", Description = "Create an adapter", Category = "Dragon")]
         public static object Push(
             [ExcelArgument(Name = "Adapter")] string adapterId,
             [ExcelArgument(Name = "Objects to push")] object[] objects,
@@ -125,7 +125,7 @@ namespace BH.UI.Dragon.Adapter
             }
 
             if (retObjs)
-                return XlCall.Excel(XlCall.xlUDF, "Resize", pushedObjects.Select(x => x.ReturnTypeHelper()).ToArray());
+                return ArrayResizer.Resize( pushedObjects.Select(x => x.ReturnTypeHelper()).ToArray());
             else
                 return pushedObjects.Count == iObjs.Count;
 
@@ -178,7 +178,7 @@ namespace BH.UI.Dragon.Adapter
             }
             else
             {
-                return XlCall.Excel(XlCall.xlUDF, "Resize", pulledObjs.Select(x => x.ReturnTypeHelper()).ToArray());
+                return ArrayResizer.Resize( pulledObjs.Select(x => x.ReturnTypeHelper()).ToArray());
             }
 
         }
