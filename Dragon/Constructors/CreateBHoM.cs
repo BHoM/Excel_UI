@@ -82,7 +82,7 @@ namespace BH.UI.Dragon
             }
 
 
-            return XlCall.Excel(XlCall.xlUDF, "Resize", objectNames.ToArray());
+            return ArrayResizer.Resize( objectNames.ToArray());
         }
 
         /*****************************************************************/
@@ -123,7 +123,7 @@ namespace BH.UI.Dragon
         //            array[i, j] = data[i][j];
         //    }
 
-        //    return XlCall.Excel(XlCall.xlUDF, "Resize", array);
+        //    return ArrayResizer.Resize( array);
         //}
 
 

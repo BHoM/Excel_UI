@@ -131,7 +131,7 @@ namespace BH.UI.Dragon
         {
             object obj = Project.ActiveProject.GetAny(objectId);
 
-            return XlCall.Excel(XlCall.xlUDF, "Resize", obj.PropertyNames().ToArray());
+            return ArrayResizer.Resize( obj.PropertyNames().ToArray());
         }
 
         /*****************************************************************/
@@ -178,7 +178,8 @@ namespace BH.UI.Dragon
                 }
 
                 //Output the values as an array
-                return XlCall.Excel(XlCall.xlUDF, "Resize", outArr);
+                return ArrayResizer.Resize(outArr);
+                //return ArrayResizer.Resize( outArr);
             }
             else
             {
@@ -196,7 +197,8 @@ namespace BH.UI.Dragon
                     }
                 }
 
-                return XlCall.Excel(XlCall.xlUDF, "Resize", outArr);
+                return ArrayResizer.Resize(outArr);
+                //return ArrayResizer.Resize( outArr);
             }
         }
 

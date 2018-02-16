@@ -157,13 +157,13 @@ namespace BH.UI.Dragon
             }
             else if (obj is IDictionary)
             {
-                
+
                 //Special case for the dictionary of <string,object> to avoid using reflection for this common type
                 if (obj is Dictionary<string, object>)
                     return Project.ActiveProject.Add(new ExcelDictionary<string, object>() { Data = (Dictionary<string, object>)obj }).ToString();
 
                 //Use reflection to instansiate any other type of dictionary
-                Type type = typeof(ExcelDictionary<,>).MakeGenericType(obj.GetType().GetGenericParameterConstraints());
+                Type type = typeof(ExcelDictionary<,>).MakeGenericType(obj.GetType().GetGenericArguments());
                 var prop = type.GetProperty("Data");
 
                 var dict = Activator.CreateInstance(type);
@@ -171,6 +171,15 @@ namespace BH.UI.Dragon
 
                 return Project.ActiveProject.IAdd(dict).ToString();
 
+            }
+            else if (obj is IList)
+            {
+                Type type = typeof(ExcelList<>).MakeGenericType(obj.GetType().GetGenericArguments());
+                var prop = type.GetProperty("Data");
+
+                var list = Activator.CreateInstance(type);
+                prop.SetValue(list, obj);
+                return Project.ActiveProject.IAdd(list).ToString();
             }
             else if (IsNumeric(obj))
                 return obj;

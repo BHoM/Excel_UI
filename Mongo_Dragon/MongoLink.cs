@@ -151,7 +151,7 @@
 //                }
 
 
-//                return XlCall.Excel(XlCall.xlUDF, "Resize", array);
+//                return ArrayResizer.Resize( array);
 //            }
 //            else if (count == 1)
 //            {
@@ -160,7 +160,7 @@
 //            else
 //            {
 //                object[] array = objects.Select(x => ItemFromMongo(x)).ToArray();
-//                return XlCall.Excel(XlCall.xlUDF, "Resize", array);
+//                return ArrayResizer.Resize( array);
 //            }
 
 
@@ -207,7 +207,7 @@
 //        public static object TestArray2()
 //        {
 //            object[,] array = new object[,] { { 3.4, 8.9 }, { "Mongo", "rules" }, { "super duper", "Test" } };
-//            return XlCall.Excel(XlCall.xlUDF, "Resize", array);
+//            return ArrayResizer.Resize( array);
 //        }
 
 //        /****************************************************************/
