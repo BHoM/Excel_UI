@@ -7,6 +7,21 @@ namespace BH.UI.Dragon
     //Method for automatic resizing of arrays. https://github.com/Excel-DNA/ExcelDna/blob/master/Distribution/Samples/ArrayResizer.dna
     public class ArrayResizer : XlCall
     {
+
+        public static object Resize(object[] array)
+        {
+            object[,] largeArr = new object[1, array.Length];
+
+            for (int i = 0; i < array.Length; i++)
+            {
+                largeArr[0, i] = array[i];
+            }
+
+            return Resize(largeArr);
+
+        }
+
+
         // This function will run in the UDF context.
         // Needs extra protection to allow multithreaded use.
         public static object Resize(object[,] array)

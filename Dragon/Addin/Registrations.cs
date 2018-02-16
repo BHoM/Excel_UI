@@ -21,27 +21,46 @@ namespace BH.UI.Dragon
         /*****************************************************************/
 
         //Creates a function registratiosn for excel from a list of methods
-        public static List<ExcelFunctionRegistration> Registrations(this IEnumerable<MethodBase> methods, string prefix = "BH.")
+        public static List<ExcelFunctionRegistration> Registrations(this IEnumerable<MethodBase> methods, string prefix = null, bool addParamNames = true)
         {
+            bool prefixIn = prefix != null;
+            string usedPrefix = prefix;
 
             List<ExcelFunctionRegistration> regs = new List<ExcelFunctionRegistration>();
-            foreach (var group in methods.GroupBy(x => GetMethodName(x as dynamic)))
-            {
-                if (group.Count() == 1)
-                {
-                    regs.Add(ExcelFunctionRegistration(group.First(), prefix + GetMethodName(group.First() as dynamic)));
-                }
-                else
-                {
-                    foreach (MethodBase method in group)
-                    {
-                        string paramNames = ParamName(method);
 
-                        regs.Add(ExcelFunctionRegistration(method, prefix + GetMethodName(method as dynamic) + paramNames));
-                    }
-                }
+
+
+
+            foreach (MethodBase method in methods)
+            {
+                if (!prefixIn)
+                    usedPrefix = method.DeclaringType.Name + ".";
+
+                string paramNames = addParamNames? ParamName(method) : "";
+
+                regs.Add(ExcelFunctionRegistration(method, usedPrefix + GetMethodName(method as dynamic) + paramNames));
             }
-            return regs;
+
+                //foreach (var group in methods.GroupBy(x => GetMethodName(x as dynamic)))
+                //{
+                //    if (!prefixIn)
+                //        usedPrefix = group.First().DeclaringType.Name + ".";
+
+                //    if (group.Count() == 1)
+                //    {
+                //        regs.Add(ExcelFunctionRegistration(group.First(), usedPrefix + GetMethodName(group.First() as dynamic)));
+                //    }
+                //    else
+                //    {
+                //        foreach (MethodBase method in group)
+                //        {
+                //            string paramNames = ParamName(method);
+
+                //            regs.Add(ExcelFunctionRegistration(method, usedPrefix + GetMethodName(method as dynamic) + paramNames));
+                //        }
+                //    }
+                //}
+                return regs;
         }
 
         /*****************************************************************/
@@ -66,7 +85,10 @@ namespace BH.UI.Dragon
             foreach (ParameterInfo info in method.GetParameters())
             {
                 if (typeof(IList).IsAssignableFrom(info.ParameterType))
-                    paramNames += "_List" + info.ParameterType.GenericTypeArguments[0].Name;
+                    if (info.ParameterType.IsGenericType)
+                        paramNames += "_List" + info.ParameterType.GenericTypeArguments[0].Name;
+                    else
+                        paramNames += "_List";
                 else if (typeof(IEnumerable).IsAssignableFrom(info.ParameterType) && info.ParameterType.IsGenericType)
                     paramNames += "_IEnum" + info.ParameterType.GenericTypeArguments[0].Name;
                 else if (typeof(BHoMGroup<>).Name == info.ParameterType.Name && info.ParameterType.IsGenericType)
