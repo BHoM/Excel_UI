@@ -81,20 +81,21 @@ namespace BH.UI.Dragon
 
         private static string ParamName(MethodBase method)
         {
-            string paramNames = "";
+            string paramNames = "│By";
+            char delimiter = '│';
             foreach (ParameterInfo info in method.GetParameters())
             {
                 if (typeof(IList).IsAssignableFrom(info.ParameterType))
                     if (info.ParameterType.IsGenericType)
-                        paramNames += "_List" + info.ParameterType.GenericTypeArguments[0].Name;
+                        paramNames += delimiter+ "List" + info.ParameterType.GenericTypeArguments[0].Name;
                     else
-                        paramNames += "_List";
+                        paramNames += delimiter +"List";
                 else if (typeof(IEnumerable).IsAssignableFrom(info.ParameterType) && info.ParameterType.IsGenericType)
-                    paramNames += "_IEnum" + info.ParameterType.GenericTypeArguments[0].Name;
+                    paramNames += delimiter + "IEnum" + info.ParameterType.GenericTypeArguments[0].Name;
                 else if (typeof(BHoMGroup<>).Name == info.ParameterType.Name && info.ParameterType.IsGenericType)
-                    paramNames += "_Group" + info.ParameterType.GenericTypeArguments[0].Name;
+                    paramNames += delimiter + "Group" + info.ParameterType.GenericTypeArguments[0].Name;
                 else
-                    paramNames += "_" + info.ParameterType.Name;
+                    paramNames += delimiter + info.ParameterType.Name;
             }
 
             return paramNames;
