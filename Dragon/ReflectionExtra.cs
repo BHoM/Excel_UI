@@ -4,6 +4,9 @@ using System.Reflection;
 
 namespace BH.Engine.Reflection
 {
+    //TODO: This whole class is copied from the Reflection_Engine and modified slightly to make the m_BHoMTypeList include interfacetypes as well as objecttypes.
+    //This should not sit here but be part of the reflection engine that would need some additional tweaks.
+
     public static partial class ReflectionExtra
     {
         /***************************************************/

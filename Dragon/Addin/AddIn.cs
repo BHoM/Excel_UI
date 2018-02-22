@@ -19,23 +19,34 @@ namespace BH.UI.Dragon
     public partial class AddIn : IExcelAddIn
     {
         /*****************************************************************/
+        /******* Public methods                             **************/
+        /*****************************************************************/
         public void AutoOpen()
         {
-            RegisterDragonMethods();
-
             LoadBHomAssemblies();
+
+            RegisterDragonMethods();
             RegisterBHoMMethods();
             
             //Hide error box showing methods not working properly
-            if(!Config.ShowExcelDNALog)
+            if(!DebugConfig.ShowExcelDNALog)
                 ExcelDna.Logging.LogDisplay.Hide();
         }
 
+        /***************************************************/
+
+        public void AutoClose()
+        {
+            
+        }
+
+        /*****************************************************************/
+        /******* Private methods                            **************/
         /*****************************************************************/
         private void LoadBHomAssemblies()
         {
             Assembly ass = Assembly.GetExecutingAssembly();
-            string sourceFolder = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\BHoM\BHoM_dlls";
+            string sourceFolder = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\BHoM\Assemblies";
 
             List<string> loadedAssemblies = ass.GetReferencedAssemblies().Select(x => x.Name + ".dll").ToList();
 
@@ -101,7 +112,7 @@ namespace BH.UI.Dragon
 
         /*****************************************************************/
 
-        static ParameterConversionConfiguration GetParameterConversionConfig()
+        private static ParameterConversionConfiguration GetParameterConversionConfig()
         {
             //Note below taken from the excel registration samples. The order in which the convert methods are added is very sensitive. Take greate care if modifying any of the below
             //
@@ -324,7 +335,7 @@ namespace BH.UI.Dragon
         /******* Converter functions                        **************/
         /*****************************************************************/
 
-        static Func<Type, ExcelParameterRegistration, LambdaExpression> GetParameterConversion(Type type, MethodInfo method)
+        private static Func<Type, ExcelParameterRegistration, LambdaExpression> GetParameterConversion(Type type, MethodInfo method)
         {
             MethodInfo generic = method.MakeGenericMethod(new Type[] { type });
             return (unusedParamType, unusedParamReg) => (LambdaExpression)generic.Invoke(null, new object[] { });
@@ -332,7 +343,7 @@ namespace BH.UI.Dragon
 
         /*****************************************************************/
 
-        static Func<Type, ExcelReturnRegistration, LambdaExpression> GetReturnConversion(Type type, MethodInfo method)
+        private static Func<Type, ExcelReturnRegistration, LambdaExpression> GetReturnConversion(Type type, MethodInfo method)
         {
             MethodInfo generic = method.MakeGenericMethod(new Type[] { type });
             return (unusedParamType, unusedParamReg) => (LambdaExpression)generic.Invoke(null, new object[] { });
@@ -341,17 +352,12 @@ namespace BH.UI.Dragon
 
         /***************************************************/
 
-        static FunctionExecutionConfiguration GetFunctionExecutionHandlerConfig()
+        private static FunctionExecutionConfiguration GetFunctionExecutionHandlerConfig()
         {
             return new FunctionExecutionConfiguration()
                 .AddFunctionExecutionHandler(DragonFunctionExecutionHandler.LoggingHandlerSelector);
         }
 
-        /***************************************************/
-
-        public void AutoClose()
-        {
-        }
 
         /*****************************************************************/
     }

@@ -17,7 +17,7 @@ namespace BH.UI.Dragon
         public override void OnException(FunctionExecutionArgs args)
         {
             //Choose what to happend if an exception is thrown. Controlled from the Config class
-            switch (Config.ErrorHandling)
+            switch (DebugConfig.ErrorHandling)
             {
                 case ErrorMessageHandling.ErrorMessage:
                     //Display the error message in the excel cell

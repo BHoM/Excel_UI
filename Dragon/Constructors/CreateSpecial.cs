@@ -25,7 +25,7 @@ namespace BH.UI.Dragon
 
             if (objectsIds.Length < 1)
                 return "No objects provided";
-            List<object> objects = objectsIds.Select(x => x.CheckAndGetObjectOrGeometry()).ToList();
+            List<object> objects = objectsIds.Select(x => x.CheckAndGetStoredObject()).ToList();
 
 
             bool sameType;
@@ -73,8 +73,8 @@ namespace BH.UI.Dragon
         [ExcelArgument(Name = "Type hint2. Optional")] string typeHint2 = null
         )
         {
-            object item1 = item1id.CheckAndGetObjectOrGeometry();
-            object item2 = item2id.CheckAndGetObjectOrGeometry();
+            object item1 = item1id.CheckAndGetStoredObject();
+            object item2 = item2id.CheckAndGetStoredObject();
 
             Type t1, t2;
 
@@ -106,8 +106,8 @@ namespace BH.UI.Dragon
             if (keysIds.Length < 1)
                 return "No objects provided";
 
-            List<object> keys = keysIds.Select(x => x.CheckAndGetObjectOrGeometry()).ToList();
-            List<object> values = valuesIds.Select(x => x.CheckAndGetObjectOrGeometry()).ToList();
+            List<object> keys = keysIds.Select(x => x.CheckAndGetStoredObject()).ToList();
+            List<object> values = valuesIds.Select(x => x.CheckAndGetStoredObject()).ToList();
 
 
             bool sameTypeKey, sameTypeValue;
