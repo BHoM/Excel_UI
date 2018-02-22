@@ -29,37 +29,26 @@ namespace BH.UI.Dragon
             List<ExcelFunctionRegistration> regs = new List<ExcelFunctionRegistration>();
 
 
-
+            List<string> fails = new List<string>();
 
             foreach (MethodBase method in methods)
             {
-                if (!prefixIn)
-                    usedPrefix = method.DeclaringType.Name + ".";
+                try
+                {
+                    if (!prefixIn)
+                        usedPrefix = method.DeclaringType.Name + ".";
 
-                string paramNames = addParamNames? ParamName(method) : "";
+                    string paramNames = addParamNames ? ParamName(method) : "";
 
-                regs.Add(ExcelFunctionRegistration(method, usedPrefix + GetMethodName(method as dynamic) + paramNames));
+                    regs.Add(ExcelFunctionRegistration(method, usedPrefix + GetMethodName(method as dynamic) + paramNames));
+                }
+                catch (Exception e)
+                {
+                    fails.Add(method.Name + "failed due to: " + e.Message);
+                }
+
             }
-
-                //foreach (var group in methods.GroupBy(x => GetMethodName(x as dynamic)))
-                //{
-                //    if (!prefixIn)
-                //        usedPrefix = group.First().DeclaringType.Name + ".";
-
-                //    if (group.Count() == 1)
-                //    {
-                //        regs.Add(ExcelFunctionRegistration(group.First(), usedPrefix + GetMethodName(group.First() as dynamic)));
-                //    }
-                //    else
-                //    {
-                //        foreach (MethodBase method in group)
-                //        {
-                //            string paramNames = ParamName(method);
-
-                //            regs.Add(ExcelFunctionRegistration(method, usedPrefix + GetMethodName(method as dynamic) + paramNames));
-                //        }
-                //    }
-                //}
+            
                 return regs;
         }
 

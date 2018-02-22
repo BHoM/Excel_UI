@@ -45,7 +45,7 @@ namespace BH.UI.Dragon
             if (methods.Count == 0)
                 return "Method with the given name not found";
 
-            arguments = arguments.Select(x => x.CheckAndGetObjectOrGeometry()).ToArray();
+            arguments = arguments.Select(x => x.CheckAndGetStoredObject()).ToArray();
 
             object[] matchingArgs;
             MethodBase method;

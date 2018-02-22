@@ -49,7 +49,7 @@ namespace BH.UI.Dragon.Adapters
 
                 for (int i = 0; i < eqName.Length; i++)
                 {
-                    equalities[eqName[i] as string] = eqVal[i].CheckAndGetObjectOrGeometry();
+                    equalities[eqName[i] as string] = eqVal[i].CheckAndGetStoredObject();
                 }
             }
 
