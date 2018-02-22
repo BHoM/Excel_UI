@@ -30,12 +30,14 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="BHoM">
+    <Reference Include="BHoM, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\BHoM\Build\BHoM.dll</HintPath>
     </Reference>
     <Reference Include="BHoM_Adapter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\BHoM_Adapter\Build\BHoM_Adapter.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="ExcelDna.Integration, Version=0.34.6373.42344, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ExcelDna.Integration.0.34.6\lib\ExcelDna.Integration.dll</HintPath>
@@ -56,10 +58,12 @@
     <Reference Include="Reflection_Engine, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\BHoM_Engine\Build\Reflection_Engine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Serialiser_Engine, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\BHoM_Engine\Build\Serialiser_Engine.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -71,6 +75,7 @@
     <Reference Include="System.Xml" />
     <Reference Include="UI_PostBuild">
       <HintPath>..\..\BHoM_UI\Build\UI_PostBuild.exe</HintPath>
+      <Private>False</Private>
     </Reference>
   </ItemGroup>
   <ItemGroup>
@@ -82,11 +87,10 @@
     <Compile Include="Addin\Registrations.cs" />
     <Compile Include="Addin\Tests.cs" />
     <Compile Include="ArrayResizer.cs" />
-    <Compile Include="Config.cs" />
+    <Compile Include="DebugConfig.cs" />
     <Compile Include="Constructors\CreateBHoM.cs" />
     <Compile Include="Constructors\CreateGeometry.cs" />
     <Compile Include="Constructors\CreateSpecial.cs" />
-    <Compile Include="Excel_Resize.cs" />
     <Compile Include="IO\InOutHelp.cs" />
     <Compile Include="Methods\GenericMethodCall.cs" />
     <Compile Include="Methods\JSON.cs" />
@@ -98,8 +102,6 @@
     <Compile Include="Project\Project.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReflectionExtra.cs" />
-    <Compile Include="Structural\Loads\Loads.cs" />
-    <Compile Include="Structural\Properties\SectionProperty.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -110,7 +112,7 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>call "$(TargetDir)UI_PostBuild.exe" ..\..\ "C:\Users\$(Username)\AppData\Roaming\BHoM\BHoM_dlls"
+    <PostBuildEvent>call "$(TargetDir)UI_PostBuild.exe" ..\..\ "C:\Users\$(Username)\AppData\Roaming\BHoM\Assemblies"
 
 xcopy "$(SolutionDir)Dragon\ExcelDna.IntelliSense.xll*" "$(TargetDir)ExcelDna.IntelliSense.xll*" /C /Y
 </PostBuildEvent>

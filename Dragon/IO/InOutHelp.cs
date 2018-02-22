@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.CompilerServices;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -18,7 +19,7 @@ namespace BH.UI.Dragon
         /******* Public methods                             **************/
         /*****************************************************************/
 
-        public static object CheckAndGetObjectOrGeometry(this object obj)
+        public static object CheckAndGetStoredObject(this object obj)
         {
             Guid guid;
             if (obj is string && Guid.TryParse(obj as string, out guid))
@@ -33,38 +34,7 @@ namespace BH.UI.Dragon
         }
 
         /*****************************************************************/
-
-        public static object CheckAndGetObject(this object obj)
-        {
-            Guid guid;
-            if (obj is string && Guid.TryParse(obj as string, out guid))
-            {
-                //Get out object or geometry
-                return Project.ActiveProject.GetBHoM(guid);
-            }
-            else
-            {
-                return obj;
-            }
-        }
-
-        /*****************************************************************/
-
-        public static object CheckAndGetGeometry(this object obj)
-        {
-            Guid guid;
-            if (obj is string && Guid.TryParse(obj as string, out guid))
-            {
-                //Get out object or geometry
-                return Project.ActiveProject.GetGeometry(guid);
-            }
-            else
-            {
-                return obj;
-            }
-        }
-
-        /*****************************************************************/
+        
         public static bool SetPropertyHelper(this object obj, object[] propNames, object[] propValues, out string message)
         {
             message = "";
@@ -73,7 +43,7 @@ namespace BH.UI.Dragon
                 if ((propNames[i] is ExcelMissing) || (propValues[i] is ExcelMissing))
                     continue;
 
-                object val = propValues[i].CheckAndGetObjectOrGeometry();
+                object val = propValues[i].CheckAndGetStoredObject();
                 val = val is IExcelObject ? ((IExcelObject)val).InnerObject : val;
 
                 //Set the properties
@@ -96,7 +66,7 @@ namespace BH.UI.Dragon
                 if ((propNames[i] is ExcelMissing) || (propValues[i] is ExcelMissing))
                     continue;
 
-                object val = propValues[i].CheckAndGetObjectOrGeometry();
+                object val = propValues[i].CheckAndGetStoredObject();
 
                 val = val is IExcelObject ? ((IExcelObject)val).InnerObject : val;
 
@@ -145,6 +115,8 @@ namespace BH.UI.Dragon
         {
             if (obj == null)
                 return "Failed to get property";
+            else if (IsNumeric(obj))
+                return obj;
             else if (obj is IObject)
             {
                 IObject iObj = (IObject)obj;
@@ -181,11 +153,23 @@ namespace BH.UI.Dragon
                 prop.SetValue(list, obj);
                 return Project.ActiveProject.IAdd(list).ToString();
             }
-            else if (IsNumeric(obj))
-                return obj;
+            else if (iTupleType.IsAssignableFrom(obj.GetType()))
+            {
+                Type type = typeof(ExcelTuple<,>).MakeGenericType(obj.GetType().GetGenericArguments());
+                var prop = type.GetProperty("Data");
+
+                var tuple = Activator.CreateInstance(type);
+                prop.SetValue(tuple, obj);
+                return Project.ActiveProject.IAdd(tuple).ToString();
+            }
+
 
             return obj.ToString();
         }
+
+        /*****************************************************************/
+
+        private static Type iTupleType = Type.GetType("System.ITuple, mscorlib"); //the ITuple interface is "internal" for some reason. getting it out once via reflection to be used for checking in the method above...
 
         /*****************************************************************/
 
