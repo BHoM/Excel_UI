@@ -100,20 +100,20 @@ namespace BH.UI.Dragon.Adapter
             if (adapter == null)
                 return "Failed to get adapter";
 
-            List<IBHoMObject> iObjs = new List<IBHoMObject>();
+            List<IObject> iObjs = new List<IObject>();
 
             foreach (object obj in objects)
             {
                 Guid guid;
                 if (obj is string && Guid.TryParse(obj as string, out guid))
                 {
-                    IBHoMObject iOb = Project.ActiveProject.GetBHoM(guid);
+                    IObject iOb = Project.ActiveProject.GetBHoM(guid);
                     if (iOb != null)
                         iObjs.Add(iOb);
                 }
             }
 
-            List<IBHoMObject> pushedObjects;
+            List<IObject> pushedObjects;
 
             try
             {
