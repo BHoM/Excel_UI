@@ -49,12 +49,12 @@ namespace BH.UI.Dragon
             [ExcelArgument(Name = "property value")] object[] propValues)
         {
 
-            IObject obj = Project.ActiveProject.GetBHoM(objectId);
+            IBHoMObject obj = Project.ActiveProject.GetBHoM(objectId);
 
             if (obj == null)
                 return "Failed to get BHoMObject";
 
-            IObject clone = obj.GetShallowClone(true);
+            IBHoMObject clone = obj.GetShallowClone(true);
 
             string message;
             
@@ -74,12 +74,12 @@ namespace BH.UI.Dragon
             [ExcelArgument(Name = "property value")] object[] propValues)
         {
 
-            IObject obj = Project.ActiveProject.GetBHoM(objectId);
+            IBHoMObject obj = Project.ActiveProject.GetBHoM(objectId);
 
             if (obj == null)
                 return "Failed to get BHoMObject";
 
-            IObject clone = obj.GetShallowClone(true);
+            IBHoMObject clone = obj.GetShallowClone(true);
 
             string message;
 
@@ -98,8 +98,8 @@ namespace BH.UI.Dragon
             [ExcelArgument(Name = "Custom data key")] string key,
             [ExcelArgument(Name = "Custom data value")] object val)
         {
-            IObject oblObj = Project.ActiveProject.GetBHoM(objectId);
-            IObject newObj = oblObj.GetShallowClone(true);
+            IBHoMObject oblObj = Project.ActiveProject.GetBHoM(objectId);
+            IBHoMObject newObj = oblObj.GetShallowClone(true);
 
             newObj.CustomData[key] = val;
 
@@ -114,7 +114,7 @@ namespace BH.UI.Dragon
             [ExcelArgument(Name = "object id")] string objectId,
             [ExcelArgument(Name = "Custom data key")] string key)
         {
-            IObject obj = Project.ActiveProject.GetBHoM(objectId);
+            IBHoMObject obj = Project.ActiveProject.GetBHoM(objectId);
 
             object val;
             if (!obj.CustomData.TryGetValue(key, out val))

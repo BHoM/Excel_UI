@@ -51,14 +51,14 @@ namespace BH.UI.Dragon
 
 
         /*****************************************************************/
-        public static Expression<Func<Guid, BHoMGroup<T>>> GuidToBHoMGroup<T>() where T : IObject
+        public static Expression<Func<Guid, BHoMGroup<T>>> GuidToBHoMGroup<T>() where T : IBHoMObject
         {
             return x => (BHoMGroup<T>)Project.ActiveProject.GetBHoM(x);
         }
 
         /*****************************************************************/
 
-        public static Expression<Func<BHoMGroup<T>, Guid>> BHoMGroupToGuid<T>() where T : IObject
+        public static Expression<Func<BHoMGroup<T>, Guid>> BHoMGroupToGuid<T>() where T : IBHoMObject
         {
             return x => Project.ActiveProject.Add(x);
         }

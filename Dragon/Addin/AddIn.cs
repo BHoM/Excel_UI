@@ -226,7 +226,7 @@ namespace BH.UI.Dragon
         private static ParameterConversionConfiguration AddConversionToBHom(ParameterConversionConfiguration paramConversionConfig, IEnumerable<MethodInfo> methods)
         {
 
-            //Register IObject and IBHoMGeometry
+            //Register IBHoMObject and IBHoMGeometry
             paramConversionConfig.AddParameterConversion((Guid value) => Project.ActiveProject.GetBHoM(value))
             .AddParameterConversion((Guid value) => Project.ActiveProject.GetGeometry(value));
 
@@ -240,7 +240,7 @@ namespace BH.UI.Dragon
             foreach (Type type in ReflectionExtra.BHoMTypeList())
             {
                 //TODO: switch all these type checks to only check for the empty interface once it has been implemented
-                if (typeof(IObject).IsAssignableFrom(type) || typeof(IBHoMGeometry).IsAssignableFrom(type) || typeof(BH.oM.Queries.IQuery).IsAssignableFrom(type) || typeof(BH.oM.Common.IResult).IsAssignableFrom(type))
+                if (typeof(IBHoMObject).IsAssignableFrom(type) || typeof(IBHoMGeometry).IsAssignableFrom(type) || typeof(BH.oM.Queries.IQuery).IsAssignableFrom(type) || typeof(BH.oM.Common.IResult).IsAssignableFrom(type))
                 {
                     //Conversion for single objects
                     paramConversionConfig.AddParameterConversion(GetParameterConversion(type, guidToObject), type);
@@ -250,7 +250,7 @@ namespace BH.UI.Dragon
                     paramConversionConfig.AddParameterConversion(listParam, typeof(List<>).MakeGenericType(new Type[] { type }));
                     paramConversionConfig.AddParameterConversion(listParam, typeof(IEnumerable<>).MakeGenericType(new Type[] { type }));
 
-                    if (typeof(IObject).IsAssignableFrom(type))
+                    if (typeof(IBHoMObject).IsAssignableFrom(type))
                     {
                         //Conversion for BHoMGroup
                         paramConversionConfig.AddParameterConversion(GetParameterConversion(type, guidToBHoMGroup), typeof(BHoMGroup<>).MakeGenericType(new Type[] { type }));
@@ -292,9 +292,9 @@ namespace BH.UI.Dragon
             MethodInfo bhomGroupToGuid = methods.Single(m => m.Name == "BHoMGroupToGuid");
 
 
-            //Register type coversions for all IObjects from guid to BHoMObjects
+            //Register type coversions for all IBHoMObjects from guid to BHoMObjects
             paramConversionConfig
-                .AddReturnConversion((IObject value) => Project.ActiveProject.Add(value), true)
+                .AddReturnConversion((IBHoMObject value) => Project.ActiveProject.Add(value), true)
                 .AddReturnConversion((IBHoMGeometry value) => Project.ActiveProject.Add(value), true);
 
             //Register type coversions for all bhom objects from guid to BHoMObjects
@@ -312,7 +312,7 @@ namespace BH.UI.Dragon
                 paramConversionConfig.AddReturnConversion(retParamIEnum, typeof(IEnumerable<>).MakeGenericType(new Type[] { type }));
 
                 //COnversion for BHoMGroup<T>
-                if (typeof(IObject).IsAssignableFrom(type))
+                if (typeof(IBHoMObject).IsAssignableFrom(type))
                 {
                     paramConversionConfig.AddReturnConversion(GetReturnConversion(type, bhomGroupToGuid), typeof(BHoMGroup<>).MakeGenericType(new Type[] { type }));
                 }
