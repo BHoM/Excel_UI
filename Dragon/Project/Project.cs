@@ -57,18 +57,18 @@ namespace BH.UI.Dragon
         /**** Public get methods        **********/
         /*****************************************/
 
-        public IObject GetBHoM(Guid guid)
+        public IBHoMObject GetBHoM(Guid guid)
         {
             object obj;
             if (m_objects.TryGetValue(guid, out obj))
-                return (IObject)obj;
+                return (IBHoMObject)obj;
             else
                 return null;
         }
 
         /*****************************************/
 
-        public IObject GetBHoM(string str)
+        public IBHoMObject GetBHoM(string str)
         {
             Guid guid;
             return Guid.TryParse(str, out guid) ? GetBHoM(guid) : null;
@@ -162,7 +162,7 @@ namespace BH.UI.Dragon
         /***** Add methods             ***********/
         /*****************************************/
 
-        public Guid Add(IObject obj)
+        public Guid Add(IBHoMObject obj)
         {
             if (m_objects.ContainsKey(obj.BHoM_Guid))
                 return obj.BHoM_Guid;

@@ -85,8 +85,8 @@ namespace BH.UI.Dragon
             var specificType = type.MakeGenericType(t1, t2);
             var exTuple = Activator.CreateInstance(specificType, item1, item2);
 
-            Project.ActiveProject.Add(exTuple as IObject);
-            return (exTuple as IObject).BHoM_Guid.ToString();
+            Project.ActiveProject.Add(exTuple as IBHoMObject);
+            return (exTuple as IBHoMObject).BHoM_Guid.ToString();
         }
 
         /*****************************************************************/

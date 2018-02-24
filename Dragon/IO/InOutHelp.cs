@@ -117,9 +117,9 @@ namespace BH.UI.Dragon
                 return "Failed to get property";
             else if (IsNumeric(obj))
                 return obj;
-            else if (obj is IObject)
+            else if (obj is IBHoMObject)
             {
-                IObject iObj = (IObject)obj;
+                IBHoMObject iObj = (IBHoMObject)obj;
                 Project.ActiveProject.Add(iObj);
                 return iObj.BHoM_Guid.ToString();
             }
