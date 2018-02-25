@@ -90,7 +90,7 @@ namespace BH.UI.Dragon
 
         /*****************************************************************/
 
-        //public static bool SetPropertyHelper(this IBHoMGeometry obj, object[] propNames, object[] propValues, out string message)
+        //public static bool SetPropertyHelper(this IGeometry obj, object[] propNames, object[] propValues, out string message)
         //{
         //    message = "";
         //    for (int i = 0; i < propNames.Length; i++)
@@ -123,9 +123,9 @@ namespace BH.UI.Dragon
                 Project.ActiveProject.Add(iObj);
                 return iObj.BHoM_Guid.ToString();
             }
-            else if (obj is IBHoMGeometry)
+            else if (obj is IGeometry)
             {
-                return Project.ActiveProject.Add(obj as IBHoMGeometry).ToString();
+                return Project.ActiveProject.Add(obj as IGeometry).ToString();
             }
             else if (obj is IDictionary)
             {

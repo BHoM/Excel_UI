@@ -76,18 +76,18 @@ namespace BH.UI.Dragon
 
         /*****************************************/
 
-        public IBHoMGeometry GetGeometry(Guid guid)
+        public IGeometry GetGeometry(Guid guid)
         {
             object obj;
             if (m_objects.TryGetValue(guid, out obj))
-                return (IBHoMGeometry)obj;
+                return (IGeometry)obj;
             else
                 return null;
         }
 
         /*****************************************/
 
-        public IBHoMGeometry GetGeometry(string str)
+        public IGeometry GetGeometry(string str)
         {
             Guid guid;
             return Guid.TryParse(str, out guid) ? GetGeometry(guid) : null;
@@ -222,7 +222,7 @@ namespace BH.UI.Dragon
 
         /*****************************************/
 
-        public Guid Add(IBHoMGeometry geom)
+        public Guid Add(IGeometry geom)
         {
             Guid guid = Guid.NewGuid();
             m_objects[guid] = geom;
