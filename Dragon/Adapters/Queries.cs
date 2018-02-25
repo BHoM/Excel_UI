@@ -8,7 +8,7 @@ using System.Reflection;
 using BH.Adapter;
 using BH.Engine.Reflection;
 using BH.oM.Base;
-using BH.oM.Queries;
+using BH.oM.DataManipulation.Queries;
 
 
 namespace BH.UI.Dragon.Adapters
