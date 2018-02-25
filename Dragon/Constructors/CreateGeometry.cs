@@ -28,7 +28,7 @@ namespace BH.UI.Dragon
                 return "Need to provide the same number of property names as property values";
 
             Type type = BH.Engine.Reflection.Create.Type(typeString);
-            IBHoMGeometry geom = type.GetConstructor(Type.EmptyTypes).Invoke(new object[] { }) as IBHoMGeometry;
+            IGeometry geom = type.GetConstructor(Type.EmptyTypes).Invoke(new object[] { }) as IGeometry;
 
             string message;
             if (!InOutHelp.SetPropertyHelper(geom, propNames, propValues, out message))
