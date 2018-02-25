@@ -240,7 +240,7 @@ namespace BH.UI.Dragon
             foreach (Type type in ReflectionExtra.BHoMTypeList())
             {
                 //TODO: switch all these type checks to only check for the empty interface once it has been implemented
-                if (typeof(IBHoMObject).IsAssignableFrom(type) || typeof(IGeometry).IsAssignableFrom(type) || typeof(BH.oM.Queries.IQuery).IsAssignableFrom(type) || typeof(BH.oM.Common.IResult).IsAssignableFrom(type))
+                if (typeof(IBHoMObject).IsAssignableFrom(type) || typeof(IGeometry).IsAssignableFrom(type) || typeof(BH.oM.DataManipulation.Queries.IQuery).IsAssignableFrom(type) || typeof(BH.oM.Common.IResult).IsAssignableFrom(type))
                 {
                     //Conversion for single objects
                     paramConversionConfig.AddParameterConversion(GetParameterConversion(type, guidToObject), type);
