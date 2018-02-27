@@ -144,13 +144,17 @@ namespace BH.UI.Dragon
                 return Project.ActiveProject.IAdd(dict).ToString();
 
             }
-            else if (obj is IList)
+            else if (obj is IList && obj.GetType().IsGenericType)
             {
                 Type type = typeof(ExcelList<>).MakeGenericType(obj.GetType().GetGenericArguments());
                 var prop = type.GetProperty("Data");
 
+                //Needed for types being IList but not List<T> (Example: ReadOnlyCollection)
+                Type innerType = typeof(List<>).MakeGenericType(obj.GetType().GetGenericArguments());
+                var innerList = Activator.CreateInstance(innerType, new object[] { obj });
+
                 var list = Activator.CreateInstance(type);
-                prop.SetValue(list, obj);
+                prop.SetValue(list, innerList);
                 return Project.ActiveProject.IAdd(list).ToString();
             }
             else if (iTupleType.IsAssignableFrom(obj.GetType()))
