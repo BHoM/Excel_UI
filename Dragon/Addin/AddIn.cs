@@ -53,9 +53,16 @@ namespace BH.UI.Dragon
             //Load all BHoM dlls on opening excel
             foreach (string path in Directory.GetFiles(sourceFolder, "*.dll"))
             {
-                //Check that the dll is not allready loaded
-                if (loadedAssemblies.Where(x => x == Path.GetFileName(path)).Count() < 1)
-                    Assembly.LoadFrom(path);
+                try
+                {
+                    //Check that the dll is not allready loaded
+                    if (loadedAssemblies.Where(x => x == Path.GetFileName(path)).Count() < 1)
+                        Assembly.LoadFrom(path);
+                }
+                catch
+                {
+                    
+                }
             }
         }
 
