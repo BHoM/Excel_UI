@@ -176,8 +176,8 @@ namespace BH.UI.Dragon
 
             // Register the Standard Parameter Conversions (with the optional switch on how to treat references to empty cells)
             paramConversionConfig
-                .AddParameterConversion(ParameterConversions.GetOptionalConversion(treatEmptyAsMissing: true, treatNAErrorAsMissing: true));
-                //.AddParameterConversion(ParameterConversions.GetNullableConversion(treatEmptyAsMissing: true, treatNAErrorAsMissing: true));
+                .AddParameterConversion(ParameterConversions.GetOptionalConversion(treatEmptyAsMissing: true, treatNAErrorAsMissing: true))
+                .AddParameterConversion(ParameterConversions.GetNullableConversion(treatEmptyAsMissing: true, treatNAErrorAsMissing: true));
 
 
             return paramConversionConfig;
@@ -196,10 +196,10 @@ namespace BH.UI.Dragon
 
             //Add conversions for standard list types
             paramConversionConfig
-                .AddParameterConversion((object[] inputs) => inputs.Select(x => Convert.ToInt32(x)).ToList())
-                .AddParameterConversion((object[] inputs) => inputs.Select(x => Convert.ToDouble(x)).ToList())
-                .AddParameterConversion((object[] inputs) => inputs.Select(x => Convert.ToInt32(x)))
-                .AddParameterConversion((object[] inputs) => inputs.Select(x => Convert.ToDouble(x)))
+                .AddParameterConversion((object[] inputs) => inputs.Select(x => IsNullMissingOrEmpty(x) ? 0 : Convert.ToInt32(x)).ToList())
+                .AddParameterConversion((object[] inputs) => inputs.Select(x => IsNullMissingOrEmpty(x) ? 0 : Convert.ToDouble(x)).ToList())
+                .AddParameterConversion((object[] inputs) => inputs.Select(x => IsNullMissingOrEmpty(x) ? 0 : Convert.ToInt32(x)))
+                .AddParameterConversion((object[] inputs) => inputs.Select(x => IsNullMissingOrEmpty(x) ? 0 : Convert.ToDouble(x)))
                 .AddParameterConversion((double[] inputs) => inputs.ToList())
                 .AddParameterConversion((object[] inputs) => inputs.ToList())
                 .AddParameterConversion((object[] inputs) => inputs.Select(TypeConversion.ConvertToString).ToList());
@@ -208,6 +208,23 @@ namespace BH.UI.Dragon
         }
 
         /*****************************************************************/
+
+        private static bool IsNullMissingOrEmpty(object obj)
+        {
+            if (obj == null)
+                return true;
+
+            if (obj == ExcelMissing.Value)
+                return true;
+
+            if (obj == ExcelEmpty.Value)
+                return true;
+
+            if (obj is string && string.IsNullOrWhiteSpace(obj as string))
+                return true;
+
+            return false;
+        }
 
         private static ParameterConversionConfiguration AddStandardReturnConfigurations(ParameterConversionConfiguration paramConversionConfig)
         {

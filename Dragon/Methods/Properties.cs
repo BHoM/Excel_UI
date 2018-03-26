@@ -142,6 +142,10 @@ namespace BH.UI.Dragon
                 [ExcelArgument(Name = "Include the name of the properties")] bool includePropertyNames = false,
                 [ExcelArgument(Name = "Explode inner objects")] bool goDeep = false)
         {
+
+            //Clean the array
+            objectIds = objectIds.CleanArray();
+
             //Get the object
             List<object> objs = objectIds.Select(x => Project.ActiveProject.GetAny(x as string)).ToList();
 

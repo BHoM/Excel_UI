@@ -25,7 +25,12 @@ namespace BH.UI.Dragon
             if (obj is string && Guid.TryParse(obj as string, out guid))
             {
                 //Get out object or geometry
-                return Project.ActiveProject.GetAny(guid);
+                object outObj = Project.ActiveProject.GetAny(guid);
+
+                if (outObj is IExcelObject)
+                    return ((IExcelObject)outObj).InnerObject;
+                else
+                    return outObj;
             }
             else
             {
@@ -117,15 +122,9 @@ namespace BH.UI.Dragon
                 return "Failed to get property";
             else if (IsNumeric(obj))
                 return obj;
-            else if (obj is IBHoMObject)
+            else if (obj is IObject)
             {
-                IBHoMObject iObj = (IBHoMObject)obj;
-                Project.ActiveProject.Add(iObj);
-                return iObj.BHoM_Guid.ToString();
-            }
-            else if (obj is IGeometry)
-            {
-                return Project.ActiveProject.Add(obj as IGeometry).ToString();
+                return Project.ActiveProject.IAdd(obj).ToString();
             }
             else if (obj is IDictionary)
             {
@@ -144,17 +143,13 @@ namespace BH.UI.Dragon
                 return Project.ActiveProject.IAdd(dict).ToString();
 
             }
-            else if (obj is IList && obj.GetType().IsGenericType)
+            else if (obj is IList)
             {
                 Type type = typeof(ExcelList<>).MakeGenericType(obj.GetType().GetGenericArguments());
                 var prop = type.GetProperty("Data");
 
-                //Needed for types being IList but not List<T> (Example: ReadOnlyCollection)
-                Type innerType = typeof(List<>).MakeGenericType(obj.GetType().GetGenericArguments());
-                var innerList = Activator.CreateInstance(innerType, new object[] { obj });
-
                 var list = Activator.CreateInstance(type);
-                prop.SetValue(list, innerList);
+                prop.SetValue(list, obj);
                 return Project.ActiveProject.IAdd(list).ToString();
             }
             else if (iTupleType.IsAssignableFrom(obj.GetType()))
@@ -207,6 +202,13 @@ namespace BH.UI.Dragon
                 return false;
 
             return true;
+        }
+
+        /*****************************************************************/
+
+        public static object[] CleanArray(this object[] arr)
+        {
+            return arr.Where(x => x != null && x != ExcelMissing.Value && x != ExcelEmpty.Value).ToArray();
         }
 
         /*****************************************************************/
