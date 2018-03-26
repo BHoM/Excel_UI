@@ -113,7 +113,7 @@
   <PropertyGroup>
     <PostBuildEvent>call "$(TargetDir)UI_PostBuild.exe" ..\..\ "C:\Users\$(Username)\AppData\Roaming\BHoM\Assemblies"
 
-xcopy "$(SolutionDir)Dragon\ExcelDna.IntelliSense.xll*" "$(TargetDir)ExcelDna.IntelliSense.xll*" /C /Y
+C:\Windows\System32\xcopy "$(SolutionDir)Dragon\ExcelDna.IntelliSense.xll*" "$(TargetDir)ExcelDna.IntelliSense.xll*" /C /Y
 </PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\ExcelDna.AddIn.0.34.6\tools\ExcelDna.AddIn.targets" Condition="Exists('..\packages\ExcelDna.AddIn.0.34.6\tools\ExcelDna.AddIn.targets')" />
