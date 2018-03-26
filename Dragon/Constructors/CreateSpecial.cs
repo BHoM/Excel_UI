@@ -23,6 +23,8 @@ namespace BH.UI.Dragon
                 )
         {
 
+            objectsIds = objectsIds.CleanArray();
+
             if (objectsIds.Length < 1)
                 return "No objects provided";
             List<object> objects = objectsIds.Select(x => x.CheckAndGetStoredObject()).ToList();
