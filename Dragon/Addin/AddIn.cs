@@ -11,7 +11,6 @@ using BH.oM.Base;
 using BH.oM.Geometry;
 using System.Linq.Expressions;
 using BH.Adapter;
-using ExcelDna.Integration;
 
 
 namespace BH.UI.Dragon
@@ -24,7 +23,6 @@ namespace BH.UI.Dragon
         public void AutoOpen()
         {
             LoadBHomAssemblies();
-
             RegisterDragonMethods();
             RegisterBHoMMethods();
             
