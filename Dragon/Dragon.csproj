@@ -84,7 +84,6 @@
     <Compile Include="Addin\ConvertExpressions.cs" />
     <Compile Include="Addin\DragonFunctionExecutionHandler.cs" />
     <Compile Include="Addin\Registrations.cs" />
-    <Compile Include="Addin\Tests.cs" />
     <Compile Include="ArrayResizer.cs" />
     <Compile Include="DebugConfig.cs" />
     <Compile Include="Constructors\CreateBHoM.cs" />
