@@ -149,18 +149,18 @@ namespace BH.UI.Dragon
                 var prop = type.GetProperty("Data");
 
                 var list = Activator.CreateInstance(type);
-                prop.SetValue(list, obj);
+                prop.SetValue(list as IList, obj);
                 return Project.ActiveProject.IAdd(list).ToString();
             }
-            else if (iTupleType.IsAssignableFrom(obj.GetType()))
-            {
-                Type type = typeof(ExcelTuple<,>).MakeGenericType(obj.GetType().GetGenericArguments());
-                var prop = type.GetProperty("Data");
+            //else if (iTupleType.IsAssignableFrom(obj.GetType()))
+            //{
+            //    Type type = typeof(ExcelTuple<,>).MakeGenericType(obj.GetType().GetGenericArguments());
+            //    var prop = type.GetProperty("Data");
 
-                var tuple = Activator.CreateInstance(type);
-                prop.SetValue(tuple, obj);
-                return Project.ActiveProject.IAdd(tuple).ToString();
-            }
+            //    var tuple = Activator.CreateInstance(type);
+            //    prop.SetValue(tuple, obj);
+            //    return Project.ActiveProject.IAdd(tuple).ToString();
+            //}
 
 
             return obj.ToString();
