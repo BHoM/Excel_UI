@@ -173,17 +173,18 @@ namespace BH.UI.Dragon
             //Recurively add the objects dependecies
             foreach (object o in obj.PropertyObjects())
             {
-                if (o is BHoMObject)
+                if (o is IBHoMObject)
                 {
-                    Add(o as BHoMObject);
-                }
+                    Add(o as IBHoMObject);
+                } 
             }
+
             //Add all objects in the custom data
             foreach (KeyValuePair<string, object> kvp in obj.CustomData)
             {
-                if (kvp.Value is BHoMObject)
+                if (kvp.Value is IBHoMObject)
                 {
-                    Add(kvp.Value as BHoMObject);
+                    Add(kvp.Value as IBHoMObject);
                 }
             }
             return obj.BHoM_Guid;
