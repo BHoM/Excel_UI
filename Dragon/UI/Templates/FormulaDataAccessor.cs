@@ -60,14 +60,51 @@ namespace BH.UI.Dragon.UI.Templates
 
         public override List<T> GetDataList<T>(int index)
         {
-            return (Project.ActiveProject.GetAny(inputs[index] as string) as IEnumerable)
-                .Cast<T>().ToList();
+            object item = inputs[index];
+            if (item is string)
+            {
+                string id = inputs[index] as string;
+                object obj = Project.ActiveProject.GetAny(id);
+                return (obj as IEnumerable).Cast<T>().ToList();
+            } else if (item is object[,])
+            {
+                object[,] list = item as object[,];
+                if(typeof(T).IsPrimitive) 
+                {
+                    return list.Cast<object>()
+                        // As above
+                        .Select(o=>(T)(o as dynamic))
+                        .ToList();
+                }
+                else if (typeof(T).Equals(typeof(string)))
+                {
+
+                    return list.Cast<object>()
+                        .Select(o => o.ToString())
+                        .Cast<T>() // We know T == string but compiler doesn't
+                        .ToList();
+                }
+                // Otherwise try to retrieve objects from the Project
+                List<T> l = new List<T>();
+                foreach ( var listitem in list )
+                {
+                    if( listitem is string )
+                    {
+                        T stored = (T)Project.ActiveProject
+                            .GetAny(listitem as string);
+                        if (stored != null) l.Add(stored);
+                    }
+                }
+                return l;
+            }
+            return null;
         }
 
         public override List<List<T>> GetDataTree<T>(int index)
         {
-            return (Project.ActiveProject.GetAny(inputs[index] as string) as IEnumerable)
-                .Cast<List<T>>().ToList();
+            string id = inputs[index] as string;
+            object obj = Project.ActiveProject.GetAny(id);
+            return (obj as IEnumerable).Cast<List<T>>().ToList();
         }
 
         public override bool SetDataItem<T>(int index, T data)
@@ -79,7 +116,8 @@ namespace BH.UI.Dragon.UI.Templates
                     output = data;
                     return true;
                 }
-                output = Project.ActiveProject.Add(data as dynamic).ToString();
+                Guid id = Project.ActiveProject.Add(data as dynamic);
+                output = id.ToString();
                 return true;
             } catch
             {
