@@ -96,7 +96,7 @@
     <Compile Include="Project\Project.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReflectionExtra.cs" />
-    <Compile Include="UI\Templates\FormulaCaller.cs" />
+    <Compile Include="UI\Templates\IFormulaCaller.cs" />
     <Compile Include="UI\Templates\FormulaDataAccessor.cs" />
     <Compile Include="UI\Templates\FormulaParameter.cs" />
     <Compile Include="UI\Templates\IFormulaParameter.cs" />
