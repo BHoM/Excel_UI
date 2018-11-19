@@ -28,7 +28,8 @@ namespace BH.UI.Dragon.UI.Templates
                 bool hasParams = InputParams.Count() > 0;
                 string params_ = "";
                 if (hasParams) {
-                    params_ = "?by_"+ InputParams.Select(p => p.DataType.Name)
+                    params_ = "?by_" + InputParams
+                        .Select(p => p.DataType.Name)
                         .Aggregate((a, b) => $"{a}_{b}");
                 }
                 return new ExcelFunctionAttribute()
@@ -45,28 +46,65 @@ namespace BH.UI.Dragon.UI.Templates
 
         public IEnumerable<IFormulaParameter> Params { get; protected set; }
 
-        public IEnumerable<ExcelArgumentAttribute> ExcelParams => Params.Select((p) => p.ArgumentAttribute);
+        public IEnumerable<ExcelArgumentAttribute> ExcelParams =>
+            Params.Select((p) => p.ArgumentAttribute);
 
         private void SetExcelMethod()
         {
+            // Create a Delegate that looks like:
+            //
+            // (a, b, c, ...) => {
+            //     DataAccessor.Store( new [] {a, b, c, ...} );
+            //     Run();
+            //     return DataAccessor.GetOutput();
+            // }
+
             // Create an array of [n] parameters
-            List<ParameterExpression> lambdaParams = new List<ParameterExpression>();
+            List<ParameterExpression> lambdaParams =
+                new List<ParameterExpression>();
             foreach (var p in InputParams) {
                 lambdaParams.Add(Expression.Parameter(typeof(object)));
             }
-            Expression newArr = Expression.NewArrayInit(typeof(object), lambdaParams);
-            MethodInfo storeMethod = DataAccessor.GetType().GetMethod("Store");
-            MethodInfo returnMethod = DataAccessor.GetType().GetMethod("GetOutput");
+            Expression newArr = Expression.NewArrayInit(
+                typeof(object), // new []
+                lambdaParams    // { ... }
+            );
 
+            Type accessorType = typeof(FormulaDataAccessor);
+
+            // Convert DataAccessor to FormulaDataAccessor
             Expression accessorInstance = Expression.Convert(
                 Expression.Constant(DataAccessor),
-                typeof(FormulaDataAccessor)
+                accessorType
             );
-            Expression storeCall = Expression.Call(accessorInstance, storeMethod, newArr);
-            Expression runCall = Expression.Call(Expression.Constant(this), this.GetType().GetMethod("Run", new Type[0]));
-            Expression returnCall = Expression.Call(accessorInstance, returnMethod);
+
+            // Call FormulaDataAccessor.Store with array
+            MethodInfo storeMethod = accessorType.GetMethod("Store");
+            Expression storeCall = Expression.Call(
+                accessorInstance, // (FormulaDataAccessor)DataAccessor
+                storeMethod,      // void Store(object[])
+                newArr            // new [] { ... }
+            );
+
+            // Call this.Run()
+            MethodInfo runMethod = GetType().GetMethod("Run", new Type[0]);
+            Expression runCall = Expression.Call(
+                Expression.Constant(this),
+                runMethod
+            );
+
+            // Return call FormulaDataAccessor.GetOutput()
+            MethodInfo returnMethod = accessorType.GetMethod("GetOutput");
+            Expression returnCall = Expression.Call(
+                accessorInstance, // (FormulaDataAccessor)DataAccessor
+                returnMethod      // object GetOutput()
+            );
+
+            // Chain them together
             Expression tree = Expression.Block(storeCall, runCall, returnCall);
             LambdaExpression lambda = Expression.Lambda(tree, lambdaParams);
+
+            // Compile
             ExcelMethod = lambda.Compile();
         }
     }
