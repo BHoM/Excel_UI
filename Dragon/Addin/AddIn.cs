@@ -106,8 +106,11 @@ namespace BH.UI.Dragon
             {
                 ExcelIntegration.RegisterDelegates(
                     callers.Select(caller => caller.ExcelMethod).ToList(),
-                    callers.Select(caller => caller.FunctionAttribute).Cast<object>().ToList(),
-                    callers.Select(caller => caller.ExcelParams.Cast<object>().ToList()).ToList()
+                    callers.Select(caller => caller.FunctionAttribute)
+                        .Cast<object>().ToList(),
+                    callers.Select(
+                        caller => caller.ExcelParams.Cast<object>().ToList()
+                    ).ToList()
                 );
             }
             catch (Exception e)
