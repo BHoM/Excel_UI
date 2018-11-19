@@ -51,7 +51,11 @@ namespace BH.UI.Dragon.UI.Templates
                 var stored = (T)Project.ActiveProject.GetAny(item as string);
                 if (stored != null) return stored;
             }
-            return (T)item;
+
+            // Can't always cast directly to T from object storage type even
+            // when the actual type as castable to T. So have to use `as
+            // dynamic` so the cast is between the actual type of `item` to T.
+            return (T)(item as dynamic);
         }
 
         public override List<T> GetDataList<T>(int index)
