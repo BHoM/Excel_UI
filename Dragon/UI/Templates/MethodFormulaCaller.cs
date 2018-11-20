@@ -30,17 +30,7 @@ namespace BH.UI.Dragon.UI.Templates
                 string params_ = "";
                 if (hasParams) {
                     params_ = "?by_" + InputParams
-                        .Select(p =>
-                            typeof(IEnumerable).IsAssignableFrom(p.DataType) &&
-                              p.DataType.IsConstructedGenericType ?
-                                // make lists of things by by_[Thing]s,
-                                // e.g.  by_Points
-                                // Yes this doesn't make nice plurals in all cases
-                                // but it does avoid some invalic characters in the
-                                // formula name.
-                                p.DataType.GenericTypeArguments.First().Name + "s" :
-                                p.DataType.Name
-                            )
+                        .Select(p => p.Name )
                         .Aggregate((a, b) => $"{a}_{b}");
                 }
                 return new ExcelFunctionAttribute()
