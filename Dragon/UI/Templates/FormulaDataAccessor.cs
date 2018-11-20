@@ -25,9 +25,14 @@ namespace BH.UI.Dragon.UI.Templates
         }
 
         // Store some inputs in this DataAccessor
+        // convert Guid strings to objects
         public void Store(params object[] in_)
         {
-            inputs = in_;
+            inputs = new object[in_.Length];
+            for (int i = 0; i < in_.Length; i++)
+            {
+                inputs[i] = Evaluate(in_[i]);
+            }
         }
 
         // Retrieve the output from this DataAccessor
@@ -46,10 +51,11 @@ namespace BH.UI.Dragon.UI.Templates
             if(item is ExcelEmpty || item is ExcelMissing) {
                 return (T)defaults[index];
             }
-            if (item is string)
+            if (item is object[,])
             {
-                var stored = (T)Project.ActiveProject.GetAny(item as string);
-                if (stored != null) return stored;
+                // Incase T is object or something similarly cabable of
+                // holding a list.
+                return (T)(GetDataList<object>(index) as dynamic);
             }
 
             // Can't always cast directly to T from object storage type even
@@ -61,50 +67,81 @@ namespace BH.UI.Dragon.UI.Templates
         public override List<T> GetDataList<T>(int index)
         {
             object item = inputs[index];
-            if (item is string)
+            if (item is List<T>)
             {
-                string id = inputs[index] as string;
-                object obj = Project.ActiveProject.GetAny(id);
-                return (obj as IEnumerable).Cast<T>().ToList();
-            } else if (item is object[,])
+                return item as List<T>;
+            }
+            if (item is IEnumerable<T>)
             {
-                object[,] list = item as object[,];
-                if(typeof(T).IsPrimitive) 
-                {
-                    return list.Cast<object>()
-                        // As above
-                        .Select(o=>(T)(o as dynamic))
-                        .ToList();
-                }
-                else if (typeof(T).Equals(typeof(string)))
-                {
-
-                    return list.Cast<object>()
-                        .Select(o => o.ToString())
-                        .Cast<T>() // We know T == string but compiler doesn't
-                        .ToList();
-                }
-                // Otherwise try to retrieve objects from the Project
-                List<T> l = new List<T>();
-                foreach ( var listitem in list )
-                {
-                    if( listitem is string )
+                return (item as IEnumerable<T>).ToList();
+            }
+            if (item is IEnumerable)
+            {
+                // This will flatten object[,]s
+                List<T> list = new List<T>();
+                foreach(object o in item as IEnumerable) {
+                    if (!(o is ExcelMissing || o is ExcelEmpty))
                     {
-                        T stored = (T)Project.ActiveProject
-                            .GetAny(listitem as string);
-                        if (stored != null) l.Add(stored);
+                        list.Add((T)(o as dynamic));
                     }
                 }
-                return l;
+                return list;
             }
             return null;
         }
 
         public override List<List<T>> GetDataTree<T>(int index)
         {
-            string id = inputs[index] as string;
-            object obj = Project.ActiveProject.GetAny(id);
-            return (obj as IEnumerable).Cast<List<T>>().ToList();
+            object item = inputs[index];
+            if (item is List<List<T>>)
+            {
+                return item as List<List<T>>;
+            }
+            if (item is object[,])
+            {
+                // Convert 2D arrays to List<List<T>> with columns as the
+                // inner list, e.g.
+                //     a1 b1 c1 
+                //     a2 b2 c2 
+                //     a3 b3 c3 
+                //       ->
+                //     new List<List<T>>() {
+                //         new List<T>() { a1, a2, a3 },
+                //         new List<T>() { b1, b2, b3 },
+                //         new List<T>() { c1, c2, c3 }
+                //     }
+                //
+                // This is arbitrary, but it has to be one way or the other
+                List<List<T>> list = new List<List<T>>();
+                int height = (item as object[,]).GetLength(0);
+                int width = (item as object[,]).GetLength(1);
+                for(int i = 0; i < width; i++)
+                {
+                    list.Add(new List<T>());
+                    for (int j = 0; j < height; j++)
+                    {
+                        object o = (item as object[,])[i, j];
+                        if (!(o is ExcelMissing || o is ExcelEmpty))
+                        {
+                            list[i].Add((T)(o as dynamic));
+                        }
+                    }
+                }
+                return list;
+            }
+            if (item is IEnumerable)
+            {
+                return (item as IEnumerable).Cast<object>()
+                    .Select(o =>
+                        (o is IEnumerable) ? (o as IEnumerable)
+                            .Cast<object>()
+                            .Select(inner => (T)(inner as dynamic))
+                            .ToList()
+                            : null as List<T> )
+                    .ToList();
+
+            }
+            return null;
         }
 
         public override bool SetDataItem<T>(int index, T data)
@@ -116,7 +153,7 @@ namespace BH.UI.Dragon.UI.Templates
                     output = data;
                     return true;
                 }
-                Guid id = Project.ActiveProject.Add(data as dynamic);
+                Guid id = Project.ActiveProject.IAdd(data);
                 output = id.ToString();
                 return true;
             } catch
@@ -130,7 +167,7 @@ namespace BH.UI.Dragon.UI.Templates
         {
             try
             {
-                Guid id = Project.ActiveProject.Add(data as dynamic);
+                Guid id = Project.ActiveProject.IAdd(data);
                 output = id.ToString();
                 return true;
             } catch
@@ -145,7 +182,7 @@ namespace BH.UI.Dragon.UI.Templates
         {
             try
             {
-                Guid id = Project.ActiveProject.Add(data as dynamic);
+                Guid id = Project.ActiveProject.IAdd(data);
                 output = id.ToString();
                 return true;
             } catch
@@ -154,5 +191,42 @@ namespace BH.UI.Dragon.UI.Templates
                 return false;
             }
         }
+
+        private object Evaluate(object input)
+        {
+            if (input.GetType().IsPrimitive)
+            {
+                return input;
+            }
+            if(input is string)
+            {
+                object obj = Project.ActiveProject.GetAny(input as string);
+                return obj == null ? input : obj;
+            }
+            if( input is object[,])
+            {
+                // Keep the 2D array layout but evaluate members recursively
+                // to convert Guid strings into objects from the Project
+                return Evaluate(input as object[,]);
+            }
+            return input;
+        }
+
+        private object Evaluate(object[,] input)
+        {
+            int height = input.GetLength(0);
+            int width = input.GetLength(1);
+
+            object[,] evaluated = new object[height, width];
+            for(int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    evaluated[i, j] = Evaluate(input[i,j]);
+                }
+            }
+            return evaluated;
+        }
+
     }
 }
