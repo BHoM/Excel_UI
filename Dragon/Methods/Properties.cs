@@ -138,16 +138,28 @@ namespace BH.UI.Dragon
 
         [ExcelFunction(Description = "Get all properties from an object. WARNING This is an array formula and will take up more than one cell!", Category = "Dragon")]
         public static object Explode(
-                [ExcelArgument(Name = "object ids")] object[] objectIds,
+                [ExcelArgument(Name = "object ids")] object objectIds,
                 [ExcelArgument(Name = "Include the name of the properties")] bool includePropertyNames = false,
                 [ExcelArgument(Name = "Explode inner objects")] bool goDeep = false)
         {
 
+            object[] _objectIds = new object[] { };
+            if (objectIds is object[,])
+            {
+                 _objectIds = (objectIds as object[,]).Cast<object>().ToArray().CleanArray();
+            } else if (objectIds is object[])
+            {
+                _objectIds = (objectIds as object[]);
+            } else if (objectIds is string)
+            {
+                _objectIds = new[] { objectIds };
+            }
+
             //Clean the array
-            objectIds = objectIds.CleanArray();
+            _objectIds = _objectIds.CleanArray();
 
             //Get the object
-            List<object> objs = objectIds.Select(x => Project.ActiveProject.GetAny(x as string)).ToList();
+            List<object> objs = _objectIds.Select(x => Project.ActiveProject.GetAny(x as string)).ToList();
 
             if (objs == null)
                 return "Failed to get object";
