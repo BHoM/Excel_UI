@@ -78,7 +78,6 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Adapters\Adapter.cs" />
-    <Compile Include="Adapters\Queries.cs" />
     <Compile Include="Addin\AddIn.cs" />
     <Compile Include="ArrayResizer.cs" />
     <Compile Include="DebugConfig.cs" />
@@ -87,7 +86,6 @@
     <Compile Include="Constructors\CreateSpecial.cs" />
     <Compile Include="IO\InOutHelp.cs" />
     <Compile Include="Methods\GenericMethodCall.cs" />
-    <Compile Include="Methods\JSON.cs" />
     <Compile Include="Methods\Properties.cs" />
     <Compile Include="Objects\ExcelDictionary.cs" />
     <Compile Include="Objects\ExcelList.cs" />

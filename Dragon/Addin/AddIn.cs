@@ -84,6 +84,21 @@ namespace BH.UI.Dragon
                 else
                     otherMethods.Add(mi);
             }
+            List<object> fattrs = new List<object>();
+            List<List<object>> attrs = new List<List<object>>();
+            foreach (MethodInfo method in otherMethods)
+            {
+                var fa = method.GetCustomAttribute<ExcelFunctionAttribute>();
+                fa.Name = "Dragon." + (fa.Name != null ? fa.Name : method.Name);
+
+                fattrs.Add(fa);
+                attrs.Add(
+                    method.GetParameters()
+                        .Select(p => p.GetCustomAttribute<ExcelArgumentAttribute>() as object)
+                        .ToList()
+                );
+            }
+            ExcelIntegration.RegisterMethods(otherMethods,fattrs,attrs);
         }
 
         /*****************************************************************/
@@ -91,6 +106,7 @@ namespace BH.UI.Dragon
         {
             IEnumerable<MethodBase> methods = Query.BHoMMethodList();
             var callers = new List<IFormulaCaller>();
+            var failed = new List<MethodBase>();
             foreach (MethodBase method in methods)
             {
                 try
@@ -99,7 +115,9 @@ namespace BH.UI.Dragon
                 }
                 catch (Exception e)
                 {
-                    Console.WriteLine(e.ToString());
+                    // For debugging purposes, keep a record of methods that
+                    // fail to compile
+                    failed.Add(method);
                 }
             }
             try
