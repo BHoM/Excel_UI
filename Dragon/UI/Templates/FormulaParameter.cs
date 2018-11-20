@@ -16,28 +16,30 @@ namespace BH.UI.Dragon.UI.Templates
             get
             {
                 var attr = new ExcelArgumentAttribute();
-                try
+                attr.Name = ParamInfo.Name;
+                attr.Description = ParamInfo.Description;
+                string typeinfo = typeToString(ParamInfo.DataType);
+                if (ParamInfo.HasDefaultValue)
                 {
-                    attr.Name = ParamInfo.Name;
-                    attr.Description = ParamInfo.Description;
-                    if (ParamInfo.HasDefaultValue)
-                    {
-                        // So InteliSense makes it clear to the user that the
-                        // parameter is optional.
-                        attr.Name = $"[{attr.Name}]";
-                        object default_ = ParamInfo.DefaultValue;
-                        string def = $"[default: {default_.ToString()}]";
-                        if (string.IsNullOrWhiteSpace(attr.Description))
-                        {
-                            attr.Description = def;
-                        }
-                        else
-                        {
-                            attr.Description += "\n" + def;
-                        }
-                    }
+                    // So InteliSense makes it clear to the user that the
+                    // parameter is optional.
+                    attr.Name = $"[{attr.Name}]";
+                    object default_ = ParamInfo.DefaultValue;
+                    if (default_ == null)
+                        default_ = "null";
+                    else if (default_ is string)
+                        default_ = $"\"{default_}\"";
+                    string def = $"[default: {default_.ToString()}]";
+                    typeinfo += " " + def;
                 }
-                catch { }
+                if (string.IsNullOrWhiteSpace(attr.Description))
+                {
+                    attr.Description = typeinfo;
+                }
+                else
+                {
+                    attr.Description += ". " + typeinfo;
+                }
                 return attr;
             }
         }
@@ -46,5 +48,20 @@ namespace BH.UI.Dragon.UI.Templates
         {
             ParamInfo = info;
         }
+
+        private static string typeToString(Type t)
+        {
+            if(t.IsGenericType)
+            {
+                return t.Name.Split('`').FirstOrDefault()
+                    + "<"
+                    + t.GenericTypeArguments
+                        .Select(g => typeToString(g))
+                        .Aggregate((a, b) => $"{a}, {b}")
+                    + ">";
+            }
+            return t.Name;
+        }
     }
+
 }
