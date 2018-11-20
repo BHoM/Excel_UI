@@ -120,7 +120,7 @@ namespace BH.UI.Dragon.UI.Templates
                     list.Add(new List<T>());
                     for (int j = 0; j < height; j++)
                     {
-                        object o = (item as object[,])[i, j];
+                        object o = (item as object[,])[j, i];
                         if (!(o is ExcelMissing || o is ExcelEmpty))
                         {
                             list[i].Add((T)(o as dynamic));
@@ -222,7 +222,7 @@ namespace BH.UI.Dragon.UI.Templates
             {
                 for (int j = 0; j < height; j++)
                 {
-                    evaluated[i, j] = Evaluate(input[i,j]);
+                    evaluated[j,i] = Evaluate(input[j,i]);
                 }
             }
             return evaluated;
