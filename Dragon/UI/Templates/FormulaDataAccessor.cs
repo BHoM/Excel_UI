@@ -21,6 +21,11 @@ namespace BH.UI.Dragon.Templates
         private object[] defaults;
         private object output;
 
+
+        public FormulaDataAccessor()
+        {
+        }
+
         public void StoreDefaults(object [] params_)
         {
             // Collect default values from ParamInfo so defaultable
@@ -181,8 +186,7 @@ namespace BH.UI.Dragon.Templates
                     output = data;
                     return true;
                 }
-                Guid id = Project.ActiveProject.IAdd(data);
-                output = id.ToString();
+                output = Project.ActiveProject.IAdd(data);
                 return true;
             } catch
             {
@@ -195,8 +199,7 @@ namespace BH.UI.Dragon.Templates
         {
             try
             {
-                Guid id = Project.ActiveProject.IAdd(data);
-                output = id.ToString();
+                output = Project.ActiveProject.IAdd(data.ToList());
                 return true;
             } catch
             {
@@ -210,8 +213,7 @@ namespace BH.UI.Dragon.Templates
         {
             try
             {
-                Guid id = Project.ActiveProject.IAdd(data);
-                output = id.ToString();
+                output = Project.ActiveProject.IAdd(data.Select(d=>d.ToList()).ToList());
                 return true;
             } catch
             {
