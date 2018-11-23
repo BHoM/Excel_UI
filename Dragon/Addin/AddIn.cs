@@ -11,18 +11,25 @@ using BH.oM.Geometry;
 using System.Linq.Expressions;
 using BH.Adapter;
 using BH.UI.Templates;
-using BH.UI.Dragon.UI.Templates;
+using BH.UI.Dragon.Templates;
+using BH.UI.Dragon.Components;
+using BH.UI.Dragon.Global;
+using BH.UI.Global;
+using BH.UI.Components;
+using BH.Engine.Reflection.Convert;
 
 namespace BH.UI.Dragon
 {
     public partial class AddIn : IExcelAddIn
     {
+        private FormulaDataAccessor m_da;
+        private Dictionary<string, CallerFormula> m_formulea;
+
         /*****************************************************************/
         /******* Public methods                             **************/
         /*****************************************************************/
         public void AutoOpen()
         {
-            LoadBHomAssemblies();
             RegisterDragonMethods();
             RegisterBHoMMethods();
             
@@ -41,30 +48,7 @@ namespace BH.UI.Dragon
         /*****************************************************************/
         /******* Private methods                            **************/
         /*****************************************************************/
-        private void LoadBHomAssemblies()
-        {
-            Assembly ass = Assembly.GetExecutingAssembly();
-            string sourceFolder = @"C:\Users\" + Environment.UserName + @"\AppData\Roaming\BHoM\Assemblies";
 
-            List<string> loadedAssemblies = ass.GetReferencedAssemblies().Select(x => x.Name + ".dll").ToList();
-
-            //Load all BHoM dlls on opening excel
-            foreach (string path in Directory.GetFiles(sourceFolder, "*.dll"))
-            {
-                try
-                {
-                    //Check that the dll is not allready loaded
-                    if (loadedAssemblies.Where(x => x == Path.GetFileName(path)).Count() < 1)
-                        Assembly.LoadFrom(path);
-                }
-                catch
-                {
-                    
-                }
-            }
-        }
-
-        /*****************************************************************/
         private void RegisterDragonMethods()
         {
             //Get out all the methods marked with the excel attributes
@@ -75,14 +59,9 @@ namespace BH.UI.Dragon
             List<MethodInfo> adapterMethods = new List<MethodInfo>();
             List<MethodInfo> otherMethods = new List<MethodInfo>();
 
-            Type adapterType = typeof(Dragon.Adapter.Adapter);
-
             foreach (MethodInfo mi in allDragonMethods)
             {
-                if (mi.DeclaringType == adapterType)
-                    adapterMethods.Add(mi);
-                else
-                    otherMethods.Add(mi);
+                otherMethods.Add(mi);
             }
             List<object> fattrs = new List<object>();
             List<List<object>> attrs = new List<List<object>>();
@@ -104,36 +83,53 @@ namespace BH.UI.Dragon
         /*****************************************************************/
         private void RegisterBHoMMethods()
         {
-            IEnumerable<MethodBase> methods = Query.BHoMMethodList();
-            var callers = new List<IFormulaCaller>();
-            var failed = new List<MethodBase>();
-            foreach (MethodBase method in methods)
+            m_da = new FormulaDataAccessor();
+            var searcher = new FormulaSearchMenu(m_da);
+            GlobalSearch.Attach(searcher);
+            GlobalSearch.ItemSelected += GlobalSearch_ItemSelected;
+
+            searcher.SetParent(null);
+            Type fda = typeof(FormulaDataAccessor);
+            Type callform = typeof(CallerFormula);
+            Type[] constrtypes = new Type[] { fda };
+            object[] args = new object[] { m_da };
+            Type adapterType = typeof(BHoMAdapter);
+
+            IEnumerable<MethodBase> methods = Query.AdapterTypeList().Where(x => x.IsSubclassOf(adapterType)).OrderBy(x => x.Name).SelectMany(x => x.GetConstructors());
+
+
+            var adapterRegs = new List<Tuple<Delegate, ExcelFunctionAttribute, List<object>>>();
+            foreach ( MethodBase adapter in methods)
             {
-                try
+                var proxy = m_da.Wrap(adapter, () => GlobalSearch_ItemSelected(null, new oM.UI.ComponentRequest
                 {
-                    callers.Add(new MethodFormulaCaller(method));
-                }
-                catch (Exception e)
-                {
-                    // For debugging purposes, keep a record of methods that
-                    // fail to compile
-                    failed.Add(method);
-                }
+                    CallerType = typeof(CreateAdapterCaller),
+                    SelectedItem = adapter
+                }));
+                adapterRegs.Add(proxy);
             }
-            try
+
+            ExcelIntegration.RegisterDelegates(
+                adapterRegs.Select(r => r.Item1).ToList(),
+                adapterRegs.Select(r => r.Item2).ToList<object>(),
+                adapterRegs.Select(r => r.Item3).ToList()
+            );
+
+            m_formulea = ExcelIntegration.GetExportedAssemblies()
+                .SelectMany(a => a.GetTypes())
+                .Where(t => t.Namespace == "BH.UI.Dragon.Components"
+                            && callform.IsAssignableFrom(t))
+                .Select(t => t.GetConstructor(constrtypes).Invoke(args) as CallerFormula)
+                .ToDictionary(o => o.Caller.GetType().Name);
+        }
+
+        private void GlobalSearch_ItemSelected(object sender, oM.UI.ComponentRequest e)
+        {
+            if (m_formulea.ContainsKey(e.CallerType.Name))
             {
-                ExcelIntegration.RegisterDelegates(
-                    callers.Select(caller => caller.ExcelMethod).ToList(),
-                    callers.Select(caller => caller.FunctionAttribute)
-                        .Cast<object>().ToList(),
-                    callers.Select(
-                        caller => caller.ExcelParams.Cast<object>().ToList()
-                    ).ToList()
-                );
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e.ToString());
+                CallerFormula formula = m_formulea[e.CallerType.Name];
+                formula.Caller.SetItem(e.SelectedItem);
+                formula.Caller.Run();
             }
         }
 

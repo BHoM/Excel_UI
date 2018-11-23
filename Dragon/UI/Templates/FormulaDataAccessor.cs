@@ -8,8 +8,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ExcelDna.Integration;
+using System.Linq.Expressions;
+using System.Reflection;
+using BH.Engine.Reflection;
+using BH.Engine.Reflection.Convert;
 
-namespace BH.UI.Dragon.UI.Templates
+namespace BH.UI.Dragon.Templates
 {
     public class FormulaDataAccessor : DataAccessor
     {
@@ -17,11 +21,11 @@ namespace BH.UI.Dragon.UI.Templates
         private object[] defaults;
         private object output;
 
-        public FormulaDataAccessor(IEnumerable<ParamInfo> params_)
+        public void StoreDefaults(object [] params_)
         {
             // Collect default values from ParamInfo so defaultable
             // arguments can be ommited in excel
-            defaults = params_.Select(p => p.DefaultValue).ToArray();
+            defaults = params_;
         }
 
         // Store some inputs in this DataAccessor
@@ -43,6 +47,11 @@ namespace BH.UI.Dragon.UI.Templates
                 return ExcelError.ExcelErrorNull;
             }
             return output;
+        }
+
+        public void ResetOutput()
+        {
+            output = null;
         }
         
         public override T GetDataItem<T>(int index)
@@ -210,6 +219,144 @@ namespace BH.UI.Dragon.UI.Templates
                 return Evaluate(input as object[,]);
             }
             return input;
+        }
+
+
+        public Tuple<Delegate, ExcelFunctionAttribute, List<object>>
+            Wrap(MethodBase item, Expression<Action> action)
+        {
+            // Create a Delegate that looks like:
+            //
+            // (a, b, c, ...) => {
+            //     accessor.ResetOutput();
+            //     accessor.StoreDefaults(defaults);
+            //     accessor.Store( new [] {a, b, c, ...} );
+            //     NotifySelection(itemStr);
+            //     return accessor.GetOutput();
+            // }
+
+            // Create an array of [n] parameters
+            var rawParams = item.GetParameters();
+            ParameterExpression[] lambdaParams = rawParams
+                .Select(p => Expression.Parameter(typeof(object)))
+                .ToArray();
+            Expression newArr = Expression.NewArrayInit(
+                typeof(object),
+                lambdaParams
+            );
+
+            Expression defs = Expression.Constant(rawParams.Select(p => p.DefaultValue).ToArray());
+
+            Expression accessorInstance = Expression.Constant(this);
+            Type accessorType = GetType();
+
+            // Call SetItem
+            Expression setItemCall = Expression.Invoke(action);
+
+
+            // Call FormulaDataAccessor.ResetOutput 
+            MethodInfo resetMethod = accessorType.GetMethod("ResetOutput");
+            Expression resetCall = Expression.Call(
+                accessorInstance, // (FormulaDataAccessor)DataAccessor
+                resetMethod       // void Reset()
+            );
+
+            MethodInfo storeDefMethod = accessorType.GetMethod("StoreDefaults");
+            Expression storeDefCall = Expression.Call(
+                accessorInstance, // FormulaDataAccessor
+                storeDefMethod,   // void StoreDefaults(...)
+                defs
+            );
+
+            // Call FormulaDataAccessor.Store with array
+            MethodInfo storeMethod = accessorType.GetMethod("Store");
+            Expression storeCall = Expression.Call(
+                accessorInstance, // (FormulaDataAccessor)DataAccessor
+                storeMethod,      // void Store(object[])
+                newArr            // new [] { ... }
+            );
+            // Return call FormulaDataAccessor.GetOutput()
+            MethodInfo returnMethod = accessorType.GetMethod("GetOutput");
+            Expression returnCall = Expression.Call(
+                accessorInstance, // (FormulaDataAccessor)DataAccessor
+                returnMethod      // object GetOutput()
+            );
+
+            // Chain them together
+            Expression tree = Expression.Block(
+                resetCall,
+                storeDefCall,
+                storeCall,
+                setItemCall,
+                returnCall
+            );
+            LambdaExpression lambda = Expression.Lambda(tree, lambdaParams);
+
+            // Compile
+            var argAttrs = item.GetParameters()
+                        .Select(p =>
+                        {
+                            string desc = p.Description() + p.ParameterType.ToText();
+                            if (p.HasDefaultValue)
+                            {
+                                desc += " [default: " +
+                                (p.DefaultValue is string
+                                    ? $"\"{p.DefaultValue}\""
+                                    : p.DefaultValue == null
+                                        ? "null"
+                                        : p.DefaultValue.ToString()
+                                ) + "]";
+                            }
+
+                            return new ExcelArgumentAttribute()
+                            {
+                                Name = p.HasDefaultValue ? $"[{p.Name}]" : p.Name,
+                                Description = desc
+                            };
+                        }).ToList<object>();
+            return new Tuple<Delegate, ExcelFunctionAttribute, List<object>>(
+                lambda.Compile(),
+                GetFunctionAttribute(item),
+                argAttrs
+            );
+        }
+
+        private ExcelFunctionAttribute GetFunctionAttribute(MethodBase info)
+        {
+            var paramList = info.GetParameters();
+            bool hasParams = paramList.Count() > 0;
+            string params_ = "";
+            if (hasParams)
+            {
+                params_ = "?by_" + paramList
+                    .Select(p => p.Name)
+                    .Aggregate((a, b) => $"{a}_{b}");
+            }
+
+            string name = null;
+            string prefix = null;
+            if (info is ConstructorInfo)
+            {
+                prefix = info.DeclaringType.Namespace;
+                if(prefix.StartsWith("BH."))
+                {
+                    prefix = prefix.Substring(3) + ".";
+                }
+                name = prefix + info.DeclaringType.Name;
+            } else
+            {
+                prefix = info.DeclaringType.Name + "."
+                + info.DeclaringType.Namespace.Split('.').Last() + ".";
+
+                name = prefix + info.Name;
+            }
+            return new ExcelFunctionAttribute()
+            {
+                Name = name + params_,
+                Description = info.Description(),
+                Category = "Dragon." + info.DeclaringType.Name,
+                IsMacroType = true
+            };
         }
 
         private object Evaluate(object[,] input)

@@ -42,56 +42,6 @@ namespace BH.UI.Dragon
 
         /*****************************************************************/
 
-        [ExcelFunction(Description = "Set the property of an object", Category = "Dragon")]
-        public static object SetProperty(
-            [ExcelArgument(Name = "object id")] string objectId,
-            [ExcelArgument(Name = "property name")] object[] propNames,
-            [ExcelArgument(Name = "property value")] object[] propValues)
-        {
-
-            IBHoMObject obj = Project.ActiveProject.GetBHoM(objectId);
-
-            if (obj == null)
-                return "Failed to get BHoMObject";
-
-            IBHoMObject clone = obj.GetShallowClone(true);
-
-            string message;
-            
-            if (!InOutHelp.SetPropertyHelper(clone, propNames, propValues, out message))
-                return message;
-
-            Project.ActiveProject.Add(clone);
-            return clone.BHoM_Guid.ToString();
-        }
-
-        /*****************************************************************/
-
-        [ExcelFunction(Description = "Set the property of an object", Category = "Dragon")]
-        public static object SetPropertyList(
-            [ExcelArgument(Name = "object id")] string objectId,
-            [ExcelArgument(Name = "property name")] object[] propName,
-            [ExcelArgument(Name = "property value")] object[] propValues)
-        {
-
-            IBHoMObject obj = Project.ActiveProject.GetBHoM(objectId);
-
-            if (obj == null)
-                return "Failed to get BHoMObject";
-
-            IBHoMObject clone = obj.GetShallowClone(true);
-
-            string message;
-
-            if (!InOutHelp.SetPropertyHelper(clone, propName, propValues, out message))
-                return message;
-
-            Project.ActiveProject.Add(clone);
-            return clone.BHoM_Guid.ToString();
-        }
-
-        /*****************************************************************/
-
         [ExcelFunction(Description = "Adds a custom data to an object", Category = "Dragon")]
         public static object AddCustomData(
             [ExcelArgument(Name = "object id")] string objectId,
