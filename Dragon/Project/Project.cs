@@ -20,7 +20,7 @@ namespace BH.UI.Dragon
         /**** Data fields               **********/
         /*****************************************/
 
-        private Dictionary<Guid, object> m_objects;
+        private Dictionary<string, object> m_objects;
 
 
         /*****************************************/
@@ -35,7 +35,7 @@ namespace BH.UI.Dragon
 
         private Project()
         {
-            m_objects = new Dictionary<Guid, object>();
+            m_objects = new Dictionary<string, object>();
         }
 
         /*****************************************/
@@ -57,103 +57,48 @@ namespace BH.UI.Dragon
         /**** Public get methods        **********/
         /*****************************************/
 
-        public IBHoMObject GetBHoM(Guid guid)
-        {
-            object obj;
-            if (m_objects.TryGetValue(guid, out obj))
-                return (IBHoMObject)obj;
-            else
-                return null;
-        }
-
-        /*****************************************/
-
         public IBHoMObject GetBHoM(string str)
         {
-            Guid guid;
-            return Guid.TryParse(str, out guid) ? GetBHoM(guid) : null;
-        }
-
-        /*****************************************/
-
-        public IGeometry GetGeometry(Guid guid)
-        {
-            object obj;
-            if (m_objects.TryGetValue(guid, out obj))
-                return (IGeometry)obj;
-            else
-                return null;
+            return GetAny(str) as IBHoMObject;
         }
 
         /*****************************************/
 
         public IGeometry GetGeometry(string str)
         {
-            Guid guid;
-            return Guid.TryParse(str, out guid) ? GetGeometry(guid) : null;
-        }
-
-        /*****************************************/
-
-        public object GetAny(Guid guid)
-        {
-            object obj;
-            if (m_objects.TryGetValue(guid, out obj))
-                return obj;
-            else
-                return null;
+            return GetAny(str) as IGeometry;
         }
 
         /*****************************************/
 
         public object GetAny(string str)
         {
-            Guid guid;
-            return Guid.TryParse(str, out guid) ? GetAny(guid) : null;
-        }
-
-        /*****************************************/
-
-        public BHoMAdapter GetAdapter(Guid guid)
-        {
-            object obj;
-            if (m_objects.TryGetValue(guid, out obj))
-                return (BHoMAdapter)obj;
-            else
-                return null;
+            if(m_objects.ContainsKey(str))
+            {
+                return m_objects[str]; 
+            }
+            return null;
         }
 
         /*****************************************/
 
         public BHoMAdapter GetAdapter(string str)
         {
-            Guid guid;
-            return Guid.TryParse(str, out guid) ? GetAdapter(guid) : null;
+            return GetAny(str) as BHoMAdapter;
         }
 
         /*****************************************/
 
-        public IQuery GetQuery(Guid guid)
-        {
-            object obj;
-            if (m_objects.TryGetValue(guid, out obj))
-                return (IQuery)obj;
-            else
-                return null;
-        }
-
-        /*****************************************/
 
         public IQuery GetQuery(string str)
         {
-            Guid guid;
-            return Guid.TryParse(str, out guid) ? GetQuery(guid) : null;
+            return GetAny(str) as IQuery;
         }
 
         /*****************************************/
         /****** "Interface" Add method     *******/
         /*****************************************/
-        public Guid IAdd(object obj)
+        public string IAdd(object obj)
         {
             return Add(obj as dynamic);
         }
@@ -162,12 +107,12 @@ namespace BH.UI.Dragon
         /***** Add methods             ***********/
         /*****************************************/
 
-        public Guid Add(IBHoMObject obj)
+        public string Add(IBHoMObject obj)
         {
-            if (m_objects.ContainsKey(obj.BHoM_Guid))
-                return obj.BHoM_Guid;
+            string guid = ToString(obj.BHoM_Guid);
+            if (m_objects.ContainsKey(guid))
+                return guid;
 
-            Guid guid = obj.BHoM_Guid;
             m_objects.Add(guid, obj);
 
             //Recurively add the objects dependecies
@@ -187,54 +132,63 @@ namespace BH.UI.Dragon
                     Add(kvp.Value as IBHoMObject);
                 }
             }
-            return obj.BHoM_Guid;
+            return guid;
         }
 
         /*****************************************/
 
-        public Guid Add(BHoMAdapter adapter)
+        public string Add(BHoMAdapter adapter)
         {
-            if (m_objects.ContainsKey(adapter.BHoM_Guid))
-                return adapter.BHoM_Guid;
+            string guid = ToString(adapter.BHoM_Guid);
+            if (m_objects.ContainsKey(guid))
+                return guid;
 
-            m_objects[adapter.BHoM_Guid] = adapter;
-            return adapter.BHoM_Guid;
+            m_objects[guid] = adapter;
+            return guid;
         }
 
         /*****************************************/
 
-        public Guid Add(IExcelObject excelObj)
+        public string Add(IExcelObject excelObj)
         {
-            if (m_objects.ContainsKey(excelObj.BHoM_Guid))
-                return excelObj.BHoM_Guid;
+            string guid = ToString(excelObj.BHoM_Guid);
+            if (m_objects.ContainsKey(guid))
+                return guid;
 
-            m_objects[excelObj.BHoM_Guid] = excelObj;
-            return excelObj.BHoM_Guid;
+            m_objects[guid] = excelObj;
+            return guid;
         }
 
         /*****************************************/
 
-        public Guid Add(IQuery query)
+        public string Add(IQuery query)
         {
-            Guid guid = Guid.NewGuid();
+            string guid = ToString(Guid.NewGuid());
             m_objects[guid] = query;
             return guid;
         }
 
         /*****************************************/
 
-        public Guid Add(IGeometry geom)
+        public string Add(IGeometry geom)
         {
-            Guid guid = Guid.NewGuid();
+            string guid = ToString(Guid.NewGuid());
             m_objects[guid] = geom;
             return guid;
         }
 
         /*****************************************/
 
-        private Guid Add(object obj)
+        private static string ToString(Guid id)
         {
-            Guid guid = Guid.NewGuid();
+            return Convert.ToBase64String(id.ToByteArray()).Remove(8);
+        }
+
+        /*****************************************/
+
+        private string Add(object obj)
+        {
+            string guid = ToString(Guid.NewGuid());
             m_objects[guid] = obj;
             return guid;
         }
