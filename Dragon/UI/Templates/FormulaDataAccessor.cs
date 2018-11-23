@@ -42,6 +42,19 @@ namespace BH.UI.Dragon.Templates
         // Retrieve the output from this DataAccessor
         public object GetOutput()
         {
+            var errors = Query.CurrentEvents()
+                .Where(e => e.Type == oM.Reflection.Debuging.EventType.Error);
+            if (errors.Count() > 0) {
+                string msg = errors
+                    .Select(e => e.Message)
+                    .Aggregate((a, b) => a + "\n" + b);
+                try
+                {
+                    ExcelReference caller = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
+                    ExcelAsyncUtil.QueueAsMacro(() => XlCall.Excel(XlCall.xlfNote, msg, caller));
+                }
+                catch { }
+            }
             if (output == null)
             {
                 return ExcelError.ExcelErrorNull;
@@ -51,6 +64,12 @@ namespace BH.UI.Dragon.Templates
 
         public void ResetOutput()
         {
+            try
+            {
+                ExcelReference caller = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
+                ExcelAsyncUtil.QueueAsMacro(() => XlCall.Excel(XlCall.xlfNote, "", caller));
+            }
+            catch { }
             output = null;
         }
         
