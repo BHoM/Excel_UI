@@ -149,18 +149,6 @@ namespace BH.UI.Dragon
 
         /*****************************************/
 
-        public string Add(IExcelObject excelObj)
-        {
-            string guid = ToString(excelObj.BHoM_Guid);
-            if (m_objects.ContainsKey(guid))
-                return guid;
-
-            m_objects[guid] = excelObj;
-            return guid;
-        }
-
-        /*****************************************/
-
         public string Add(IQuery query)
         {
             string guid = ToString(Guid.NewGuid());

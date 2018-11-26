@@ -82,10 +82,6 @@
     <Compile Include="DebugConfig.cs" />
     <Compile Include="IO\InOutHelp.cs" />
     <Compile Include="Methods\Properties.cs" />
-    <Compile Include="Objects\ExcelDictionary.cs" />
-    <Compile Include="Objects\ExcelList.cs" />
-    <Compile Include="Objects\ExcelTuple.cs" />
-    <Compile Include="Objects\IExcelObject.cs" />
     <Compile Include="Project\Project.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ReflectionExtra.cs" />

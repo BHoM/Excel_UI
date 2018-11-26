@@ -186,8 +186,17 @@ namespace BH.UI.Dragon.Templates
                     output = data;
                     return true;
                 }
-                output = Project.ActiveProject.IAdd(data);
-                return true;
+                if (data is Guid)
+                {
+                    return SetDataItem(index, data.ToString());
+                }
+                if(!(data is ICollection) && data is IEnumerable)
+                {
+                    return SetDataItem(index, (data as IEnumerable).Cast<object>().ToList());
+                }
+                return SetDataItem(index,
+                    data.GetType().ToText() + " [" + Project.ActiveProject.IAdd(data) + "]"
+                );
             } catch
             {
                 output = ExcelError.ExcelErrorNA;
@@ -197,29 +206,21 @@ namespace BH.UI.Dragon.Templates
 
         public override bool SetDataList<T>(int index, IEnumerable<T> data)
         {
-            try
+            if (data is ICollection)
             {
-                output = Project.ActiveProject.IAdd(data.ToList());
-                return true;
-            } catch
-            {
-                output = ExcelError.ExcelErrorNA;
-                return false;
+                return SetDataItem(index, data);
             }
+            return SetDataItem(index, data.ToList());
         }
 
         public override bool SetDataTree<T>(int index,
             IEnumerable<IEnumerable<T>> data)
         {
-            try
+            if (data is ICollection && data.All(sub => sub is ICollection))
             {
-                output = Project.ActiveProject.IAdd(data.Select(d=>d.ToList()).ToList());
-                return true;
-            } catch
-            {
-                output = ExcelError.ExcelErrorNA;
-                return false;
+                return SetDataItem(index, data);
             }
+            return SetDataItem(index, data.Select(sub=>sub.ToList()).ToList());
         }
 
         private object Evaluate(object input)
@@ -230,8 +231,16 @@ namespace BH.UI.Dragon.Templates
             }
             if(input is string)
             {
-                object obj = Project.ActiveProject.GetAny(input as string);
-                return obj == null ? input : obj;
+                string str = input as string;
+                int start = str.LastIndexOf('[');
+                int end = str.LastIndexOf(']');
+                if (start != -1 && end != -1 && end > start)
+                {
+                    start += 1;
+                    object obj = Project.ActiveProject.GetAny(str.Substring(start,end-start));
+                    return obj == null ? input : obj;
+                }
+                return input;
             }
             if( input is object[,])
             {
