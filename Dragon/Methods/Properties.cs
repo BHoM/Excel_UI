@@ -8,6 +8,7 @@ using System.Reflection;
 using BH.oM.Base;
 using BH.Engine.Reflection;
 using BH.oM.Geometry;
+using System.Collections;
 
 namespace BH.UI.Dragon
 {
@@ -15,75 +16,6 @@ namespace BH.UI.Dragon
     {
         /*****************************************************************/
         /******* Public methods                             **************/
-        /*****************************************************************/
-
-        [ExcelFunction(Description = "Get the property of an object", Category = "Dragon")]
-        public static object GetProperty(
-            [ExcelArgument(Name = "object id")] string objectId,
-            [ExcelArgument(Name = "property name")] string property)
-        {
-
-            //Get out the object
-            object obj = Project.ActiveProject.GetAny(objectId);
-
-            if (obj == null)
-                return "Object does not exist";
-
-            object prop;
-            //Get out the property. If object is custom object look in the custom data dictionary
-            if (obj is CustomObject && property != "Name")
-                prop = (obj as CustomObject).CustomData[property];    
-            else    
-                prop = obj.PropertyValue(property);
-
-            return prop.ReturnTypeHelper();
-
-        }
-
-        /*****************************************************************/
-
-        [ExcelFunction(Description = "Adds a custom data to an object", Category = "Dragon")]
-        public static object AddCustomData(
-            [ExcelArgument(Name = "object id")] string objectId,
-            [ExcelArgument(Name = "Custom data key")] string key,
-            [ExcelArgument(Name = "Custom data value")] object val)
-        {
-            IBHoMObject oblObj = Project.ActiveProject.GetBHoM(objectId);
-            IBHoMObject newObj = oblObj.GetShallowClone(true);
-
-            newObj.CustomData[key] = val;
-
-            Project.ActiveProject.Add(newObj);
-            return newObj.BHoM_Guid.ToString();
-        }
-
-        /*****************************************************************/
-
-        [ExcelFunction(Description = "Gets a custom data from an object", Category = "Dragon")]
-        public static object GetCustomData(
-            [ExcelArgument(Name = "object id")] string objectId,
-            [ExcelArgument(Name = "Custom data key")] string key)
-        {
-            IBHoMObject obj = Project.ActiveProject.GetBHoM(objectId);
-
-            object val;
-            if (!obj.CustomData.TryGetValue(key, out val))
-                return "Custom data with key: " + key + "Does not extist in the custom data";
-
-            return val.ReturnTypeHelper();
-        }
-
-        /*****************************************************************/
-
-        [ExcelFunction(Description = "Gets all property names from an object. WARNING This is an array formula and will take up more than one cell!", Category = "Dragon")]
-        public static object GetAllPropertyNames(
-                [ExcelArgument(Name = "object id")] string objectId)
-        {
-            object obj = Project.ActiveProject.GetAny(objectId);
-
-            return ArrayResizer.Resize( obj.PropertyNames().ToArray());
-        }
-
         /*****************************************************************/
 
         [ExcelFunction(Description = "Get all properties from an object. WARNING This is an array formula and will take up more than one cell!", Category = "Dragon")]
@@ -109,7 +41,17 @@ namespace BH.UI.Dragon
             _objectIds = _objectIds.CleanArray();
 
             //Get the object
-            List<object> objs = _objectIds.Select(x => Project.ActiveProject.GetAny(x as string)).ToList();
+            List<object> objs = _objectIds.Select(x => {
+                string str = x as string;
+                int start = str.LastIndexOf("[");
+                int end = str.LastIndexOf("]");
+                if(start != -1 && end != -1 && end > start)
+                {
+                    start++;
+                    return Project.ActiveProject.GetAny(str.Substring(start, end - start));
+                }
+                return x;
+            }).ToList();
 
             if (objs == null)
                 return "Failed to get object";
@@ -178,10 +120,16 @@ namespace BH.UI.Dragon
             List<Dictionary<string, object>> props = new List<Dictionary<string, object>>();
             foreach (object obj in objs)
             {
-                Dictionary<string, object> dict = new Dictionary<string, object>();
-                GetPropertyDictionary(ref dict, obj, goDeep);
+                if (obj is IEnumerable)
+                {
+                    props.AddRange(GetPropertyDictionaries((obj as IEnumerable).Cast<object>().ToList(), goDeep));
+                } else
+                {
+                    Dictionary<string, object> dict = new Dictionary<string, object>();
+                    GetPropertyDictionary(ref dict, obj, goDeep);
+                    props.Add(dict);
+                }
 
-                props.Add(dict);
             }
 
             return props;
@@ -194,20 +142,14 @@ namespace BH.UI.Dragon
         {
             if (!goDeep)
             {
-                if (obj is IExcelObject)
-                    dict = ((IExcelObject)obj).PropertyDictionary();
-                else
-                    dict = obj.PropertyDictionary();
+                dict = obj.PropertyDictionary();
                 return;
             }
             else
             {
                 Dictionary<string, object> baseDict;
 
-                if (obj is IExcelObject)
-                    baseDict = ((IExcelObject)obj).PropertyDictionary();
-                else
-                    baseDict = obj.PropertyDictionary();
+                baseDict = obj.PropertyDictionary();
 
                 foreach (KeyValuePair<string,object> kvp in baseDict)
                 {
