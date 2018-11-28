@@ -17,6 +17,7 @@ using BH.UI.Dragon.Global;
 using BH.UI.Global;
 using BH.UI.Components;
 using BH.Engine.Reflection.Convert;
+using Microsoft.Office.Interop.Excel;
 
 namespace BH.UI.Dragon
 {
@@ -36,6 +37,82 @@ namespace BH.UI.Dragon
             //Hide error box showing methods not working properly
             if(!DebugConfig.ShowExcelDNALog)
                 ExcelDna.Logging.LogDisplay.Hide();
+
+            var app = ExcelDnaUtil.Application as Application;
+            app.WorkbookBeforeSave += App_WorkbookBeforeSave;
+            app.WorkbookOpen += App_WorkbookOpen;
+        }
+
+        private void App_WorkbookOpen(Workbook Wb)
+        {
+            List<string> json = new List<string>();
+            try
+            {
+                _Worksheet newsheet = Wb.Sheets["BHoM_Data"];
+                foreach (Range row in newsheet.UsedRange.Rows)
+                {
+                    string str = "";
+                    try
+                    {
+                        Range cell = row.Cells[1, 1];
+                        while (cell.Value != null && cell.Value is string && (cell.Value as string).Length > 0)
+                        {
+                            str += cell.Value;
+                            cell = cell.Next;
+                        }
+                    }
+                    catch { }
+                    if (str.Length > 0)
+                    {
+                        json.Add(str);
+                    }
+                }
+                Project.ActiveProject.Deserialize(json);
+            }
+            catch
+            {
+            }
+        }
+
+        private void App_WorkbookBeforeSave(Workbook Wb, bool SaveAsUI, ref bool Cancel)
+        {
+            Project p = Project.ForWorkbook(Wb);
+
+            _Worksheet newsheet;
+            try
+            {
+                newsheet = Wb.Sheets["BHoM_Data"];
+                try
+                {
+                    foreach (Range cell in newsheet.UsedRange)
+                    {
+                        cell.Value = "";
+                    }
+                }
+                catch { }
+            } catch
+            {
+                if (p.Empty) return;
+                newsheet = Wb.Sheets.Add();
+                newsheet.Name = "BHoM_Data";
+            }
+            if (p.Empty) return;
+
+            newsheet.Visible = XlSheetVisibility.xlSheetHidden;
+            int row = 1;
+            var json = Project.ForWorkbook(Wb).Serialize();
+            foreach (var obj in json)
+            {
+                Range cell = newsheet.Cells[row, 1];
+                int c = 0;
+                while (c < obj.Length)
+                {
+                    cell.Value = obj.Substring(c);
+                    c += (cell.Value as string).Length;
+                    cell = cell.Next;
+                }
+                row++;
+            }
         }
 
         /***************************************************/
