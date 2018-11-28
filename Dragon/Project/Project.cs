@@ -8,6 +8,8 @@ using BH.oM.Geometry;
 using BH.Engine.Reflection;
 using BH.Adapter;
 using BH.oM.DataManipulation.Queries;
+using BH.Engine.Serialiser;
+using Microsoft.Office.Interop.Excel;
 
 namespace BH.UI.Dragon
 {
@@ -53,6 +55,8 @@ namespace BH.UI.Dragon
             }
         }
 
+        public bool Empty => m_objects.Count == 0;
+
         /*****************************************/
         /**** Public get methods        **********/
         /*****************************************/
@@ -76,6 +80,14 @@ namespace BH.UI.Dragon
             if(m_objects.ContainsKey(str))
             {
                 return m_objects[str]; 
+            } else
+            {
+                int start = str.LastIndexOf("[");
+                int end = str.LastIndexOf("]");
+                if(start != -1 && end != -1 && end > start)
+                {
+                    return GetAny(str.Substring(++start, end - start));
+                }
             }
             return null;
         }
@@ -169,7 +181,7 @@ namespace BH.UI.Dragon
 
         private static string ToString(Guid id)
         {
-            return Convert.ToBase64String(id.ToByteArray()).Remove(8);
+            return System.Convert.ToBase64String(id.ToByteArray()).Remove(8);
         }
 
         /*****************************************/
@@ -181,6 +193,95 @@ namespace BH.UI.Dragon
             return guid;
         }
 
+        public static Project ForWorkbook(Workbook Wb)
+        {
+            Project proj = new Project();
+            foreach (Worksheet sheet in Wb.Sheets)
+            {
+                if (sheet.Name == "BHoM_Data") continue;
+                foreach ( Range cell in sheet.UsedRange)
+                {
+                    try
+                    {
+                        if (cell.Value is string)
+                        {
+                            string val = cell.Value;
+                            int start = val.LastIndexOf("[");
+                            int end = val.LastIndexOf("]");
+                            if (start != -1 && end != -1 && end > start)
+                            {
+                                ++start;
+                                val = val.Substring(start, end - start);
+                                object obj = Project.ActiveProject.GetAny(val);
+                                if (obj != null)
+                                {
+                                    proj.m_objects.Add(val, obj);
+                                }
+                            }
+                        }
+                    }
+                    catch { }
+                }
+            }
+            return proj;
+        }
+
         /*****************************************/
+
+        public IEnumerable<string> Serialize()
+        {
+            foreach(var kvp in m_objects)
+            {
+                string json = null;
+                try
+                {
+                    if (kvp.Value is IBHoMObject)
+                    {
+                        json = kvp.Value.ToJson();
+                    }
+                    else
+                    {
+                        json = new Dictionary<string, object>()
+                        {
+                            { kvp.Key, kvp.Value }
+                        }.ToJson();
+                    }
+                }
+                catch { }
+                if (json != null) yield return json;
+            }
+            yield break;
+        }
+
+        public void Deserialize(IEnumerable<string> objs)
+        {
+            foreach (var str in objs)
+            {
+                try
+                {
+                    var obj = Engine.Serialiser.Convert.FromJson(str);
+                    if (obj == null) continue;
+                    if (obj is KeyValuePair<string, object>)
+                    {
+                        var kvp = (KeyValuePair<string, object>)obj;
+                        m_objects.Add(kvp.Key, kvp.Value);
+                    } else if (obj is CustomObject)
+                    {
+                        var co = obj as CustomObject;
+                        foreach (var kvp in co.CustomData)
+                        {
+                            m_objects.Add(kvp.Key, kvp.Value);
+                        }
+                    } else if (obj is IBHoMObject)
+                    {
+                        Add(obj as IBHoMObject);
+                    }
+                }
+                catch (Exception e)
+                {
+                    Engine.Reflection.Compute.RecordError(e.Message);
+                }
+            }
+        }
     }
 }

@@ -190,7 +190,7 @@ namespace BH.UI.Dragon.Templates
                 {
                     return SetDataItem(index, data.ToString());
                 }
-                if(!(data is ICollection) && data is IEnumerable)
+                if(data is IEnumerable && !(data is ICollection) )
                 {
                     return SetDataItem(index, (data as IEnumerable).Cast<object>().ToList());
                 }
