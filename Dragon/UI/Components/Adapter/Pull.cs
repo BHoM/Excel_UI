@@ -7,17 +7,19 @@ using System.Collections.Generic;
 
 namespace BH.UI.Dragon.Components
 {
-    public class PullFormula : SingleMethodCallerFormula
+    public class PullFormula : CallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/
         /*******************************************/
 
+        public override string Name => "Adapter." + Caller.Name;
+
+        /*******************************************/
+
         public override Caller Caller { get; } = new PullCaller();
 
-        public override string Name => "Adapter.Pull";
-
-        public override string Category => "Dragon.Adapter";
+        /*******************************************/
 
         public PullFormula(FormulaDataAccessor accessor) : base(accessor)
         {

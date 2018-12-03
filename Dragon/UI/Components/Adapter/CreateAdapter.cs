@@ -11,6 +11,7 @@ namespace BH.UI.Dragon.Components
 {
     public class CreateAdapterFormula : CallerFormula
     {
+        public override string Name => "Adapter.Create." + Caller.Name;
         public override Caller Caller { get; } = new CreateAdapterCaller();
         public CreateAdapterFormula(FormulaDataAccessor accessor) : base(accessor) {
         }

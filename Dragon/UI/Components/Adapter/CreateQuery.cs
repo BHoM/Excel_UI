@@ -12,6 +12,8 @@ namespace BH.UI.Dragon.Components
         /**** Properties                        ****/
         /*******************************************/
 
+        public override string Name => "Adapter.Query." + Caller.Name;
+
         public override Caller Caller { get; } = new CreateQueryCaller();
 
 

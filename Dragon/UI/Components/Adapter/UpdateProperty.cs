@@ -6,17 +6,15 @@ using BH.UI.Components;
 
 namespace BH.UI.Dragon.Components
 {
-    public class UpdatePropertyFormula : SingleMethodCallerFormula
+    public class UpdatePropertyFormula : CallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/
         /*******************************************/
 
+        public override string Name => "Adapter." + Caller.Name;
+
         public override Caller Caller { get; } = new UpdatePropertyCaller();
-
-        public override string Name => "Adapter.UpdateProperty";
-
-        public override string Category => "Dragon.Adapter";
 
         public UpdatePropertyFormula(FormulaDataAccessor accessor) : base(accessor) { }
 
