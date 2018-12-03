@@ -107,7 +107,6 @@
     <Compile Include="UI\Components\oM\CreateObject.cs" />
     <Compile Include="UI\Components\oM\CreateType.cs" />
     <Compile Include="UI\Global\FormulaSearchMenu.cs" />
-    <Compile Include="UI\Templates\SingleMethodCallerFormula.cs" />
     <Compile Include="UI\Templates\CallerFormula.cs" />
     <Compile Include="UI\Templates\FormulaDataAccessor.cs" />
   </ItemGroup>
