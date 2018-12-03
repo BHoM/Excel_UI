@@ -4,17 +4,15 @@ using BH.UI.Components;
 
 namespace BH.UI.Dragon.Components
 {
-    public class PushFormula : SingleMethodCallerFormula
+    public class PushFormula : CallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/
         /*******************************************/
 
+        public override string Name => "Adapter." + Caller.Name;
+
         public override Caller Caller { get; } = new PushCaller();
-
-        public override string Name => "Adapter.Push";
-
-        public override string Category => "Dragon.Adapter";
 
         public PushFormula(FormulaDataAccessor accessor) : base(accessor) { }
 

@@ -1,7 +1,9 @@
 ﻿using BH.Engine.Reflection;
 using BH.Engine.Reflection.Convert;
+using BH.oM.UI;
 using BH.UI.Dragon.Templates;
 using BH.UI.Global;
+using BH.UI.Templates;
 using ExcelDna.Integration;
 using System;
 using System.Collections.Generic;
@@ -15,33 +17,42 @@ namespace BH.UI.Dragon.Global
 {
     public class FormulaSearchMenu : SearchMenu
     {
-        FormulaDataAccessor m_accessor;
+        private FormulaDataAccessor m_accessor;
+        private Dictionary<string, CallerFormula> m_callers;
 
-        public FormulaSearchMenu(FormulaDataAccessor accessor)
+        public FormulaSearchMenu(FormulaDataAccessor accessor, Dictionary<string, CallerFormula> callers) : base()
         {
             m_accessor = accessor;
+            m_callers = callers;
         }
 
         public override bool SetParent(object parent)
         {
             List<Delegate> delegates = new List<Delegate>();
-            List<object> funcAttrs = new List<object>();
+            List<ExcelFunctionAttribute> funcAttrs = new List<ExcelFunctionAttribute>();
             List<List<object>> argAttrs = new List<List<object>>();
+            Dictionary<string, int> dups = new Dictionary<string, int>();
             foreach(var item in PossibleItems)
             {
                 try
                 {
-                    var proxy = CreateDelegate(item.Key, item.Value);
-                    delegates.Add(proxy.Item1);
-                    funcAttrs.Add(proxy.Item2);
-                    argAttrs.Add(proxy.Item3);
+                    var proxy = CreateDelegate(item);
+                    if (proxy == null) continue;
+                    var name = proxy.Item2.Name;
+                    if (!dups.ContainsKey(name))
+                    {
+                        dups.Add(name, 1);
+                        delegates.Add(proxy.Item1);
+                        funcAttrs.Add(proxy.Item2);
+                        argAttrs.Add(proxy.Item3);
+                    }
                 } catch (Exception e) {
                     Console.WriteLine(e.Message);
                 }
             }
             try
             {
-                ExcelIntegration.RegisterDelegates(delegates, funcAttrs, argAttrs);
+                ExcelIntegration.RegisterDelegates(delegates, funcAttrs.Cast<object>().ToList(), argAttrs);
             } catch
             {
                 return false;
@@ -49,14 +60,15 @@ namespace BH.UI.Dragon.Global
             return true;
         }
 
-        private Tuple<Delegate, ExcelFunctionAttribute, List<object>> CreateDelegate(string itemStr, MethodInfo item)
+        private Tuple<Delegate, ExcelFunctionAttribute, List<object>> CreateDelegate(SearchItem item)
         {
-            return m_accessor.Wrap(item, () => NotifySelection(itemStr));
-        }
-
-        private ParameterExpression[] GetParams(IEnumerable<ParameterInfo> input)
-        {
-            return input.Select(p => Expression.Parameter(typeof(object))).ToArray();
+            if (m_callers.ContainsKey(item.CallerType.Name))
+            {
+                CallerFormula caller = m_callers[item.CallerType.Name];
+                caller.Caller.SetItem(item.Item);
+                return m_accessor.Wrap(caller, () => NotifySelection(item));
+            }
+            return null;
         }
     }
 }

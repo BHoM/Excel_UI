@@ -253,7 +253,7 @@ namespace BH.UI.Dragon.Templates
 
 
         public Tuple<Delegate, ExcelFunctionAttribute, List<object>>
-            Wrap(MethodBase item, Expression<Action> action)
+            Wrap(CallerFormula caller, Expression<Action> action)
         {
             // Create a Delegate that looks like:
             //
@@ -265,8 +265,9 @@ namespace BH.UI.Dragon.Templates
             //     return accessor.GetOutput();
             // }
 
+
             // Create an array of [n] parameters
-            var rawParams = item.GetParameters();
+            var rawParams = caller.Caller.InputParams;
             ParameterExpression[] lambdaParams = rawParams
                 .Select(p => Expression.Parameter(typeof(object)))
                 .ToArray();
@@ -323,10 +324,10 @@ namespace BH.UI.Dragon.Templates
             LambdaExpression lambda = Expression.Lambda(tree, lambdaParams);
 
             // Compile
-            var argAttrs = item.GetParameters()
+            var argAttrs = rawParams
                         .Select(p =>
                         {
-                            string desc = p.Description() + p.ParameterType.ToText();
+                            string desc = p.Description + " " + p.DataType.ToText();
                             if (p.HasDefaultValue)
                             {
                                 desc += " [default: " +
@@ -346,47 +347,70 @@ namespace BH.UI.Dragon.Templates
                         }).ToList<object>();
             return new Tuple<Delegate, ExcelFunctionAttribute, List<object>>(
                 lambda.Compile(),
-                GetFunctionAttribute(item),
+                GetFunctionAttribute(caller, rawParams),
                 argAttrs
             );
         }
 
-        private ExcelFunctionAttribute GetFunctionAttribute(MethodBase info)
+        private ExcelFunctionAttribute GetFunctionAttribute(CallerFormula caller, IEnumerable<ParamInfo> paramList)
         {
-            var paramList = info.GetParameters();
             bool hasParams = paramList.Count() > 0;
             string params_ = "";
             if (hasParams)
             {
                 params_ = "?by_" + paramList
-                    .Select(p => p.Name)
+                    .Select(p => p.DataType.ToText())
+                    .Select(p => p.Replace("[]","s"))
+                    .Select(p => p.Replace("[,]","Matrix"))
+                    .Select(p => p.Replace("&",""))
+                    .Select(p => p.Replace("<","Of"))
+                    .Select(p => p.Replace(">",""))
+                    .Select(p => p.Replace(", ","_"))
+                    .Select(p => p.Replace("`","_"))
                     .Aggregate((a, b) => $"{a}_{b}");
             }
 
-            string name = null;
-            string prefix = null;
-            if (info is ConstructorInfo)
-            {
-                prefix = info.DeclaringType.Namespace;
-                if(prefix.StartsWith("BH."))
-                {
-                    prefix = prefix.Substring(3) + ".";
-                }
-                name = prefix + info.DeclaringType.Name;
-            } else
-            {
-                prefix = info.DeclaringType.Name + "."
-                + info.DeclaringType.Namespace.Split('.').Last() + ".";
-
-                name = prefix + info.Name;
-            }
+            object info = caller.Caller.SelectedItem;
+            string name = caller.Name;
+            
             return new ExcelFunctionAttribute()
             {
                 Name = name + params_,
-                Description = info.Description(),
-                Category = "Dragon." + info.DeclaringType.Name,
+                Description = caller.Caller.Description,
+                Category = "Dragon." + caller.Caller.Category,
                 IsMacroType = true
             };
+        }
+
+        private string GetName(ConstructorInfo info)
+        {
+            string prefix = info.DeclaringType.Namespace;
+            if (prefix.StartsWith("BH."))
+            {
+                prefix = prefix.Substring(3) + ".";
+            }
+            return prefix + info.DeclaringType.Name;
+        }
+
+        private string GetName(MethodBase info)
+        {
+
+            string prefix = info.DeclaringType.Name + "."
+            + info.DeclaringType.Namespace.Split('.').Last() + ".";
+
+            return prefix + info.Name;
+        }
+
+        private string GetName(Type info)
+        {
+
+            string prefix = info.Namespace;
+            if (prefix.StartsWith("BH."))
+            {
+                prefix = prefix.Substring(3) + ".";
+            }
+
+            return "Type." + prefix + info.Name;
         }
 
         private object Evaluate(object[,] input)

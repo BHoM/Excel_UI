@@ -8,17 +8,15 @@ using BH.UI.Components;
 
 namespace BH.UI.Dragon.Components
 {
-    public class MoveFormula : SingleMethodCallerFormula
+    public class MoveFormula : CallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/
         /*******************************************/
 
+        public override string Name => "Adapter." + Caller.Name;
+
         public override Caller Caller { get; } = new MoveCaller();
-
-        public override string Category => "Dragon.Adapter";
-
-        public override string Name => "Adapter.Move";
 
         public MoveFormula(FormulaDataAccessor accessor) : base(accessor) { }
 

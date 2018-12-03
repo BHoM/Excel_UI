@@ -6,7 +6,6 @@ using System.Threading.Tasks;
 using BH.oM.Base;
 using BH.oM.Geometry;
 using BH.Engine.Reflection;
-using BH.Adapter;
 using BH.oM.DataManipulation.Queries;
 using BH.Engine.Serialiser;
 using Microsoft.Office.Interop.Excel;
@@ -94,13 +93,6 @@ namespace BH.UI.Dragon
 
         /*****************************************/
 
-        public BHoMAdapter GetAdapter(string str)
-        {
-            return GetAny(str) as BHoMAdapter;
-        }
-
-        /*****************************************/
-
 
         public IQuery GetQuery(string str)
         {
@@ -144,18 +136,6 @@ namespace BH.UI.Dragon
                     Add(kvp.Value as IBHoMObject);
                 }
             }
-            return guid;
-        }
-
-        /*****************************************/
-
-        public string Add(BHoMAdapter adapter)
-        {
-            string guid = ToString(adapter.BHoM_Guid);
-            if (m_objects.ContainsKey(guid))
-                return guid;
-
-            m_objects[guid] = adapter;
             return guid;
         }
 

@@ -9,7 +9,6 @@ using BH.Engine.Reflection;
 using BH.oM.Base;
 using BH.oM.Geometry;
 using System.Linq.Expressions;
-using BH.Adapter;
 using BH.UI.Templates;
 using BH.UI.Dragon.Templates;
 using BH.UI.Dragon.Components;
@@ -160,44 +159,32 @@ namespace BH.UI.Dragon
         /*****************************************************************/
         private void RegisterBHoMMethods()
         {
-            m_da = new FormulaDataAccessor();
-            var searcher = new FormulaSearchMenu(m_da);
-            GlobalSearch.Attach(searcher);
-            GlobalSearch.ItemSelected += GlobalSearch_ItemSelected;
-
-            searcher.SetParent(null);
-            Type fda = typeof(FormulaDataAccessor);
-            Type callform = typeof(CallerFormula);
-            Type[] constrtypes = new Type[] { fda };
-            object[] args = new object[] { m_da };
-            Type adapterType = typeof(BHoMAdapter);
-
-            IEnumerable<MethodBase> methods = Query.AdapterTypeList().Where(x => x.IsSubclassOf(adapterType)).OrderBy(x => x.Name).SelectMany(x => x.GetConstructors());
-
-
-            var adapterRegs = new List<Tuple<Delegate, ExcelFunctionAttribute, List<object>>>();
-            foreach ( MethodBase adapter in methods)
+            try
             {
-                var proxy = m_da.Wrap(adapter, () => GlobalSearch_ItemSelected(null, new oM.UI.ComponentRequest
-                {
-                    CallerType = typeof(CreateAdapterCaller),
-                    SelectedItem = adapter
-                }));
-                adapterRegs.Add(proxy);
+                Compute.LoadAllAssemblies(Environment.GetEnvironmentVariable("APPDATA") + @"\BHoM\Assemblies");
+                m_da = new FormulaDataAccessor();
+
+                Type fda = typeof(FormulaDataAccessor);
+                Type callform = typeof(CallerFormula);
+                Type[] constrtypes = new Type[] { fda };
+                object[] args = new object[] { m_da };
+                m_formulea = ExcelIntegration.GetExportedAssemblies()
+                    .SelectMany(a => a.GetTypes())
+                    .Where(t => t.Namespace == "BH.UI.Dragon.Components"
+                                && callform.IsAssignableFrom(t))
+                    .Select(t => t.GetConstructor(constrtypes).Invoke(args) as CallerFormula)
+                    .ToDictionary(o => o.Caller.GetType().Name);
+
+                var searcher = new FormulaSearchMenu(m_da, m_formulea);
+                searcher.SetParent(null);
+
+                searcher.ItemSelected += GlobalSearch_ItemSelected;
+
             }
-
-            ExcelIntegration.RegisterDelegates(
-                adapterRegs.Select(r => r.Item1).ToList(),
-                adapterRegs.Select(r => r.Item2).ToList<object>(),
-                adapterRegs.Select(r => r.Item3).ToList()
-            );
-
-            m_formulea = ExcelIntegration.GetExportedAssemblies()
-                .SelectMany(a => a.GetTypes())
-                .Where(t => t.Namespace == "BH.UI.Dragon.Components"
-                            && callform.IsAssignableFrom(t))
-                .Select(t => t.GetConstructor(constrtypes).Invoke(args) as CallerFormula)
-                .ToDictionary(o => o.Caller.GetType().Name);
+            catch (Exception e)
+            {
+                Compute.RecordError(e.Message);
+            }
         }
 
         private void GlobalSearch_ItemSelected(object sender, oM.UI.ComponentRequest e)
