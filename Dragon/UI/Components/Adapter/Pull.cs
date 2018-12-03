@@ -15,15 +15,13 @@ namespace BH.UI.Dragon.Components
 
         public override string Name => "Adapter." + Caller.Name;
 
-        /*******************************************/
-
         public override Caller Caller { get; } = new PullCaller();
 
         /*******************************************/
+        /**** Constructors                      ****/
+        /*******************************************/
 
-        public PullFormula(FormulaDataAccessor accessor) : base(accessor)
-        {
-        }
+        public PullFormula(FormulaDataAccessor accessor) : base(accessor) { }
 
         /*******************************************/
     }

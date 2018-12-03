@@ -11,8 +11,15 @@ namespace BH.UI.Dragon.Components
 {
     public class CreateObjectFormula : CallerFormula
     {
+        /*******************************************/
+        /**** Properties                        ****/
+        /*******************************************/
 
         public override Caller Caller { get; } = new CreateObjectCaller();
+
+        /*******************************************/
+        /**** Constructors                      ****/
+        /*******************************************/
 
         public CreateObjectFormula(FormulaDataAccessor accessor) : base(accessor) { }
     }
