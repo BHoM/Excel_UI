@@ -17,67 +17,18 @@ namespace BH.UI.Dragon.Templates
 {
     public class FormulaDataAccessor : DataAccessor
     {
-        private object[] inputs;
-        private object[] defaults;
-        private object output;
-
+        /*******************************************/
+        /**** Constructors                      ****/
+        /*******************************************/
 
         public FormulaDataAccessor()
         {
         }
 
-        public void StoreDefaults(object [] params_)
-        {
-            // Collect default values from ParamInfo so defaultable
-            // arguments can be ommited in excel
-            defaults = params_;
-        }
+        /*******************************************/
+        /**** Public Methods                    ****/
+        /*******************************************/
 
-        // Store some inputs in this DataAccessor
-        // convert Guid strings to objects
-        public void Store(params object[] in_)
-        {
-            inputs = new object[in_.Length];
-            for (int i = 0; i < in_.Length; i++)
-            {
-                inputs[i] = Evaluate(in_[i]);
-            }
-        }
-
-        // Retrieve the output from this DataAccessor
-        public object GetOutput()
-        {
-            var errors = Query.CurrentEvents()
-                .Where(e => e.Type == oM.Reflection.Debuging.EventType.Error);
-            if (errors.Count() > 0) {
-                string msg = errors
-                    .Select(e => e.Message)
-                    .Aggregate((a, b) => a + "\n" + b);
-                try
-                {
-                    ExcelReference caller = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
-                    ExcelAsyncUtil.QueueAsMacro(() => XlCall.Excel(XlCall.xlfNote, msg, caller));
-                }
-                catch { }
-            }
-            if (output == null)
-            {
-                return ExcelError.ExcelErrorNull;
-            }
-            return output;
-        }
-
-        public void ResetOutput()
-        {
-            try
-            {
-                ExcelReference caller = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
-                ExcelAsyncUtil.QueueAsMacro(() => XlCall.Excel(XlCall.xlfNote, "", caller));
-            }
-            catch { }
-            output = null;
-        }
-        
         public override T GetDataItem<T>(int index)
         {
             object item = inputs[index];
@@ -96,6 +47,8 @@ namespace BH.UI.Dragon.Templates
             // dynamic` so the cast is between the actual type of `item` to T.
             return (T)(item as dynamic);
         }
+
+        /*******************************************/
 
         public override List<T> GetDataList<T>(int index)
         {
@@ -122,6 +75,8 @@ namespace BH.UI.Dragon.Templates
             }
             return null;
         }
+
+        /*******************************************/
 
         public override List<List<T>> GetDataTree<T>(int index)
         {
@@ -177,6 +132,8 @@ namespace BH.UI.Dragon.Templates
             return null;
         }
 
+        /*******************************************/
+
         public override bool SetDataItem<T>(int index, T data)
         {
             try
@@ -204,6 +161,8 @@ namespace BH.UI.Dragon.Templates
             }
         }
 
+        /*******************************************/
+
         public override bool SetDataList<T>(int index, IEnumerable<T> data)
         {
             if (data is ICollection)
@@ -212,6 +171,8 @@ namespace BH.UI.Dragon.Templates
             }
             return SetDataItem(index, data.ToList());
         }
+
+        /*******************************************/
 
         public override bool SetDataTree<T>(int index,
             IEnumerable<IEnumerable<T>> data)
@@ -223,35 +184,68 @@ namespace BH.UI.Dragon.Templates
             return SetDataItem(index, data.Select(sub=>sub.ToList()).ToList());
         }
 
-        private object Evaluate(object input)
+        /*******************************************/
+
+        public void StoreDefaults(object [] params_)
         {
-            if (input.GetType().IsPrimitive)
-            {
-                return input;
-            }
-            if(input is string)
-            {
-                string str = input as string;
-                int start = str.LastIndexOf('[');
-                int end = str.LastIndexOf(']');
-                if (start != -1 && end != -1 && end > start)
-                {
-                    start += 1;
-                    object obj = Project.ActiveProject.GetAny(str.Substring(start,end-start));
-                    return obj == null ? input : obj;
-                }
-                return input;
-            }
-            if( input is object[,])
-            {
-                // Keep the 2D array layout but evaluate members recursively
-                // to convert Guid strings into objects from the Project
-                return Evaluate(input as object[,]);
-            }
-            return input;
+            // Collect default values from ParamInfo so defaultable
+            // arguments can be ommited in excel
+            defaults = params_;
         }
 
+        /*******************************************/
 
+        public void Store(params object[] in_)
+        {
+            // Store some inputs in this DataAccessor
+            // convert Guid strings to objects
+            inputs = new object[in_.Length];
+            for (int i = 0; i < in_.Length; i++)
+            {
+                inputs[i] = Evaluate(in_[i]);
+            }
+        }
+
+        /*******************************************/
+
+        public object GetOutput()
+        {
+            // Retrieve the output from this DataAccessor
+            var errors = Query.CurrentEvents()
+                .Where(e => e.Type == oM.Reflection.Debuging.EventType.Error);
+            if (errors.Count() > 0) {
+                string msg = errors
+                    .Select(e => e.Message)
+                    .Aggregate((a, b) => a + "\n" + b);
+                try
+                {
+                    ExcelReference caller = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
+                    ExcelAsyncUtil.QueueAsMacro(() => XlCall.Excel(XlCall.xlfNote, msg, caller));
+                }
+                catch { }
+            }
+            if (output == null)
+            {
+                return ExcelError.ExcelErrorNull;
+            }
+            return output;
+        }
+
+        /*******************************************/
+
+        public void ResetOutput()
+        {
+            try
+            {
+                ExcelReference caller = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
+                ExcelAsyncUtil.QueueAsMacro(() => XlCall.Excel(XlCall.xlfNote, "", caller));
+            }
+            catch { }
+            output = null;
+        }
+        
+        /*******************************************/
+         
         public Tuple<Delegate, ExcelFunctionAttribute, List<object>>
             Wrap(CallerFormula caller, Expression<Action> action)
         {
@@ -261,7 +255,7 @@ namespace BH.UI.Dragon.Templates
             //     accessor.ResetOutput();
             //     accessor.StoreDefaults(defaults);
             //     accessor.Store( new [] {a, b, c, ...} );
-            //     NotifySelection(itemStr);
+            //     action();
             //     return accessor.GetOutput();
             // }
 
@@ -281,9 +275,8 @@ namespace BH.UI.Dragon.Templates
             Expression accessorInstance = Expression.Constant(this);
             Type accessorType = GetType();
 
-            // Call SetItem
-            Expression setItemCall = Expression.Invoke(action);
-
+            // Invoke action
+            Expression actionCall = Expression.Invoke(action);
 
             // Call FormulaDataAccessor.ResetOutput 
             MethodInfo resetMethod = accessorType.GetMethod("ResetOutput");
@@ -318,7 +311,7 @@ namespace BH.UI.Dragon.Templates
                 resetCall,
                 storeDefCall,
                 storeCall,
-                setItemCall,
+                actionCall,
                 returnCall
             );
             LambdaExpression lambda = Expression.Lambda(tree, lambdaParams);
@@ -352,6 +345,50 @@ namespace BH.UI.Dragon.Templates
             );
         }
 
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
+
+        private object Evaluate(object input)
+        {
+            if (input.GetType().IsPrimitive)
+            {
+                return input;
+            }
+            if(input is string)
+            {
+                object obj = Project.ActiveProject.GetAny(input as string);
+                return obj == null ? input : obj;
+            }
+            if(input is object[,])
+            {
+                // Keep the 2D array layout but evaluate members recursively
+                // to convert Guid strings into objects from the Project
+                return Evaluate(input as object[,]);
+            }
+            return input;
+        }
+
+        /*******************************************/
+
+        private object Evaluate(object[,] input)
+        {
+            int height = input.GetLength(0);
+            int width = input.GetLength(1);
+
+            object[,] evaluated = new object[height, width];
+            for(int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                {
+                    evaluated[j,i] = Evaluate(input[j,i]);
+                }
+            }
+            return evaluated;
+        }
+
+        /*******************************************/
+        
         private ExcelFunctionAttribute GetFunctionAttribute(CallerFormula caller, IEnumerable<ParamInfo> paramList)
         {
             bool hasParams = paramList.Count() > 0;
@@ -382,52 +419,12 @@ namespace BH.UI.Dragon.Templates
             };
         }
 
-        private string GetName(ConstructorInfo info)
-        {
-            string prefix = info.DeclaringType.Namespace;
-            if (prefix.StartsWith("BH."))
-            {
-                prefix = prefix.Substring(3) + ".";
-            }
-            return prefix + info.DeclaringType.Name;
-        }
-
-        private string GetName(MethodBase info)
-        {
-
-            string prefix = info.DeclaringType.Name + "."
-            + info.DeclaringType.Namespace.Split('.').Last() + ".";
-
-            return prefix + info.Name;
-        }
-
-        private string GetName(Type info)
-        {
-
-            string prefix = info.Namespace;
-            if (prefix.StartsWith("BH."))
-            {
-                prefix = prefix.Substring(3) + ".";
-            }
-
-            return "Type." + prefix + info.Name;
-        }
-
-        private object Evaluate(object[,] input)
-        {
-            int height = input.GetLength(0);
-            int width = input.GetLength(1);
-
-            object[,] evaluated = new object[height, width];
-            for(int i = 0; i < width; i++)
-            {
-                for (int j = 0; j < height; j++)
-                {
-                    evaluated[j,i] = Evaluate(input[j,i]);
-                }
-            }
-            return evaluated;
-        }
-
+        /*******************************************/
+        /**** Private Fields                    ****/
+        /*******************************************/
+        
+        private object[] inputs;
+        private object[] defaults;
+        private object output;
     }
 }

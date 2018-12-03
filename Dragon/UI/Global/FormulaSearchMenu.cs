@@ -17,14 +17,19 @@ namespace BH.UI.Dragon.Global
 {
     public class FormulaSearchMenu : SearchMenu
     {
-        private FormulaDataAccessor m_accessor;
-        private Dictionary<string, CallerFormula> m_callers;
+        /*******************************************/
+        /**** Constructors                      ****/
+        /*******************************************/
 
         public FormulaSearchMenu(FormulaDataAccessor accessor, Dictionary<string, CallerFormula> callers) : base()
         {
             m_accessor = accessor;
             m_callers = callers;
         }
+
+        /*******************************************/
+        /**** Public Methods                    ****/
+        /*******************************************/
 
         public override bool SetParent(object parent)
         {
@@ -60,6 +65,10 @@ namespace BH.UI.Dragon.Global
             return true;
         }
 
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
+
         private Tuple<Delegate, ExcelFunctionAttribute, List<object>> CreateDelegate(SearchItem item)
         {
             if (m_callers.ContainsKey(item.CallerType.Name))
@@ -70,5 +79,12 @@ namespace BH.UI.Dragon.Global
             }
             return null;
         }
+
+        /*******************************************/
+        /**** Private Fields                    ****/
+        /*******************************************/
+
+        private FormulaDataAccessor m_accessor;
+        private Dictionary<string, CallerFormula> m_callers;
     }
 }

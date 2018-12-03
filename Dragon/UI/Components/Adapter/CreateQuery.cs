@@ -16,6 +16,9 @@ namespace BH.UI.Dragon.Components
 
         public override Caller Caller { get; } = new CreateQueryCaller();
 
+        /*******************************************/
+        /**** Constructors                      ****/
+        /*******************************************/
 
         public CreateQueryFormula(FormulaDataAccessor accessor) : base(accessor) { }
 

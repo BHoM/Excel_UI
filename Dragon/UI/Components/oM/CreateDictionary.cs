@@ -14,6 +14,10 @@ namespace BH.UI.Dragon.Components
 
         public override Caller Caller { get; } = new CreateDictionaryCaller();
 
+        /*******************************************/
+        /**** Constructors                      ****/
+        /*******************************************/
+
 
         public CreateDictionaryFormula(FormulaDataAccessor accessor) : base(accessor) { }
         /*******************************************/

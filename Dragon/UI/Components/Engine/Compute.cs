@@ -14,6 +14,10 @@ namespace BH.UI.Dragon.Components
 
         public override Caller Caller { get; } = new ComputeCaller();
 
+        /*******************************************/
+        /**** Constructors                      ****/
+        /*******************************************/
+
         public ComputeFormula(FormulaDataAccessor accessor) : base(accessor) { }
 
         /*******************************************/

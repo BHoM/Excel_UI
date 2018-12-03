@@ -16,6 +16,10 @@ namespace BH.UI.Dragon.Components
 
         public override Caller Caller { get; } = new DeleteCaller();
 
+        /*******************************************/
+        /**** Constructors                      ****/
+        /*******************************************/
+
         public DeleteFormula(FormulaDataAccessor accessor) : base(accessor) { }
 
         /*******************************************/

@@ -14,6 +14,10 @@ namespace BH.UI.Dragon.Components
 
         public override Caller Caller { get; } = new ToJsonCaller();
 
+        /*******************************************/
+        /**** Constructors                      ****/
+        /*******************************************/
+
         public ToJsonFormula(FormulaDataAccessor accessor) : base(accessor) { }
 
         /*******************************************/

@@ -9,7 +9,9 @@ namespace BH.UI.Dragon.Templates
 {
     public abstract class CallerFormula
     {
-        private FormulaDataAccessor m_dataAccessor;
+        /*******************************************/
+        /**** Properties                        ****/
+        /*******************************************/
 
         public virtual string Name 
         {
@@ -23,11 +25,23 @@ namespace BH.UI.Dragon.Templates
                 return Caller.Category + "." + Caller.Name;
             }
         }
+
         public abstract Caller Caller { get; }
+
+        /*******************************************/
+        /**** Constructors                      ****/
+        /*******************************************/
+
         public CallerFormula(FormulaDataAccessor accessor)
         {
             m_dataAccessor = accessor;
             Caller.SetDataAccessor(m_dataAccessor);
         }
+
+        /*******************************************/
+        /**** Private Fields                    ****/
+        /*******************************************/
+
+        private FormulaDataAccessor m_dataAccessor;
     }
 }
