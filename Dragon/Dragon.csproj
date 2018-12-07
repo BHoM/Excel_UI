@@ -35,7 +35,6 @@
       <HintPath>..\..\BHoM\Build\BHoM.dll</HintPath>
     </Reference>
     <Reference Include="BHoM_Adapter, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
-      <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\BHoM_Adapter\Build\BHoM_Adapter.dll</HintPath>
       <Private>True</Private>
     </Reference>
@@ -148,9 +147,12 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>call "$(TargetDir)UI_PostBuild.exe" ..\..\ "C:\Users\$(Username)\AppData\Roaming\BHoM\Assemblies"
+    <PostBuildEvent>"$(TargetDir)UI_PostBuild.exe" ..\..\ "$(APPDATA)\BHoM\Assemblies"
 
-C:\Windows\System32\xcopy "$(SolutionDir)Dragon\ExcelDna.IntelliSense.xll*" "$(TargetDir)ExcelDna.IntelliSense.xll*" /C /Y
+xcopy "$(SolutionDir)Dragon\ExcelDna.IntelliSense.xll*" "$(TargetDir)" /C /Y
+
+move /Y "$(TargetDir)\*.xll" "$(APPDATA)\BHoM\Assemblies"
+
 </PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\ExcelDna.AddIn.0.34.6\tools\ExcelDna.AddIn.targets" Condition="Exists('..\packages\ExcelDna.AddIn.0.34.6\tools\ExcelDna.AddIn.targets')" />
