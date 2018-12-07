@@ -151,7 +151,9 @@
 
 xcopy "$(SolutionDir)Dragon\ExcelDna.IntelliSense.xll*" "$(TargetDir)" /C /Y
 
-move /Y "$(TargetDir)\*.xll" "$(APPDATA)\BHoM\Assemblies"
+move /Y "$(TargetDir)\*.xll"  "$(APPDATA)\BHoM\Assemblies"
+
+move /Y "$(TargetDir)\*.dna"  "$(APPDATA)\BHoM\Assemblies"
 
 </PostBuildEvent>
   </PropertyGroup>
