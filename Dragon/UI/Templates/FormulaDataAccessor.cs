@@ -31,7 +31,9 @@ namespace BH.UI.Dragon.Templates
 
         public override T GetDataItem<T>(int index)
         {
+            Type type = typeof(T);
             object item = inputs[index];
+
             if(item is ExcelEmpty || item is ExcelMissing) {
                 return (T)defaults[index];
             }
@@ -40,6 +42,10 @@ namespace BH.UI.Dragon.Templates
                 // Incase T is object or something similarly cabable of
                 // holding a list.
                 return (T)(GetDataList<object>(index) as dynamic);
+            }
+            if (type.IsEnum && item is string)
+            {
+                return (T)Enum.Parse(type, item as string);
             }
 
             // Can't always cast directly to T from object storage type even
