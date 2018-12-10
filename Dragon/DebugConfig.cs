@@ -25,7 +25,7 @@ namespace BH.UI.Dragon
     public static class DebugConfig
     {
         public const ErrorMessageHandling ErrorHandling = ErrorMessageHandling.ErrorValue;  //Determains what to show in cells where calculations fail
-        public const bool ShowExcelDNALog = true;                                          //Show the excel dna dialog at startup, showing what methods have failed to initialize. Useful for debugging, but anoying for release
+        public const bool ShowExcelDNALog = false;                                          //Show the excel dna dialog at startup, showing what methods have failed to initialize. Useful for debugging, but anoying for release
     }
 
     /*****************************************************************/
