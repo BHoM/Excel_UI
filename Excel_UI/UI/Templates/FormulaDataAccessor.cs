@@ -179,6 +179,10 @@ namespace BH.UI.Excel.Templates
                 {
                     return SetDataItem(index, (data as IEnumerable).Cast<object>().ToList());
                 }
+                if (data.GetType().IsEnum)
+                {
+                    return SetDataItem(index, Enum.GetName(data.GetType(), data));
+                }
                 return SetDataItem(index,
                     data.GetType().ToText() + " [" + Project.ActiveProject.IAdd(data) + "]"
                 );
