@@ -83,7 +83,6 @@
     <Compile Include="Methods\Properties.cs" />
     <Compile Include="Project\Project.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="ReflectionExtra.cs" />
     <Compile Include="UI\Components\Adapter\CreateAdapter.cs" />
     <Compile Include="UI\Components\Adapter\CreateQuery.cs" />
     <Compile Include="UI\Components\Adapter\Delete.cs" />
