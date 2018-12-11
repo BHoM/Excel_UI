@@ -1,0 +1,25 @@
+﻿using System;
+using BH.oM.Base;
+using BH.UI.Excel.Templates;
+using BH.UI.Templates;
+using BH.UI.Components;
+
+namespace BH.UI.Excel.Components
+{
+    public class GetInfoFormula : CallerFormula
+    {
+        /*******************************************/
+        /**** Properties                        ****/
+        /*******************************************/
+
+        public override Caller Caller { get; } = new GetInfoCaller();
+
+        /*******************************************/
+        /**** Constructors                      ****/
+        /*******************************************/
+
+        public GetInfoFormula(FormulaDataAccessor accessor) : base(accessor) { }
+
+        /*******************************************/
+    }
+}
