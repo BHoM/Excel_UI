@@ -4,9 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using BH.oM.Base;
-using BH.oM.Geometry;
 using BH.Engine.Reflection;
-using BH.oM.DataManipulation.Queries;
 using BH.Engine.Serialiser;
 using Microsoft.Office.Interop.Excel;
 
@@ -67,13 +65,6 @@ namespace BH.UI.Excel
 
         /*****************************************/
 
-        public IGeometry GetGeometry(string str)
-        {
-            return GetAny(str) as IGeometry;
-        }
-
-        /*****************************************/
-
         public object GetAny(string str)
         {
             if(m_objects.ContainsKey(str))
@@ -91,13 +82,6 @@ namespace BH.UI.Excel
             return null;
         }
 
-        /*****************************************/
-
-
-        public IQuery GetQuery(string str)
-        {
-            return GetAny(str) as IQuery;
-        }
 
         /*****************************************/
         /****** "Interface" Add method     *******/
@@ -136,24 +120,6 @@ namespace BH.UI.Excel
                     Add(kvp.Value as IBHoMObject);
                 }
             }
-            return guid;
-        }
-
-        /*****************************************/
-
-        public string Add(IQuery query)
-        {
-            string guid = ToString(Guid.NewGuid());
-            m_objects[guid] = query;
-            return guid;
-        }
-
-        /*****************************************/
-
-        public string Add(IGeometry geom)
-        {
-            string guid = ToString(Guid.NewGuid());
-            m_objects[guid] = geom;
             return guid;
         }
 
