@@ -7,7 +7,6 @@ using System.Collections.Generic;
 using System.Collections;
 using BH.Engine.Reflection;
 using BH.oM.Base;
-using BH.oM.Geometry;
 using System.Linq.Expressions;
 using BH.UI.Templates;
 using BH.UI.Excel.Templates;

@@ -7,7 +7,6 @@ using ExcelDna.Integration;
 using System.Reflection;
 using BH.oM.Base;
 using BH.Engine.Reflection;
-using BH.oM.Geometry;
 using System.Collections;
 
 namespace BH.UI.Excel
