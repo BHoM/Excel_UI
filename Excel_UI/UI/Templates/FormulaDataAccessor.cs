@@ -218,7 +218,7 @@ namespace BH.UI.Excel.Templates
         {
             // Retrieve the output from this DataAccessor
             var errors = Query.CurrentEvents()
-                .Where(e => e.Type == oM.Reflection.Debuging.EventType.Error);
+                .Where(e => e.Type == oM.Reflection.Debugging.EventType.Error);
             if (errors.Count() > 0) {
                 string msg = errors
                     .Select(e => e.Message)
