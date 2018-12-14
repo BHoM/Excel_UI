@@ -11,7 +11,6 @@ using ExcelDna.Integration;
 using System.Linq.Expressions;
 using System.Reflection;
 using BH.Engine.Reflection;
-using BH.Engine.Reflection.Convert;
 
 namespace BH.UI.Excel.Templates
 {
