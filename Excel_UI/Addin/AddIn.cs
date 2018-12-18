@@ -43,9 +43,17 @@ namespace BH.UI.Excel
         private void App_WorkbookOpen(Workbook Wb)
         {
             List<string> json = new List<string>();
+            _Worksheet newsheet;
             try
             {
-                _Worksheet newsheet = Wb.Sheets["BHoM_Data"];
+                try
+                {
+                    newsheet = Wb.Sheets["BHoM_DataHidden"];
+                } catch
+                {
+                    // Backwards compatibility
+                    newsheet = Wb.Sheets["BHoM_Data"];
+                }
                 foreach (Range row in newsheet.UsedRange.Rows)
                 {
                     string str = "";
@@ -78,7 +86,13 @@ namespace BH.UI.Excel
             _Worksheet newsheet;
             try
             {
-                newsheet = Wb.Sheets["BHoM_Data"];
+                try
+                {
+                    newsheet = Wb.Sheets["BHoM_DataHidden"];
+                } catch {
+                    // Backwards compatibility
+                    newsheet = Wb.Sheets["BHoM_Data"];
+                }
                 try
                 {
                     foreach (Range cell in newsheet.UsedRange)
@@ -91,8 +105,8 @@ namespace BH.UI.Excel
             {
                 if (p.Empty) return;
                 newsheet = Wb.Sheets.Add();
-                newsheet.Name = "BHoM_Data";
             }
+            newsheet.Name = "BHoM_DataHidden";
             if (p.Empty) return;
 
             newsheet.Visible = XlSheetVisibility.xlSheetHidden;
