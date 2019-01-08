@@ -83,7 +83,7 @@ namespace BH.UI.Excel.Templates
                 CommandBarButton methodItem = AppendMenuItem(menu, tree.Name, Item_Click);
                 try
                 {
-                    methodItem.Tag = Engine.Reflection.Convert.ToText(method as dynamic);
+                    methodItem.Tag = Engine.Reflection.Convert.ToText(method as dynamic, true);
                 }
                 catch { }
                 m_ItemLinks[methodItem.Tag] = method;
