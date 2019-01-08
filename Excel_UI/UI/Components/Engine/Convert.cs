@@ -36,6 +36,8 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new ConvertCaller();
 
+        public override string MenuRoot { get; } = "Convert";
+
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/

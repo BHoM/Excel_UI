@@ -20,32 +20,37 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using System;
-using BH.oM.Base;
-using BH.UI.Excel.Templates;
+using BH.oM.UI;
 using BH.UI.Templates;
-using BH.UI.Components;
+using Microsoft.Office.Core;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using BH.oM.DataStructure;
+using BH.Engine.Reflection;
 
-namespace BH.UI.Excel.Components
+namespace BH.UI.Excel.Templates
 {
-    public class CreateQueryFormula : CallerFormula
+    internal static class SelectorMenuUtil
     {
         /*******************************************/
-        /**** Properties                        ****/
+        /**** Public Methods                    ****/
         /*******************************************/
 
-        public override string Name => "Adapter.Query." + Caller.Name;
-
-        public override Caller Caller { get; } = new CreateQueryCaller();
-
-        public override string MenuRoot { get; } = "Create Query";
-
-        /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public CreateQueryFormula(FormulaDataAccessor accessor) : base(accessor) { }
+        public static IExcelSelectorMenu ISetExcelSelectorMenu(ISelector selector)
+        {
+            return SetExcelSelectorMenu(selector as dynamic);
+        }
 
         /*******************************************/
+
+        public static IExcelSelectorMenu SetExcelSelectorMenu<T>(Selector<T> selector)
+        {
+            var menu = new SelectorMenu_CommandBar<T>();
+            selector.SetSelectorMenu(menu);
+            return menu;
+        }
     }
 }

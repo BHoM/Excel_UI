@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of the Buildings and Habitats object Model (BHoM)
  * Copyright (c) 2015 - 2018, the respective contributors. All rights reserved.
  *
@@ -20,32 +20,13 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using System;
-using BH.oM.Base;
-using BH.UI.Excel.Templates;
-using BH.UI.Templates;
-using BH.UI.Components;
-
-namespace BH.UI.Excel.Components
+namespace BH.UI.Excel.Templates
 {
-    public class CreateQueryFormula : CallerFormula
+    internal interface IExcelSelectorMenu
     {
         /*******************************************/
         /**** Properties                        ****/
         /*******************************************/
-
-        public override string Name => "Adapter.Query." + Caller.Name;
-
-        public override Caller Caller { get; } = new CreateQueryCaller();
-
-        public override string MenuRoot { get; } = "Create Query";
-
-        /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public CreateQueryFormula(FormulaDataAccessor accessor) : base(accessor) { }
-
-        /*******************************************/
+        string RootName { get; set; }
     }
 }

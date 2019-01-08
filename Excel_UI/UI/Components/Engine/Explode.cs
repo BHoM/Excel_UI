@@ -36,6 +36,8 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new ExplodeCaller();
 
+        public override string MenuRoot { get; } = "Explode";
+
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/
