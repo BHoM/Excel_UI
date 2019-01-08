@@ -36,6 +36,8 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new GetInfoCaller();
 
+        public override string MenuRoot { get; } = "Get Info";
+
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/

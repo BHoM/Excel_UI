@@ -368,7 +368,7 @@ namespace BH.UI.Excel.Templates
                         }).ToList<object>();
             return new Tuple<Delegate, ExcelFunctionAttribute, List<object>>(
                 lambda.Compile(),
-                GetFunctionAttribute(caller, rawParams),
+                GetFunctionAttribute(caller),
                 argAttrs
             );
         }
@@ -417,30 +417,11 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
-        private ExcelFunctionAttribute GetFunctionAttribute(CallerFormula caller, IEnumerable<ParamInfo> paramList)
+        private ExcelFunctionAttribute GetFunctionAttribute(CallerFormula caller)
         {
-            bool hasParams = paramList.Count() > 0;
-            string params_ = "";
-            if (hasParams)
-            {
-                params_ = "?by_" + paramList
-                    .Select(p => p.DataType.ToText())
-                    .Select(p => p.Replace("[]","s"))
-                    .Select(p => p.Replace("[,]","Matrix"))
-                    .Select(p => p.Replace("&",""))
-                    .Select(p => p.Replace("<","Of"))
-                    .Select(p => p.Replace(">",""))
-                    .Select(p => p.Replace(", ","_"))
-                    .Select(p => p.Replace("`","_"))
-                    .Aggregate((a, b) => $"{a}_{b}");
-            }
-
-            object info = caller.Caller.SelectedItem;
-            string name = caller.Name;
-
             return new ExcelFunctionAttribute()
             {
-                Name = name + params_,
+                Name = caller.Function,
                 Description = caller.Caller.Description,
                 Category = "BHoM." + caller.Caller.Category,
                 IsMacroType = true

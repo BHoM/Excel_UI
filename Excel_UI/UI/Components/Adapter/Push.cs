@@ -36,6 +36,8 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new PushCaller();
 
+        public override string MenuRoot { get; } = "Push";
+
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/

@@ -20,7 +20,11 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
+using BH.Engine.Reflection;
+using BH.oM.UI;
 using BH.UI.Templates;
+using Microsoft.Office.Core;
+using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -48,6 +52,34 @@ namespace BH.UI.Excel.Templates
             }
         }
 
+        public abstract string MenuRoot { get; }
+
+        public virtual string Function
+        {
+            get
+            {
+
+                IEnumerable<ParamInfo> paramList = Caller.InputParams;
+                bool hasParams = paramList.Count() > 0;
+                string params_ = "";
+                if (hasParams)
+                {
+                    params_ = "?by_" + paramList
+                        .Select(p => p.DataType.ToText())
+                        .Select(p => p.Replace("[]", "s"))
+                        .Select(p => p.Replace("[,]", "Matrix"))
+                        .Select(p => p.Replace("&", ""))
+                        .Select(p => p.Replace("<", "Of"))
+                        .Select(p => p.Replace(">", ""))
+                        .Select(p => p.Replace(", ", "_"))
+                        .Select(p => p.Replace("`", "_"))
+                        .Aggregate((a, b) => $"{a}_{b}");
+                }
+
+                return Name + params_;
+            }
+        }
+
         public abstract Caller Caller { get; }
 
         /*******************************************/
@@ -58,6 +90,43 @@ namespace BH.UI.Excel.Templates
         {
             m_dataAccessor = accessor;
             Caller.SetDataAccessor(m_dataAccessor);
+
+            if (Caller.Selector != null)
+            {
+                var smenu = SelectorMenuUtil.ISetExcelSelectorMenu(Caller.Selector);
+                smenu.RootName = MenuRoot;
+            }
+
+            m_app = ExcelDna.Integration.ExcelDnaUtil.Application as Application;
+
+            var commandBar = m_app.CommandBars["Cell"];
+
+            var menu = commandBar.FindControl(
+                Type: MsoControlType.msoControlPopup,
+                Tag: Caller.Category
+                ) as CommandBarPopup;
+            if (menu == null)
+            {
+                menu = commandBar.Controls.Add(MsoControlType.msoControlPopup, Temporary: true) as CommandBarPopup;
+                menu.Caption = Caller.Category;
+                menu.Tag = Caller.Category;
+            }
+
+            Caller.AddToMenu(menu.Controls);
+            Caller.ItemSelected += Caller_ItemSelected;
+        }
+
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
+
+        private void Caller_ItemSelected(object sender, object e)
+        {
+            m_app.SendKeys("="+Function+"{(}",true);
+            if(Caller.InputParams.Count == 0)
+            {
+                m_app.SendKeys("{)}{ENTER}",true);
+            }
         }
 
         /*******************************************/
@@ -65,5 +134,6 @@ namespace BH.UI.Excel.Templates
         /*******************************************/
 
         private FormulaDataAccessor m_dataAccessor;
+        private Application m_app;
     }
 }

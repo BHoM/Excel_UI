@@ -36,12 +36,14 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new CreateDictionaryCaller();
 
+        public override string MenuRoot { get; } = "Create Dictionary";
+
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/
 
-
         public CreateDictionaryFormula(FormulaDataAccessor accessor) : base(accessor) { }
+
         /*******************************************/
     }
 }

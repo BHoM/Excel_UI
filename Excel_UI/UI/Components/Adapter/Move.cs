@@ -40,6 +40,8 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new MoveCaller();
 
+        public override string MenuRoot { get; } = "Move";
+
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/

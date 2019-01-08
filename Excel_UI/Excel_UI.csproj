@@ -41,6 +41,10 @@
     <Reference Include="BHoM_UI">
       <HintPath>..\..\BHoM_UI\Build\BHoM_UI.dll</HintPath>
     </Reference>
+    <Reference Include="DataStructure_oM, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\BHoM\Build\DataStructure_oM.dll</HintPath>
+    </Reference>
     <Reference Include="ExcelDna.Integration, Version=0.34.6373.42344, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ExcelDna.Integration.0.34.6\lib\ExcelDna.Integration.dll</HintPath>
       <Private>False</Private>
@@ -49,6 +53,7 @@
       <HintPath>..\packages\ExcelDna.IntelliSense.1.0.6\lib\net40\ExcelDna.IntelliSense.dll</HintPath>
       <Private>True</Private>
     </Reference>
+    <Reference Include="PresentationFramework" />
     <Reference Include="Reflection_Engine">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\BHoM_Engine\Build\Reflection_Engine.dll</HintPath>
@@ -64,6 +69,7 @@
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -108,6 +114,9 @@
     <Compile Include="UI\Components\oM\CreateObject.cs" />
     <Compile Include="UI\Components\oM\CreateType.cs" />
     <Compile Include="UI\Global\FormulaSearchMenu.cs" />
+    <Compile Include="UI\Templates\IExcelSelectorMenu.cs" />
+    <Compile Include="UI\Templates\SelectorMenuUtil.cs" />
+    <Compile Include="UI\Templates\SelectorMenu_CommandBar.cs" />
     <Compile Include="UI\Templates\CallerFormula.cs" />
     <Compile Include="UI\Templates\FormulaDataAccessor.cs" />
   </ItemGroup>
