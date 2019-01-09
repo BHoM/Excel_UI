@@ -28,76 +28,21 @@ using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace BH.UI.Excel.Templates
 {
-    public abstract class CallerFormula
+    public abstract class SingleOptionCallerFormula : CallerFormula
     {
-        /*******************************************/
-        /**** Properties                        ****/
-        /*******************************************/
-
-        public virtual string Name 
-        {
-            get
-            {
-                if (Caller is MethodCaller && Caller.SelectedItem != null)
-                {
-                    Type decltype = (Caller as MethodCaller).Method.DeclaringType;
-                    return decltype.Name + "." + decltype.Namespace.Split('.').Last() + "." + Caller.Name;
-                }
-                return Caller.Category + "." + Caller.Name;
-            }
-        }
-
-        public abstract string MenuRoot { get; }
-
-        public virtual string Function
-        {
-            get
-            {
-
-                IEnumerable<ParamInfo> paramList = Caller.InputParams;
-                bool hasParams = paramList.Count() > 0;
-                string params_ = "";
-                if (hasParams)
-                {
-                    params_ = "?by_" + paramList
-                        .Select(p => p.DataType.ToText())
-                        .Select(p => p.Replace("[]", "s"))
-                        .Select(p => p.Replace("[,]", "Matrix"))
-                        .Select(p => p.Replace("&", ""))
-                        .Select(p => p.Replace("<", "Of"))
-                        .Select(p => p.Replace(">", ""))
-                        .Select(p => p.Replace(", ", "_"))
-                        .Select(p => p.Replace("`", "_"))
-                        .Aggregate((a, b) => $"{a}_{b}");
-                }
-
-                return Name + params_;
-            }
-        }
-
-        public abstract Caller Caller { get; }
 
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/
 
-        public CallerFormula(FormulaDataAccessor accessor)
+        public SingleOptionCallerFormula(FormulaDataAccessor accessor) : base(accessor)
         {
-            m_dataAccessor = accessor;
-            Caller.SetDataAccessor(m_dataAccessor);
-
-            if (Caller.Selector != null)
-            {
-                var smenu = SelectorMenuUtil.ISetExcelSelectorMenu(Caller.Selector);
-                smenu.RootName = MenuRoot;
-            }
-
-            Application = ExcelDna.Integration.ExcelDnaUtil.Application as Application;
 
             var commandBar = Application.CommandBars["Cell"];
 
@@ -105,6 +50,7 @@ namespace BH.UI.Excel.Templates
                 Type: MsoControlType.msoControlPopup,
                 Tag: Caller.Category
                 ) as CommandBarPopup;
+
             if (menu == null)
             {
                 menu = commandBar.Controls.Add(MsoControlType.msoControlPopup, Temporary: true) as CommandBarPopup;
@@ -112,15 +58,22 @@ namespace BH.UI.Excel.Templates
                 menu.Tag = Caller.Category;
             }
 
-            Caller.AddToMenu(menu.Controls);
-            Caller.ItemSelected += Caller_ItemSelected;
+            m_btn = menu.Controls.Add(MsoControlType.msoControlButton, Temporary: true) as CommandBarButton;
+            try
+            {
+                m_btn.Tag = Engine.Reflection.Convert.ToText(Caller.SelectedItem as dynamic, true);
+                m_btn.Caption = Engine.Reflection.Convert.ToText(Caller.SelectedItem as dynamic, false);
+                m_btn.Click += OnClick;
+            } catch {
+                m_btn.Delete();
+            }
         }
 
         /*******************************************/
         /**** Private Methods                   ****/
         /*******************************************/
 
-        private void Caller_ItemSelected(object sender, object e)
+        private void OnClick(CommandBarButton Ctrl, ref bool CancelDefault)
         {
             Application.SendKeys("="+Function+"{(}",true);
             if(Caller.InputParams.Count == 0)
@@ -130,15 +83,9 @@ namespace BH.UI.Excel.Templates
         }
 
         /*******************************************/
-        /**** Private Properties                ****/
-        /*******************************************/
-
-        protected Application Application { get; private set; }
-
-        /*******************************************/
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private FormulaDataAccessor m_dataAccessor;
+        private CommandBarButton m_btn;
     }
 }

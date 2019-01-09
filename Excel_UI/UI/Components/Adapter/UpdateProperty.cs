@@ -28,7 +28,7 @@ using BH.UI.Components;
 
 namespace BH.UI.Excel.Components
 {
-    public class UpdatePropertyFormula : CallerFormula
+    public class UpdatePropertyFormula : SingleOptionCallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/

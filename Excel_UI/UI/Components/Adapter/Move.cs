@@ -30,7 +30,7 @@ using BH.UI.Components;
 
 namespace BH.UI.Excel.Components
 {
-    public class MoveFormula : CallerFormula
+    public class MoveFormula : SingleOptionCallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/

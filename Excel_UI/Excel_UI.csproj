@@ -114,6 +114,7 @@
     <Compile Include="UI\Components\oM\CreateObject.cs" />
     <Compile Include="UI\Components\oM\CreateType.cs" />
     <Compile Include="UI\Global\FormulaSearchMenu.cs" />
+    <Compile Include="UI\Templates\SingleOptionCallerFormula.cs" />
     <Compile Include="UI\Templates\IExcelSelectorMenu.cs" />
     <Compile Include="UI\Templates\SelectorMenuUtil.cs" />
     <Compile Include="UI\Templates\SelectorMenu_CommandBar.cs" />

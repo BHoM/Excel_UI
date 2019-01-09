@@ -28,7 +28,7 @@ using BH.UI.Components;
 
 namespace BH.UI.Excel.Components
 {
-    public class CreateDictionaryFormula : CallerFormula
+    public class CreateDictionaryFormula : SingleOptionCallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/
