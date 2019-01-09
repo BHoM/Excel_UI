@@ -88,11 +88,12 @@ namespace BH.UI.Excel.Templates
             {
                 return (item as IEnumerable<T>).ToList();
             }
-            if (item is IEnumerable)
+            if (item is IEnumerable && !(item is string))
             {
                 // This will flatten object[,]s
                 List<T> list = new List<T>();
-                foreach(object o in item as IEnumerable) {
+                foreach (object o in item as IEnumerable)
+                {
                     if (!(o is ExcelMissing || o is ExcelEmpty))
                     {
                         list.Add((T)(o as dynamic));
@@ -100,7 +101,7 @@ namespace BH.UI.Excel.Templates
                 }
                 return list;
             }
-            return null;
+            return new List<T>() { GetDataItem<T>(index) };
         }
 
         /*******************************************/
