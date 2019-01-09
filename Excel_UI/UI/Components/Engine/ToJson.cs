@@ -28,7 +28,7 @@ using BH.UI.Components;
 
 namespace BH.UI.Excel.Components
 {
-    public class ToJsonFormula : CallerFormula
+    public class ToJsonFormula : SingleOptionCallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/

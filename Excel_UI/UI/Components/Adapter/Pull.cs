@@ -29,7 +29,7 @@ using System.Collections.Generic;
 
 namespace BH.UI.Excel.Components
 {
-    public class PullFormula : CallerFormula
+    public class PullFormula : SingleOptionCallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/

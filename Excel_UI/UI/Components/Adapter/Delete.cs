@@ -28,7 +28,7 @@ using BH.UI.Components;
 
 namespace BH.UI.Excel.Components
 {
-    public class DeleteFormula : CallerFormula
+    public class DeleteFormula : SingleOptionCallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/
