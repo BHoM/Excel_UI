@@ -48,9 +48,11 @@ namespace BH.UI.Excel.Templates
                     Type decltype = (Caller as MethodCaller).Method.DeclaringType;
                     return decltype.Name + "." + decltype.Namespace.Split('.').Last() + "." + Caller.Name;
                 }
-                return Caller.Category + "." + Caller.Name;
+                return Category + "." + Caller.Name;
             }
         }
+
+        public virtual string Category { get { return Caller.Category; } }
 
         public abstract string MenuRoot { get; }
 
@@ -103,13 +105,13 @@ namespace BH.UI.Excel.Templates
 
             var menu = commandBar.FindControl(
                 Type: MsoControlType.msoControlPopup,
-                Tag: Caller.Category
+                Tag: Category
                 ) as CommandBarPopup;
             if (menu == null)
             {
                 menu = commandBar.Controls.Add(MsoControlType.msoControlPopup, Temporary: true) as CommandBarPopup;
-                menu.Caption = Caller.Category;
-                menu.Tag = Caller.Category;
+                menu.Caption = Category;
+                menu.Tag = Category;
             }
 
             Caller.AddToMenu(menu.Controls);

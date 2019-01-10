@@ -36,37 +36,30 @@ namespace BH.UI.Excel.Templates
 {
     public abstract class SingleOptionCallerFormula : CallerFormula
     {
-
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/
 
         public SingleOptionCallerFormula(FormulaDataAccessor accessor) : base(accessor)
         {
-
             var commandBar = Application.CommandBars["Cell"];
 
             var menu = commandBar.FindControl(
                 Type: MsoControlType.msoControlPopup,
-                Tag: Caller.Category
+                Tag: Category
                 ) as CommandBarPopup;
 
             if (menu == null)
             {
                 menu = commandBar.Controls.Add(MsoControlType.msoControlPopup, Temporary: true) as CommandBarPopup;
-                menu.Caption = Caller.Category;
-                menu.Tag = Caller.Category;
+                menu.Caption = Category;
+                menu.Tag = Category;
             }
 
             m_btn = menu.Controls.Add(MsoControlType.msoControlButton, Temporary: true) as CommandBarButton;
-            try
-            {
-                m_btn.Tag = MenuRoot + "_btn";
-                m_btn.Caption = MenuRoot;
-                m_btn.Click += OnClick;
-            } catch {
-                m_btn.Delete();
-            }
+            m_btn.Tag = MenuRoot + "_btn";
+            m_btn.Caption = MenuRoot;
+            m_btn.Click += OnClick;
         }
 
         /*******************************************/
