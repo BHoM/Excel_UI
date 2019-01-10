@@ -28,15 +28,20 @@ using BH.UI.Components;
 
 namespace BH.UI.Excel.Components
 {
-    public class ExplodeFormula : CallerFormula
+    public class ExplodeFormula : SingleOptionCallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/
         /*******************************************/
 
-        public override Caller Caller { get; } = new ExplodeCaller();
+        // Bespoke Excel explode method
+        public override Caller Caller { get; } = new MethodCaller(typeof(Properties).GetMethod("Explode"));
 
         public override string MenuRoot { get; } = "Explode";
+
+        public override string Function { get; } = "BHoM.Explode";
+            
+        public override string Category { get; } = "Engine";
 
         /*******************************************/
         /**** Constructors                      ****/
