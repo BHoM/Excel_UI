@@ -70,7 +70,6 @@ namespace BH.UI.Excel.Templates
 
         private void AppendMenuTree(Tree<T> tree, CommandBarControls menu)
         {
-
             if (tree.Children.Count > 0)
             {
                 CommandBarControls treeMenu = AppendMenuItem(menu, tree.Name);
@@ -87,7 +86,6 @@ namespace BH.UI.Excel.Templates
                 }
                 catch { }
                 m_ItemLinks[methodItem.Tag] = method;
-                methodItem.TooltipText= method.IDescription();
             }
 
         }
