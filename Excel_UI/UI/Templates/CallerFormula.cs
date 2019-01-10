@@ -124,10 +124,17 @@ namespace BH.UI.Excel.Templates
 
         private void Caller_ItemSelected(object sender, object e)
         {
-            Application.SendKeys("="+Function+"{(}",true);
-            if(Caller.InputParams.Count == 0)
+            Range cell = Application.Selection as Range;
+            var cellcontents = "=" + Function;
+            if (Caller.InputParams.Count == 0)
             {
-                Application.SendKeys("{)}{ENTER}",true);
+                cellcontents += "()";
+                if (cell != null) cell.Formula = cellcontents;
+            }
+            else
+            {
+                if (cell != null) cell.Formula = cellcontents;
+                Application.SendKeys("{F2}{(}", true);
             }
         }
 
