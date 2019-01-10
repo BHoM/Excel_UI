@@ -61,8 +61,8 @@ namespace BH.UI.Excel.Templates
             m_btn = menu.Controls.Add(MsoControlType.msoControlButton, Temporary: true) as CommandBarButton;
             try
             {
-                m_btn.Tag = Engine.Reflection.Convert.ToText(Caller.SelectedItem as dynamic, true);
-                m_btn.Caption = Engine.Reflection.Convert.ToText(Caller.SelectedItem as dynamic, false);
+                m_btn.Tag = MenuRoot + "_btn";
+                m_btn.Caption = MenuRoot;
                 m_btn.Click += OnClick;
             } catch {
                 m_btn.Delete();
