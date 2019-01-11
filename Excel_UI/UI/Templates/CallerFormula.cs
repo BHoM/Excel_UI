@@ -103,18 +103,18 @@ namespace BH.UI.Excel.Templates
 
             var commandBar = Application.CommandBars["Cell"];
 
-            var menu = commandBar.FindControl(
+            Menu = commandBar.FindControl(
                 Type: MsoControlType.msoControlPopup,
                 Tag: Category
                 ) as CommandBarPopup;
-            if (menu == null)
+            if (Menu == null)
             {
-                menu = commandBar.Controls.Add(MsoControlType.msoControlPopup, Temporary: true) as CommandBarPopup;
-                menu.Caption = Category;
-                menu.Tag = Category;
+                Menu = commandBar.Controls.Add(MsoControlType.msoControlPopup, Temporary: true) as CommandBarPopup;
+                Menu.Caption = "BH." + Category;
+                Menu.Tag = Category;
             }
 
-            Caller.AddToMenu(menu.Controls);
+            Caller.AddToMenu(Menu.Controls);
             Caller.ItemSelected += Caller_ItemSelected;
         }
 
@@ -143,6 +143,7 @@ namespace BH.UI.Excel.Templates
         /*******************************************/
 
         protected Application Application { get; private set; }
+        protected CommandBarPopup Menu { get; private set; }
 
         /*******************************************/
         /**** Private Fields                    ****/
