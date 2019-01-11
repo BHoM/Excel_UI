@@ -44,19 +44,7 @@ namespace BH.UI.Excel.Templates
         {
             var commandBar = Application.CommandBars["Cell"];
 
-            var menu = commandBar.FindControl(
-                Type: MsoControlType.msoControlPopup,
-                Tag: Category
-                ) as CommandBarPopup;
-
-            if (menu == null)
-            {
-                menu = commandBar.Controls.Add(MsoControlType.msoControlPopup, Temporary: true) as CommandBarPopup;
-                menu.Caption = Category;
-                menu.Tag = Category;
-            }
-
-            m_btn = menu.Controls.Add(MsoControlType.msoControlButton, Temporary: true) as CommandBarButton;
+            m_btn = Menu.Controls.Add(MsoControlType.msoControlButton, Temporary: true) as CommandBarButton;
             m_btn.Tag = MenuRoot + "_btn";
             m_btn.Caption = MenuRoot;
             m_btn.Click += OnClick;
