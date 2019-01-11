@@ -22,6 +22,7 @@
 
 using BH.Engine.Reflection;
 using BH.oM.UI;
+using BH.UI.Components;
 using BH.UI.Excel.Templates;
 using BH.UI.Global;
 using BH.UI.Templates;
@@ -89,6 +90,17 @@ namespace BH.UI.Excel.Global
         /*******************************************/
         /**** Private Methods                   ****/
         /*******************************************/
+
+        protected override List<SearchItem> GetAllPossibleItems()
+        {
+            var items = base.GetAllPossibleItems();
+
+            // All Types
+            items.AddRange(Engine.Reflection.Query.BHoMTypeList()
+                                    .Select(x => new SearchItem { Item = x, CallerType = typeof(CreateCustomCaller), Text = x.ToText(true) }));
+
+            return items;
+        }
 
         private Tuple<Delegate, ExcelFunctionAttribute, List<object>> CreateDelegate(SearchItem item)
         {
