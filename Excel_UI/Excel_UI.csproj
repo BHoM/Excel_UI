@@ -110,7 +110,10 @@
     <Compile Include="UI\Components\Engine\Query.cs" />
     <Compile Include="UI\Components\Engine\SetProperty.cs" />
     <Compile Include="UI\Components\Engine\ToJson.cs" />
+    <Compile Include="UI\Components\oM\CreateData.cs" />
+    <Compile Include="UI\Templates\CallerValueListFormula.cs" />
     <Compile Include="UI\Components\oM\CreateDictionary.cs" />
+    <Compile Include="UI\Components\oM\CreateEnum.cs" />
     <Compile Include="UI\Components\oM\CreateObject.cs" />
     <Compile Include="UI\Components\oM\CreateType.cs" />
     <Compile Include="UI\Global\FormulaSearchMenu.cs" />

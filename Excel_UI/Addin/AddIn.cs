@@ -221,7 +221,7 @@ namespace BH.UI.Excel
             {
                 CallerFormula formula = m_formulea[e.CallerType.Name];
                 formula.Caller.SetItem(e.SelectedItem);
-                formula.Caller.Run();
+                formula.Run();
             }
         }
 

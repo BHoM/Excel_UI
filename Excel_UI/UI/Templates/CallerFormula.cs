@@ -122,7 +122,7 @@ namespace BH.UI.Excel.Templates
         /**** Private Methods                   ****/
         /*******************************************/
 
-        private void Caller_ItemSelected(object sender, object e)
+        protected virtual void Caller_ItemSelected(object sender, object e)
         {
             Range cell = Application.Selection as Range;
             var cellcontents = "=" + Function;
@@ -136,6 +136,14 @@ namespace BH.UI.Excel.Templates
                 if (cell != null) cell.Formula = cellcontents;
                 Application.SendKeys("{F2}{(}", true);
             }
+        }
+
+
+        /*******************************************/
+
+        public virtual bool Run()
+        {
+            return Caller.Run();
         }
 
         /*******************************************/
