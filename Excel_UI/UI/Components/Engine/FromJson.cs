@@ -36,8 +36,6 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new FromJsonCaller();
 
-        public override string MenuRoot { get; } = "From JSON";
-
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/

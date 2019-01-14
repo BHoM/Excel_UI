@@ -38,8 +38,6 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new DeleteCaller();
 
-        public override string MenuRoot { get; } = "Delete";
-
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/

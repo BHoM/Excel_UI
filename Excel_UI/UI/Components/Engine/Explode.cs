@@ -37,8 +37,6 @@ namespace BH.UI.Excel.Components
         // Bespoke Excel explode method
         public override Caller Caller { get; } = new MethodCaller(typeof(Properties).GetMethod("Explode"));
 
-        public override string MenuRoot { get; } = "Explode";
-
         public override string Function { get; } = "BHoM.Explode";
             
         public override string Category { get; } = "Engine";
