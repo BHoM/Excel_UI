@@ -82,14 +82,11 @@ namespace BH.UI.Excel.Templates
                 {
                     T method = tree.Value;
                     CommandBarButton methodItem = AppendMenuItem(menu, tree.Name, Item_Click);
-                    try
-                    {
-                        methodItem.Tag = Engine.Reflection.Convert.ToText(method as dynamic, true);
-                    }
-                    catch { }
+                    methodItem.Tag = Guid.NewGuid().ToString();
                     m_ItemLinks[methodItem.Tag] = method;
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Compute.RecordError(e.Message);
             }
