@@ -45,8 +45,8 @@ namespace BH.UI.Excel.Templates
             var commandBar = Application.CommandBars["Cell"];
 
             m_btn = Menu.Controls.Add(MsoControlType.msoControlButton, Temporary: true) as CommandBarButton;
-            m_btn.Tag = MenuRoot + "_btn";
-            m_btn.Caption = MenuRoot;
+            m_btn.Tag = Guid.NewGuid().ToString();
+            m_btn.Caption = Caller.Name;
             m_btn.Click += OnClick;
         }
 
@@ -75,5 +75,7 @@ namespace BH.UI.Excel.Templates
         /*******************************************/
 
         private CommandBarButton m_btn;
+
+        public override string MenuRoot => "";
     }
 }
