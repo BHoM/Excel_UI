@@ -161,7 +161,7 @@
   <PropertyGroup>
     <PostBuildEvent>"$(TargetDir)UI_PostBuild.exe" ..\..\ "$(APPDATA)\BHoM\Assemblies"
 
-xcopy "$(SolutionDir)Excel_UI\ExcelDna.IntelliSense.xll*" "$(TargetDir)" /C /Y
+xcopy "$(ProjectDir)ExcelDna.IntelliSense.xll*" "$(TargetDir)" /C /Y
 
 move /Y "$(TargetDir)\*.xll"  "$(APPDATA)\BHoM\Assemblies"
 
