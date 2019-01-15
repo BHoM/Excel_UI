@@ -1,4 +1,16 @@
+# Excel_Toolkit
+
+
 [![License: LGPL v3](https://img.shields.io/badge/License-LGPL%20v3-blue.svg)](https://www.gnu.org/licenses/lgpl-3.0)
+
+Exposes BHoM functionality as Excel functions.
+
+Load the add-ins from the options menu. Browse to the build folder for this solution and load ExcelDna.IntelliSense.xll and BHoM-AddIn.xll.
+
+Start by typing `=` in a cell and then `Create`, `CreateType`, `Query`, `Compute`, `Convert`, `Modify`, or `BHoM`. The available functions will appear in a dropdown.
+
+You can also find a list by clicking "Insert Function" in the Formulas ribbon and selecting BHoM, BHoM.Engine, BHoM.Adapter or BHoM.oM from the category dropdown.
+
 # BHoM
 
 A great place to start is reading our Wiki [here](https://github.com/BHoM/documentation/wiki) including pages like the [Structure of the BHoM](https://github.com/BHoM/documentation/wiki/Structure-of-the-BHoM) and [Using the BHoM](https://github.com/BHoM/documentation/wiki/Using-the-BHoM).
