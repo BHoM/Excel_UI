@@ -70,24 +70,29 @@ namespace BH.UI.Excel.Templates
 
         private void AppendMenuTree(Tree<T> tree, CommandBarControls menu)
         {
-            if (tree.Children.Count > 0)
+            try
             {
-                CommandBarControls treeMenu = AppendMenuItem(menu, tree.Name);
-                foreach (Tree<T> childTree in tree.Children.Values.OrderBy(x => x.Name))
-                    AppendMenuTree(childTree, treeMenu);
-            }
-            else
-            {
-                T method = tree.Value;
-                CommandBarButton methodItem = AppendMenuItem(menu, tree.Name, Item_Click);
-                try
+                if (tree.Children.Count > 0)
                 {
-                    methodItem.Tag = Engine.Reflection.Convert.ToText(method as dynamic, true);
+                    CommandBarControls treeMenu = AppendMenuItem(menu, tree.Name);
+                    foreach (Tree<T> childTree in tree.Children.Values.OrderBy(x => x.Name))
+                        AppendMenuTree(childTree, treeMenu);
                 }
-                catch { }
-                m_ItemLinks[methodItem.Tag] = method;
+                else
+                {
+                    T method = tree.Value;
+                    CommandBarButton methodItem = AppendMenuItem(menu, tree.Name, Item_Click);
+                    try
+                    {
+                        methodItem.Tag = Engine.Reflection.Convert.ToText(method as dynamic, true);
+                    }
+                    catch { }
+                    m_ItemLinks[methodItem.Tag] = method;
+                }
+            } catch (Exception e)
+            {
+                Compute.RecordError(e.Message);
             }
-
         }
 
         /*******************************************/
