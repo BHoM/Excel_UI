@@ -58,7 +58,6 @@ namespace BH.UI.Excel
                 ExcelDna.Logging.LogDisplay.Hide();
 
             var app = ExcelDnaUtil.Application as Application;
-            app.WorkbookBeforeSave += App_WorkbookBeforeSave;
             app.WorkbookOpen += App_WorkbookOpen;
         }
 
@@ -98,53 +97,6 @@ namespace BH.UI.Excel
             }
             catch
             {
-            }
-        }
-
-        private void App_WorkbookBeforeSave(Workbook Wb, bool SaveAsUI, ref bool Cancel)
-        {
-            Project p = Project.ForWorkbook(Wb);
-
-            _Worksheet newsheet;
-            try
-            {
-                try
-                {
-                    newsheet = Wb.Sheets["BHoM_DataHidden"];
-                } catch {
-                    // Backwards compatibility
-                    newsheet = Wb.Sheets["BHoM_Data"];
-                }
-                try
-                {
-                    foreach (Range cell in newsheet.UsedRange)
-                    {
-                        cell.Value = "";
-                    }
-                }
-                catch { }
-            } catch
-            {
-                if (p.Empty) return;
-                newsheet = Wb.Sheets.Add();
-            }
-            newsheet.Name = "BHoM_DataHidden";
-            if (p.Empty) return;
-
-            newsheet.Visible = XlSheetVisibility.xlSheetHidden;
-            int row = 1;
-            var json = Project.ForWorkbook(Wb).Serialize();
-            foreach (var obj in json)
-            {
-                Range cell = newsheet.Cells[row, 1];
-                int c = 0;
-                while (c < obj.Length)
-                {
-                    cell.Value = obj.Substring(c);
-                    c += (cell.Value as string).Length;
-                    cell = cell.Next;
-                }
-                row++;
             }
         }
 
