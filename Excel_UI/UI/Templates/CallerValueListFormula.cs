@@ -50,7 +50,9 @@ namespace BH.UI.Excel.Templates
             var options = GetChoices();
 
             var app = ExcelDnaUtil.Application as Application;
+            var workbook = app.ActiveWorkbook;
 
+            var proj = Project.ForIDs(options);
             try
             {
                 ExcelReference xlref = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
@@ -64,6 +66,7 @@ namespace BH.UI.Excel.Templates
                         cell.Validation.Delete();
                         cell.Validation.Add(XlDVType.xlValidateList, Formula1: options.Aggregate((a, b) => $"{a}, {b}"));
                         cell.Validation.IgnoreBlank = true;
+                        if (!proj.Empty) proj.SaveData(workbook);
                     });
                     Caller.DataAccessor.SetDataItem(0, "");
                     return true;
