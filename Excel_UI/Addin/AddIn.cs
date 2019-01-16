@@ -37,6 +37,8 @@ using BH.UI.Excel.Global;
 using BH.UI.Global;
 using BH.UI.Components;
 using Microsoft.Office.Interop.Excel;
+using Microsoft.Office.Core;
+using BH.Engine.Serialiser;
 
 namespace BH.UI.Excel
 {
@@ -44,14 +46,17 @@ namespace BH.UI.Excel
     {
         private FormulaDataAccessor m_da;
         private Dictionary<string, CallerFormula> m_formulea;
+        private CommandBarButton m_internalise;
 
         /*****************************************************************/
         /******* Public methods                             **************/
         /*****************************************************************/
+
         public void AutoOpen()
         {
             RegisterExcelMethods();
             RegisterBHoMMethods();
+            AddInternalise();
             
             //Hide error box showing methods not working properly
             if(!DebugConfig.ShowExcelDNALog)
@@ -60,6 +65,43 @@ namespace BH.UI.Excel
             var app = ExcelDnaUtil.Application as Application;
             app.WorkbookOpen += App_WorkbookOpen;
         }
+
+        private void AddInternalise()
+        {
+            var app = ExcelDnaUtil.Application as Application;
+            var cmb = app.CommandBars["Cell"];
+            var btn = cmb.Controls.Add(MsoControlType.msoControlButton, Temporary: true) as CommandBarButton;
+            btn.Tag = "Internalise_Data";
+            btn.Caption = "Internalise Data";
+            btn.Click += Internalise_Click;
+            m_internalise = btn;
+        }
+
+        private void Internalise_Click(CommandBarButton Ctrl, ref bool CancelDefault)
+        {
+            var app = ExcelDnaUtil.Application as Application;
+            Range selected = app.Selection;
+
+            foreach (Range objcell in selected)
+            {
+                string value;
+                try
+                {
+                    value = (string)objcell.Value;
+                    if (value == null || value.Length == 0) continue;
+                } catch { continue; }
+
+                Project proj = Project.ForIDs(new string[] { value });
+
+                if (proj.Count((o) => !(o is Adapter.BHoMAdapter)) == 0) continue;
+                proj.SaveData(app.ActiveWorkbook);
+
+                objcell.Value = value;
+            }
+        }
+
+
+        /*****************************************************************/
 
         private void App_WorkbookOpen(Workbook Wb)
         {

@@ -29,6 +29,7 @@ using BH.oM.Base;
 using BH.Engine.Reflection;
 using BH.Engine.Serialiser;
 using Microsoft.Office.Interop.Excel;
+using BH.Adapter;
 
 namespace BH.UI.Excel
 {
@@ -74,7 +75,7 @@ namespace BH.UI.Excel
             }
         }
 
-        public bool Empty => m_objects.Count == 0;
+        public bool Empty => Count() == 0;
 
         /*****************************************/
         /**** Public get methods        **********/
@@ -87,19 +88,29 @@ namespace BH.UI.Excel
 
         /*****************************************/
 
-        public object GetAny(string str)
+        public string GetId(string str)
         {
             if(m_objects.ContainsKey(str))
             {
-                return m_objects[str]; 
+                return str; 
             } else
             {
                 int start = str.LastIndexOf("[");
                 int end = str.LastIndexOf("]");
                 if(start != -1 && end != -1 && end > start)
                 {
-                    return GetAny(str.Substring(++start, end - start));
+                    return str.Substring(++start, end - start);
                 }
+            }
+            return null;
+        }
+
+        public object GetAny(string str)
+        {
+            string id = GetId(str);
+            if (id != null)
+            {
+                return m_objects[id];
             }
             return null;
         }
@@ -161,37 +172,38 @@ namespace BH.UI.Excel
             return guid;
         }
 
-        public static Project ForWorkbook(Workbook Wb)
+        /*****************************************/
+
+        public static Project ForIDs(IEnumerable<string> ids)
         {
             Project proj = new Project();
-            foreach (Worksheet sheet in Wb.Sheets)
+            foreach (string id in ids)
             {
-                if (sheet.Name == "BHoM_Data") continue;
-                foreach ( Range cell in sheet.UsedRange)
+                try
                 {
-                    try
+                    object obj = ActiveProject.GetAny(id);
+                    if (obj != null)
                     {
-                        if (cell.Value is string)
-                        {
-                            string val = cell.Value;
-                            int start = val.LastIndexOf("[");
-                            int end = val.LastIndexOf("]");
-                            if (start != -1 && end != -1 && end > start)
-                            {
-                                ++start;
-                                val = val.Substring(start, end - start);
-                                object obj = Project.ActiveProject.GetAny(val);
-                                if (obj != null)
-                                {
-                                    proj.m_objects.Add(val, obj);
-                                }
-                            }
-                        }
+                        proj.m_objects.Add(ActiveProject.GetId(id), obj);
                     }
-                    catch { }
                 }
+                catch { }
             }
             return proj;
+        }
+
+        /*****************************************/
+
+        public int Count()
+        {
+            return m_objects.Count;
+        }
+
+        /*****************************************/
+
+        public int Count(Func<object, bool> predicate)
+        {
+            return m_objects.Count((kvp) => predicate(kvp.Value));
         }
 
         /*****************************************/
@@ -207,6 +219,12 @@ namespace BH.UI.Excel
                     {
                         json = kvp.Value.ToJson();
                     }
+                    if (kvp.Value is BHoMAdapter)
+                    {
+                        // Don't serialise adapters, they don't deserialise
+                        Compute.RecordWarning("BHoMAdapter types canned be serialised");
+                        continue;
+                    }
                     else
                     {
                         json = new Dictionary<string, object>()
@@ -220,6 +238,8 @@ namespace BH.UI.Excel
             }
             yield break;
         }
+
+        /*****************************************/
 
         public void Deserialize(IEnumerable<string> objs)
         {
@@ -247,7 +267,57 @@ namespace BH.UI.Excel
                 }
                 catch (Exception e)
                 {
-                    Engine.Reflection.Compute.RecordError(e.Message);
+                    Compute.RecordError(e.Message);
+                }
+            }
+        }
+
+        /*****************************************/
+
+        public void SaveData(Workbook Wb)
+        {
+            _Worksheet newsheet;
+            try
+            {
+                try
+                {
+                    newsheet = Wb.Sheets["BHoM_DataHidden"];
+                }
+                catch
+                {
+                    // Backwards compatibility
+                    newsheet = Wb.Sheets["BHoM_Data"];
+                }
+            }
+            catch
+            {
+                newsheet = Wb.Sheets.Add();
+            }
+            newsheet.Name = "BHoM_DataHidden";
+            newsheet.Visible = XlSheetVisibility.xlSheetHidden;
+
+            int row = 0;
+            foreach (string json in Serialize())
+            {
+                string contents = "";
+                Range cell;
+                do
+                {
+                    row++;
+                    cell = newsheet.Cells[row, 1];
+                    try
+                    {
+                        contents = cell.Value;
+                    }
+                    catch { }
+                } while (contents != null && contents.Length > 0);
+
+                int c = 0;
+                while (c < json.Length)
+                {
+                    cell.Value = json.Substring(c);
+                    c += (cell.Value as string).Length;
+                    cell = cell.Next;
                 }
             }
         }
