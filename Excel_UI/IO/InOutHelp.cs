@@ -44,14 +44,9 @@ namespace BH.UI.Excel
 
         public static object ReturnTypeHelper(this object obj)
         {
-            if (obj == null)
-                return ExcelError.ExcelErrorNull;
-            else if (obj.GetType().IsPrimitive || obj is string)
-                return obj;
-            else if (obj is Guid)
-                return obj.ToString();
-            else
-                return obj.GetType().ToText() + " [" + Project.ActiveProject.IAdd(obj) + "]";
+            var acc = new Templates.FormulaDataAccessor();
+            acc.SetDataItem(0, obj);
+            return acc.GetOutput();
         }
 
         /*****************************************************************/
