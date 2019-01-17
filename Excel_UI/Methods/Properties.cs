@@ -63,15 +63,8 @@ namespace BH.UI.Excel
 
             //Get the object
             List<object> objs = _objectIds.Select(x => {
-                string str = x as string;
-                int start = str.LastIndexOf("[");
-                int end = str.LastIndexOf("]");
-                if(start != -1 && end != -1 && end > start)
-                {
-                    start++;
-                    return Project.ActiveProject.GetAny(str.Substring(start, end - start));
-                }
-                return x;
+                var obj = Project.ActiveProject.GetAny(x.ToString());
+                return obj == null ? x : obj;
             }).ToList();
 
             if (objs == null)
