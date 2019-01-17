@@ -45,6 +45,7 @@ namespace BH.UI.Excel
                 [ExcelArgument(Name = "Include the name of the properties")] bool includePropertyNames = false,
                 [ExcelArgument(Name = "Explode inner objects")] bool goDeep = false)
         {
+            Compute.ClearCurrentEvents();
 
             object[] _objectIds = new object[] { };
             if (objectIds is object[,])
