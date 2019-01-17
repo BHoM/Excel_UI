@@ -64,8 +64,11 @@ namespace BH.UI.Excel.Templates
                         Range cell = app.Range[reftext];
                         cell.Value = options.FirstOrDefault();
                         cell.Validation.Delete();
-                        cell.Validation.Add(XlDVType.xlValidateList, Formula1: options.Aggregate((a, b) => $"{a}, {b}"));
-                        cell.Validation.IgnoreBlank = true;
+                        if (options.Count > 0)
+                        {
+                            cell.Validation.Add(XlDVType.xlValidateList, Formula1: options.Aggregate((a, b) => $"{a}, {b}"));
+                            cell.Validation.IgnoreBlank = true;
+                        }
                         if (!proj.Empty) proj.SaveData(workbook);
                     });
                     Caller.DataAccessor.SetDataItem(0, "");
