@@ -166,7 +166,7 @@ namespace BH.UI.Excel.Templates
         {
             try
             {
-                if (data.GetType().IsPrimitive || data is string)
+                if (data.GetType().IsPrimitive || data is string || data is object[,])
                 {
                     output = data;
                     return true;

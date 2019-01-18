@@ -32,6 +32,12 @@ namespace BH.UI.Excel
 
         public static object Resize(object[] array)
         {
+            ExcelReference target;
+            return Resize(array, out target);
+        }
+
+        public static object Resize(object[] array, out ExcelReference target)
+        {
             object[,] largeArr = new object[1, array.Length];
 
             for (int i = 0; i < array.Length; i++)
@@ -39,16 +45,22 @@ namespace BH.UI.Excel
                 largeArr[0, i] = array[i];
             }
 
-            return Resize(largeArr);
+            return Resize(largeArr, out target);
 
         }
 
+        public static object Resize(object[,] array)
+        {
+            ExcelReference target;
+            return Resize(array, out target);
+        }
 
         // This function will run in the UDF context.
         // Needs extra protection to allow multithreaded use.
-        public static object Resize(object[,] array)
+        public static object Resize(object[,] array, out ExcelReference target)
         {
             var caller = Excel(xlfCaller) as ExcelReference;
+            target = caller;
             if (caller == null)
                 return array;
 
@@ -77,12 +89,13 @@ namespace BH.UI.Excel
                 return ExcelError.ExcelErrorValue;
             }
 
+            var t = target = new ExcelReference(caller.RowFirst, rowLast, caller.ColumnFirst, columnLast, caller.SheetId);
+
             // TODO: Add some kind of guard for ever-changing result?
             ExcelAsyncUtil.QueueAsMacro(() =>
             {
                 // Create a reference of the right size
-                var target = new ExcelReference(caller.RowFirst, rowLast, caller.ColumnFirst, columnLast, caller.SheetId);
-                DoResize(target); // Will trigger a recalc by writing formula
+                DoResize(t); // Will trigger a recalc by writing formula
             });
             // Return what we have - to prevent flashing #N/A
             return array;

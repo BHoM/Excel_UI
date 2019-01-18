@@ -47,40 +47,85 @@ namespace BH.UI.Excel.Templates
 
         public override bool Run()
         {
-            var options = GetChoices();
+            var options = GetChoices().ToArray();
+            var app = Application;
 
-            var app = ExcelDnaUtil.Application as Application;
-            var workbook = app.ActiveWorkbook;
-
-            var proj = Project.ForIDs(options);
+            var name = $"RANGE_{Function}__";
             try
             {
-                ExcelReference xlref = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
-                if (xlref != null)
+                if (options.Count() > 0)
                 {
-                    var reftext = XlCall.Excel(XlCall.xlfReftext, xlref, true);
-                    ExcelAsyncUtil.QueueAsMacro(() =>
+                    ExcelReference xlref = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
+                    if (xlref != null)
                     {
+                        var reftext = XlCall.Excel(XlCall.xlfReftext, xlref, true);
                         Range cell = app.Range[reftext];
-                        cell.Value = options.FirstOrDefault();
-                        cell.Validation.Delete();
-                        if (options.Count > 0)
+                        if (cell.Worksheet.Name == "BHoM_ValidationHidden")
                         {
-                            cell.Validation.Add(XlDVType.xlValidateList, Formula1: options.Aggregate((a, b) => $"{a}, {b}"));
-                            cell.Validation.IgnoreBlank = true;
+                            ExcelReference target;
+                            Caller.DataAccessor.SetDataItem(0, ArrayResizer.Resize(options, out target));
+                            ExcelAsyncUtil.QueueAsMacro(() =>
+                            {
+                                try
+                                {
+                                    XlCall.Excel(XlCall.xlcDefineName, name, target);
+                                }
+                                catch { }
+                            });
+                            return true;
                         }
-                        if (!proj.Empty) proj.SaveData(workbook);
-                    });
-                    Caller.DataAccessor.SetDataItem(0, "");
-                    return true;
+                        else
+                        {
+                            try
+                            {
+                                var n = app.ActiveWorkbook.Names.Item(name);
+                            }
+                            catch
+                            {
+                                Worksheet validation;
+                                try
+                                {
+                                    validation = app.ActiveWorkbook.Sheets["BHoM_ValidationHidden"];
+                                }
+                                catch
+                                {
+                                    validation = app.ActiveWorkbook.Sheets.Add();
+                                    validation.Name = "BHoM_ValidationHidden";
+                                }
+                                validation.Visible = XlSheetVisibility.xlSheetHidden;
+
+                                int row = 1;
+                                Range listcell = validation.Cells[row,1];
+                                while(listcell.Value != null)
+                                {
+                                    row++;
+                                    listcell = validation.Cells[row, 1];
+                                }
+                                listcell.Formula = $"={Function}()";
+                                Application.ActiveWorkbook.Names.Add(name, listcell);
+                            }
+
+                            ExcelAsyncUtil.QueueAsMacro(() =>
+                            {
+                                cell.Value = options.FirstOrDefault();
+                                cell.Validation.Delete();
+                                cell.Validation.Add(XlDVType.xlValidateList, Formula1: $"={name}");
+                                cell.Validation.IgnoreBlank = true;
+                            });
+                            Caller.DataAccessor.SetDataItem(0, "");
+                            return true;
+
+                        }
+                    }
                 }
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Compute.RecordError(e.GetType().ToText() + ": " + e.Message);
             }
             return false;
         }
-        
+
         protected abstract List<string> GetChoices();
 
         protected override void Caller_ItemSelected(object sender, object e)
