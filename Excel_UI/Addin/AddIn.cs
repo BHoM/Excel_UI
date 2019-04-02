@@ -64,6 +64,7 @@ namespace BH.UI.Excel
 
             var app = ExcelDnaUtil.Application as Application;
             app.WorkbookOpen += App_WorkbookOpen;
+            ExcelDna.IntelliSense.IntelliSenseServer.Register();
         }
 
         private void AddInternalise()

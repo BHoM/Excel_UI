@@ -166,13 +166,8 @@
   <PropertyGroup>
     <PostBuildEvent>"$(TargetDir)UI_PostBuild.exe" ..\..\ "$(APPDATA)\BHoM\Assemblies"
 
-xcopy "$(ProjectDir)ExcelDna.IntelliSense.xll*" "$(TargetDir)" /C /Y
-
-move /Y "$(TargetDir)\*.xll"  "$(APPDATA)\BHoM\Assemblies"
-
-move /Y "$(TargetDir)\*.dna"  "$(APPDATA)\BHoM\Assemblies"
-
-</PostBuildEvent>
+xcopy "$(TargetDir)*.xll"  "$(APPDATA)\BHoM\Assemblies" /C /Y
+xcopy "$(TargetDir)*.dna"  "$(APPDATA)\BHoM\Assemblies" /C /Y</PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\ExcelDna.AddIn.0.34.6\tools\ExcelDna.AddIn.targets" Condition="Exists('..\packages\ExcelDna.AddIn.0.34.6\tools\ExcelDna.AddIn.targets')" />
   <Target Name="EnsureExcelDnaTargetsImported" BeforeTargets="BeforeBuild" Condition="'$(ExcelDnaTargetsImported)' == ''">
