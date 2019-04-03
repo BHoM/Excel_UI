@@ -94,7 +94,7 @@ namespace BH.UI.Excel.Templates
                 List<T> list = new List<T>();
                 foreach (object o in item as IEnumerable)
                 {
-                    if (!(o is ExcelMissing || o is ExcelEmpty))
+                    if (!IsBlankOrError<T>(o))
                     {
                         list.Add((T)(o as dynamic));
                     }
@@ -137,7 +137,7 @@ namespace BH.UI.Excel.Templates
                     for (int j = 0; j < height; j++)
                     {
                         object o = (item as object[,])[j, i];
-                        if (!(o is ExcelMissing || o is ExcelEmpty))
+                        if (!IsBlankOrError<T>(o))
                         {
                             list[i].Add((T)(o as dynamic));
                         }
@@ -417,6 +417,17 @@ namespace BH.UI.Excel.Templates
                 }
             }
             return evaluated;
+        }
+
+        /*******************************************/
+
+        private bool IsBlankOrError<T>(object obj)
+        {
+            bool isString = typeof(T) == typeof(string);
+
+            // This will evaluate to true for "" unless T is a string
+            return obj is ExcelMissing || obj is ExcelEmpty || obj is ExcelError
+                || (obj is string && !isString && string.IsNullOrEmpty(obj as string));
         }
 
         /*******************************************/
