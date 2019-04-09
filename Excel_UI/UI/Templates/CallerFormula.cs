@@ -39,7 +39,7 @@ namespace BH.UI.Excel.Templates
         /**** Properties                        ****/
         /*******************************************/
 
-        public virtual string Name 
+        public virtual string Name
         {
             get
             {
@@ -101,20 +101,25 @@ namespace BH.UI.Excel.Templates
 
             Application = ExcelDna.Integration.ExcelDnaUtil.Application as Application;
 
-            var commandBar = Application.CommandBars["Cell"];
-
-            Menu = commandBar.FindControl(
-                Type: MsoControlType.msoControlPopup,
-                Tag: Category
-                ) as CommandBarPopup;
-            if (Menu == null)
+            foreach (CommandBar commandBar in Application.CommandBars)
             {
-                Menu = commandBar.Controls.Add(MsoControlType.msoControlPopup, Temporary: true) as CommandBarPopup;
-                Menu.Caption = "BH." + Category;
-                Menu.Tag = Category;
+                if (commandBar.Name != "Cell" && commandBar.Name != "List Range Popup") continue;
+                var menu = commandBar.FindControl(
+                    Type: MsoControlType.msoControlPopup,
+                    Tag: Category
+                    ) as CommandBarPopup;
+                if (menu == null)
+                {
+                    menu = commandBar.Controls.Add(MsoControlType.msoControlPopup, Temporary: true) as CommandBarPopup;
+                    menu.Caption = "BH." + Category;
+                    menu.Tag = Category;
+                }
+                Menus.Add(menu);
             }
 
-            Caller.AddToMenu(Menu.Controls);
+
+            foreach (var menu in Menus) Caller.AddToMenu(menu.Controls);
+
             Caller.ItemSelected += Caller_ItemSelected;
         }
 
@@ -151,7 +156,7 @@ namespace BH.UI.Excel.Templates
         /*******************************************/
 
         protected Application Application { get; private set; }
-        protected CommandBarPopup Menu { get; private set; }
+        protected List<CommandBarPopup> Menus { get; private set; } = new List<CommandBarPopup>();
 
         /*******************************************/
         /**** Private Fields                    ****/

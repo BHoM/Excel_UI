@@ -42,12 +42,14 @@ namespace BH.UI.Excel.Templates
 
         public SingleOptionCallerFormula(FormulaDataAccessor accessor) : base(accessor)
         {
-            var commandBar = Application.CommandBars["Cell"];
-
-            m_btn = Menu.Controls.Add(MsoControlType.msoControlButton, Temporary: true) as CommandBarButton;
-            m_btn.Tag = Guid.NewGuid().ToString();
-            m_btn.Caption = Caller.Name;
-            m_btn.Click += OnClick;
+            foreach (var menu in Menus)
+            {
+                var btn = menu.Controls.Add(MsoControlType.msoControlButton, Temporary: true) as CommandBarButton;
+                btn.Tag = Guid.NewGuid().ToString();
+                btn.Caption = Caller.Name;
+                btn.Click += OnClick;
+                m_btns.Add(btn);
+            }
         }
 
         /*******************************************/
@@ -74,7 +76,7 @@ namespace BH.UI.Excel.Templates
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private CommandBarButton m_btn;
+        private List<CommandBarButton> m_btns = new List<CommandBarButton>();
 
         public override string MenuRoot => "";
     }
