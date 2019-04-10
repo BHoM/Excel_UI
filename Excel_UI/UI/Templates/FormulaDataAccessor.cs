@@ -33,6 +33,7 @@ using ExcelDna.Integration;
 using System.Linq.Expressions;
 using System.Reflection;
 using BH.Engine.Reflection;
+using BH.Engine.Excel;
 
 namespace BH.UI.Excel.Templates
 {
@@ -67,6 +68,10 @@ namespace BH.UI.Excel.Templates
             if (type.IsEnum && item is string)
             {
                 return (T)Enum.Parse(type, item as string);
+            }
+            if (type == typeof(DateTime) && item is double)
+            {
+                DateTime date = DateTime.FromOADate((double)item);
             }
 
             // Can't always cast directly to T from object storage type even
@@ -183,6 +188,15 @@ namespace BH.UI.Excel.Templates
                 {
                     return SetDataItem(index, Enum.GetName(data.GetType(), data));
                 }
+                if(data is DateTime)
+                {
+                    DateTime? date = data as DateTime?;
+                    if (date.HasValue)
+                    {
+                        Engine.Excel.Query.Caller().NumberFormat("*yyyy-mm-dd HH:MM");
+                        return SetDataItem(index, date.Value.ToOADate());
+                    }
+                }
                 return SetDataItem(index,
                     data.GetType().ToText() + " [" + Project.ActiveProject.IAdd(data) + "]"
                 );
@@ -243,18 +257,13 @@ namespace BH.UI.Excel.Templates
         public object GetOutput()
         {
             // Retrieve the output from this DataAccessor
-            var errors = Query.CurrentEvents()
+            var errors = Engine.Reflection.Query.CurrentEvents()
                 .Where(e => e.Type == oM.Reflection.Debugging.EventType.Error);
             if (errors.Count() > 0) {
                 string msg = errors
                     .Select(e => e.Message)
                     .Aggregate((a, b) => a + "\n" + b);
-                try
-                {
-                    ExcelReference caller = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
-                    ExcelAsyncUtil.QueueAsMacro(() => XlCall.Excel(XlCall.xlfNote, msg, caller));
-                }
-                catch { }
+                Engine.Excel.Query.Caller().SetNote(msg);
             }
             if (output == null)
             {
@@ -267,12 +276,7 @@ namespace BH.UI.Excel.Templates
 
         public void ResetOutput()
         {
-            try
-            {
-                ExcelReference caller = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
-                ExcelAsyncUtil.QueueAsMacro(() => XlCall.Excel(XlCall.xlfNote, "", caller));
-            }
-            catch { }
+            Engine.Excel.Query.Caller().SetNote("");
             output = null;
         }
         
