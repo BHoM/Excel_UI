@@ -193,7 +193,6 @@ namespace BH.UI.Excel.Templates
                     DateTime? date = data as DateTime?;
                     if (date.HasValue)
                     {
-                        Engine.Excel.Query.Caller().NumberFormat("*yyyy-mm-dd HH:MM");
                         return SetDataItem(index, date.Value.ToOADate());
                     }
                 }
