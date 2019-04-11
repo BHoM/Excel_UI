@@ -9,7 +9,7 @@ namespace BH.Engine.Excel
 {
     public static partial class Compute
     {
-        public static bool NumberFormat(this oM.Excel.Reference reference, string fmt)
+        public static bool NumberFormat(this oM.Excel.Reference reference, string fmt = null)
         {
             ExcelAsyncUtil.QueueAsMacro(() =>
             {
