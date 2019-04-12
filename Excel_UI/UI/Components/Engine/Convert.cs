@@ -25,6 +25,8 @@ using BH.oM.Base;
 using BH.UI.Excel.Templates;
 using BH.UI.Templates;
 using BH.UI.Components;
+using Microsoft.Office.Core;
+using System.Collections.Generic;
 
 namespace BH.UI.Excel.Components
 {
@@ -42,7 +44,7 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public ConvertFormula(FormulaDataAccessor accessor) : base(accessor) { }
+        public ConvertFormula(FormulaDataAccessor accessor, List<CommandBar> ctxMenus) : base(accessor, ctxMenus) { }
 
         /*******************************************/
     }
