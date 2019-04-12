@@ -40,7 +40,7 @@ namespace BH.UI.Excel.Templates
         /**** Constructors                      ****/
         /*******************************************/
 
-        public SingleOptionCallerFormula(FormulaDataAccessor accessor) : base(accessor)
+        public SingleOptionCallerFormula(FormulaDataAccessor accessor, List<CommandBar> ctxMenus) : base(accessor, ctxMenus)
         {
             foreach (var menu in Menus)
             {

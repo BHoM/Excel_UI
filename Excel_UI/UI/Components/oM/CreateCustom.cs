@@ -27,6 +27,8 @@ using BH.UI.Templates;
 using System.Linq;
 using BH.Engine.Reflection;
 using BH.UI.Excel.Callers;
+using Microsoft.Office.Core;
+using System.Collections.Generic;
 
 namespace BH.UI.Excel.Components
 {
@@ -59,7 +61,7 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public CreateCustomFormula(FormulaDataAccessor accessor) : base(accessor) { }
+        public CreateCustomFormula(FormulaDataAccessor accessor, List<CommandBar> ctxMenus) : base(accessor, ctxMenus) { }
 
         /*******************************************/
     }

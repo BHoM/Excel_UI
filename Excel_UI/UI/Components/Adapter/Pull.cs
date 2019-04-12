@@ -26,6 +26,7 @@ using BH.UI.Templates;
 using BH.UI.Components;
 using ExcelDna.Integration;
 using System.Collections.Generic;
+using Microsoft.Office.Core;
 
 namespace BH.UI.Excel.Components
 {
@@ -43,7 +44,7 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public PullFormula(FormulaDataAccessor accessor) : base(accessor) { }
+        public PullFormula(FormulaDataAccessor accessor, List<CommandBar> ctxMenus) : base(accessor, ctxMenus) { }
 
         /*******************************************/
     }

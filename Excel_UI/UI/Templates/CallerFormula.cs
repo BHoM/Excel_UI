@@ -88,7 +88,7 @@ namespace BH.UI.Excel.Templates
         /**** Constructors                      ****/
         /*******************************************/
 
-        public CallerFormula(FormulaDataAccessor accessor)
+        public CallerFormula(FormulaDataAccessor accessor, List<CommandBar> ctxMenus)
         {
             m_dataAccessor = accessor;
             Caller.SetDataAccessor(m_dataAccessor);
@@ -101,9 +101,9 @@ namespace BH.UI.Excel.Templates
 
             Application = ExcelDna.Integration.ExcelDnaUtil.Application as Application;
 
-            foreach (CommandBar commandBar in Application.CommandBars)
+            foreach (CommandBar commandBar in ctxMenus)
             {
-                if (commandBar.Name != "Cell" && commandBar.Name != "List Range Popup") continue;
+
                 var menu = commandBar.FindControl(
                     Type: MsoControlType.msoControlPopup,
                     Tag: Category

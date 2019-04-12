@@ -23,6 +23,7 @@
 using BH.Engine.Reflection;
 using BH.UI.Templates;
 using ExcelDna.Integration;
+using Microsoft.Office.Core;
 using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
@@ -40,7 +41,7 @@ namespace BH.UI.Excel.Templates
             }
         }
 
-        public CallerValueListFormula(FormulaDataAccessor accessor) : base(accessor)
+        public CallerValueListFormula(FormulaDataAccessor accessor, List<CommandBar> ctxMenus) : base(accessor, ctxMenus)
         {
 
         }

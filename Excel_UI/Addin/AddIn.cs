@@ -42,11 +42,12 @@ using BH.Engine.Serialiser;
 
 namespace BH.UI.Excel
 {
-    public partial class AddIn : IExcelAddIn
+    public class AddIn : IExcelAddIn
     {
         private FormulaDataAccessor m_da;
         private Dictionary<string, CallerFormula> m_formulea;
-        private CommandBarButton m_internalise;
+        private List<CommandBar> m_menus;
+        private List<CommandBarButton> m_internalise;
 
         /*****************************************************************/
         /******* Public methods                             **************/
@@ -54,12 +55,20 @@ namespace BH.UI.Excel
 
         public void AutoOpen()
         {
+            m_menus = new List<CommandBar>();
+
+            foreach (CommandBar commandBar in (ExcelDnaUtil.Application as Application).CommandBars)
+            {
+                if (commandBar.Name == "Cell" || commandBar.Name.Contains("List Range"))
+                    m_menus.Add(commandBar);
+            }
+
             RegisterExcelMethods();
             RegisterBHoMMethods();
             AddInternalise();
-            
+
             //Hide error box showing methods not working properly
-            if(!DebugConfig.ShowExcelDNALog)
+            if (!DebugConfig.ShowExcelDNALog)
                 ExcelDna.Logging.LogDisplay.Hide();
 
             var app = ExcelDnaUtil.Application as Application;
@@ -69,13 +78,15 @@ namespace BH.UI.Excel
 
         private void AddInternalise()
         {
-            var app = ExcelDnaUtil.Application as Application;
-            var cmb = app.CommandBars["Cell"];
-            var btn = cmb.Controls.Add(MsoControlType.msoControlButton, Temporary: true) as CommandBarButton;
-            btn.Tag = "Internalise_Data";
-            btn.Caption = "Internalise Data";
-            btn.Click += Internalise_Click;
-            m_internalise = btn;
+            m_internalise = new List<CommandBarButton>();
+            foreach (var cmb in m_menus)
+            {
+                var btn = cmb.Controls.Add(MsoControlType.msoControlButton, Temporary: true) as CommandBarButton;
+                btn.Tag = "Internalise_Data";
+                btn.Caption = "Internalise Data";
+                btn.Click += Internalise_Click;
+                m_internalise.Add(btn);
+            }
         }
 
         private void Internalise_Click(CommandBarButton Ctrl, ref bool CancelDefault)
@@ -195,8 +206,10 @@ namespace BH.UI.Excel
 
                 Type fda = typeof(FormulaDataAccessor);
                 Type callform = typeof(CallerFormula);
-                Type[] constrtypes = new Type[] { fda };
-                object[] args = new object[] { m_da };
+
+                Type[] constrtypes = new Type[] { fda, m_menus.GetType() };
+                object[] args = new object[] { m_da, m_menus };
+
                 m_formulea = ExcelIntegration.GetExportedAssemblies()
                     .SelectMany(a => a.GetTypes())
                     .Where(t => t.Namespace == "BH.UI.Excel.Components"
