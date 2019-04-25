@@ -99,10 +99,10 @@ namespace BH.UI.Excel.Templates
                 List<T> list = new List<T>();
                 foreach (object o in item as IEnumerable)
                 {
-                    if (!IsBlankOrError<T>(o))
-                    {
+                    if (IsBlankOrError<T>(o))
+                        list.Add(default(T));
+                    else
                         list.Add((T)(o as dynamic));
-                    }
                 }
                 return list;
             }
@@ -142,10 +142,10 @@ namespace BH.UI.Excel.Templates
                     for (int j = 0; j < height; j++)
                     {
                         object o = (item as object[,])[j, i];
-                        if (!IsBlankOrError<T>(o))
-                        {
+                        if (IsBlankOrError<T>(o))
+                            list[i].Add(default(T));
+                        else
                             list[i].Add((T)(o as dynamic));
-                        }
                     }
                 }
                 return list;
