@@ -73,7 +73,7 @@ namespace BH.UI.Excel
 
             var app = ExcelDnaUtil.Application as Application;
             app.WorkbookOpen += App_WorkbookOpen;
-            ExcelDna.IntelliSense.IntelliSenseServer.Register();
+            ExcelDna.IntelliSense.IntelliSenseServer.Install();
         }
 
         private void AddInternalise()
@@ -158,7 +158,7 @@ namespace BH.UI.Excel
 
         public void AutoClose()
         {
-            
+            ExcelDna.IntelliSense.IntelliSenseServer.Uninstall();
         }
 
         /*****************************************************************/

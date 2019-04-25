@@ -50,9 +50,11 @@
       <HintPath>..\packages\ExcelDna.Integration.0.34.6\lib\ExcelDna.Integration.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="ExcelDna.IntelliSense, Version=1.0.5.38759, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ExcelDna.IntelliSense.1.0.6\lib\net40\ExcelDna.IntelliSense.dll</HintPath>
-      <Private>True</Private>
+    <Reference Include="ExcelDna.IntelliSense, Version=1.1.0.41869, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelDna.IntelliSense.1.1.0\lib\net40\ExcelDna.IntelliSense.dll</HintPath>
+    </Reference>
+    <Reference Include="ExcelDna.Registration, Version=0.34.6455.41786, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\ExcelDna.Registration.0.34.7\lib\net40\ExcelDna.Registration.dll</HintPath>
     </Reference>
     <Reference Include="PresentationFramework" />
     <Reference Include="Reflection_Engine">
