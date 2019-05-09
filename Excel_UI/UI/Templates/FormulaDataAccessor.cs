@@ -85,6 +85,10 @@ namespace BH.UI.Excel.Templates
         public override List<T> GetDataList<T>(int index)
         {
             object item = inputs[index];
+            if (IsBlankOrError<T>(item))
+            {
+                return defaults[index] as List<T>;
+            }
             if (item is List<T>)
             {
                 return item as List<T>;
@@ -114,6 +118,10 @@ namespace BH.UI.Excel.Templates
         public override List<List<T>> GetDataTree<T>(int index)
         {
             object item = inputs[index];
+            if (IsBlankOrError<T>(item))
+            {
+                return defaults[index] as List<List<T>>;
+            }
             if (item is List<List<T>>)
             {
                 return item as List<List<T>>;
