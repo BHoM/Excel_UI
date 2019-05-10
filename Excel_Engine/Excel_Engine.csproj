@@ -61,6 +61,7 @@
     <Compile Include="Convert\ToExcel\Reference.cs" />
     <Compile Include="Convert\ToExcel\DateTime.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Query\CleanList.cs" />
     <Compile Include="Query\TextRef.cs" />
     <Compile Include="Query\Caller.cs" />
   </ItemGroup>
