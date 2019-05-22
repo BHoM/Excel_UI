@@ -57,7 +57,8 @@ namespace BH.UI.Excel.Templates
             object item = inputs[index];
 
             if(item is ExcelEmpty || item is ExcelMissing) {
-                return (T)defaults[index];
+                object def = defaults[index];
+                return def == null ? default(T) : (T)(def as dynamic);
             }
             if (item is object[,])
             {
