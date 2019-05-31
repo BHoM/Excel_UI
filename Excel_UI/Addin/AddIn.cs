@@ -72,8 +72,14 @@ namespace BH.UI.Excel
                 ExcelDna.Logging.LogDisplay.Hide();
 
             var app = ExcelDnaUtil.Application as Application;
+            app.WorkbookActivate += App_WorkbookActivate;
             app.WorkbookOpen += App_WorkbookOpen;
             ExcelDna.IntelliSense.IntelliSenseServer.Install();
+        }
+
+        private void App_WorkbookActivate(Workbook Wb)
+        {
+            foreach (var caller in m_formulea) caller.Value.AddToMenu();
         }
 
         private void AddInternalise()
@@ -117,8 +123,6 @@ namespace BH.UI.Excel
 
         private void App_WorkbookOpen(Workbook Wb)
         {
-            foreach (var caller in m_formulea) caller.Value.AddToMenu();
-
             List<string> json = new List<string>();
             _Worksheet newsheet;
             try
