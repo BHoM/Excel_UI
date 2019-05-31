@@ -42,6 +42,21 @@ namespace BH.UI.Excel.Components
 
         public override string MenuRoot { get; } = "Create Object";
 
+        public override string Name
+        {
+            get
+            {
+                if (Caller is MethodCaller && Caller.SelectedItem != null)
+                {
+                    Type decltype = (Caller as MethodCaller).OutputParams.First().DataType;
+                    string ns = decltype.Namespace;
+                    if (ns.StartsWith("BH")) ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
+                    return decltype.Name + "." + ns + "." + Caller.Name;
+                }
+                return Category + "." + Caller.Name;
+            }
+        }
+
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/

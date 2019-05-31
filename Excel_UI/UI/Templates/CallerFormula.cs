@@ -46,7 +46,9 @@ namespace BH.UI.Excel.Templates
                 if (Caller is MethodCaller && Caller.SelectedItem != null)
                 {
                     Type decltype = (Caller as MethodCaller).Method.DeclaringType;
-                    return decltype.Name + "." + decltype.Namespace.Split('.').Last() + "." + Caller.Name;
+                    string ns = decltype.Namespace;
+                    if (ns.StartsWith("BH")) ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
+                    return decltype.Name + "." + ns + "." + Caller.Name;
                 }
                 return Category + "." + Caller.Name;
             }
