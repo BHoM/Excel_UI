@@ -72,6 +72,9 @@ namespace BH.UI.Excel.Templates
             }
         }
 
+        public override void AddToMenu()
+        {
+        }
         /*******************************************/
         /**** Private Fields                    ****/
         /*******************************************/
