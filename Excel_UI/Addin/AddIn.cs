@@ -117,6 +117,8 @@ namespace BH.UI.Excel
 
         private void App_WorkbookOpen(Workbook Wb)
         {
+            foreach (var caller in m_formulea) caller.Value.AddToMenu();
+
             List<string> json = new List<string>();
             _Worksheet newsheet;
             try

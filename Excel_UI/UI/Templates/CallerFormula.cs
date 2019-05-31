@@ -27,14 +27,17 @@ using Microsoft.Office.Core;
 using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BH.UI.Excel.Templates
 {
     public abstract class CallerFormula
     {
+
         /*******************************************/
         /**** Properties                        ****/
         /*******************************************/
@@ -118,13 +121,22 @@ namespace BH.UI.Excel.Templates
                 }
                 Menus.Add(menu);
             }
-
-
-            foreach (var menu in Menus) Caller.AddToMenu(menu.Controls);
-
             Caller.ItemSelected += Caller_ItemSelected;
         }
 
+        virtual public void AddToMenu()
+        {
+            if (!m_addedToMenu)
+            {
+                m_addedToMenu = true;
+
+                ThreadPool.QueueUserWorkItem((o) =>
+                {
+                    Caller.SetItem(null);
+                    foreach (var menu in Menus) Caller.AddToMenu(menu.Controls);
+                });
+            }
+        }
         /*******************************************/
         /**** Private Methods                   ****/
         /*******************************************/
@@ -165,5 +177,6 @@ namespace BH.UI.Excel.Templates
         /*******************************************/
 
         private FormulaDataAccessor m_dataAccessor;
+        private bool m_addedToMenu;
     }
 }
