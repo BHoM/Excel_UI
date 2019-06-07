@@ -27,11 +27,7 @@ using Microsoft.Office.Core;
 using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.Linq;
-using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace BH.UI.Excel.Templates
 {
@@ -121,22 +117,17 @@ namespace BH.UI.Excel.Templates
                 }
                 Menus.Add(menu);
             }
+
+            foreach (var menu in Menus) Caller.AddToMenu(menu.Controls);
             Caller.ItemSelected += Caller_ItemSelected;
         }
 
-        virtual public void AddToMenu()
+        private void LoadFullMenu(CommandBarButton Ctrl, ref bool CancelDefault)
         {
-            if (!m_addedToMenu)
-            {
-                m_addedToMenu = true;
-
-                ThreadPool.QueueUserWorkItem((o) =>
-                {
-                    Caller.SetItem(null);
-                    foreach (var menu in Menus) Caller.AddToMenu(menu.Controls);
-                });
-            }
+            Ctrl.Delete();
+            CancelDefault = true;
         }
+
         /*******************************************/
         /**** Private Methods                   ****/
         /*******************************************/
@@ -177,6 +168,6 @@ namespace BH.UI.Excel.Templates
         /*******************************************/
 
         private FormulaDataAccessor m_dataAccessor;
-        private bool m_addedToMenu;
+        private CommandBarButton m_lazybtn;
     }
 }

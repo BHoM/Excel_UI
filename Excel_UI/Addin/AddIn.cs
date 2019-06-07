@@ -57,11 +57,7 @@ namespace BH.UI.Excel
         {
             m_menus = new List<CommandBar>();
 
-            foreach (CommandBar commandBar in (ExcelDnaUtil.Application as Application).CommandBars)
-            {
-                if (commandBar.Name == "Cell" || commandBar.Name.Contains("List Range"))
-                    m_menus.Add(commandBar);
-            }
+            m_menus.Add((ExcelDnaUtil.Application as Application).CommandBars["Cell"]);
 
             RegisterExcelMethods();
             RegisterBHoMMethods();
@@ -72,14 +68,8 @@ namespace BH.UI.Excel
                 ExcelDna.Logging.LogDisplay.Hide();
 
             var app = ExcelDnaUtil.Application as Application;
-            app.WorkbookActivate += App_WorkbookActivate;
             app.WorkbookOpen += App_WorkbookOpen;
             ExcelDna.IntelliSense.IntelliSenseServer.Install();
-        }
-
-        private void App_WorkbookActivate(Workbook Wb)
-        {
-            foreach (var caller in m_formulea) caller.Value.AddToMenu();
         }
 
         private void AddInternalise()

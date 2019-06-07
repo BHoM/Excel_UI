@@ -75,8 +75,21 @@ namespace BH.UI.Excel.Templates
                 if (tree.Children.Count > 0)
                 {
                     CommandBarControls treeMenu = AppendMenuItem(menu, tree.Name);
-                    foreach (Tree<T> childTree in tree.Children.Values.OrderBy(x => x.Name))
-                        AppendMenuTree(childTree, treeMenu);
+                    int size = TreeSize(tree);
+                    if (size > 200 && tree.Children.Count > 5) // Defer the population of large menu trees
+                    {
+                        AppendMenuItem(treeMenu, $"Load this menu ({size} items)", (CommandBarButton Ctrl, ref bool cancel) =>
+                        {
+                            cancel = true;
+                            foreach (Tree<T> childTree in tree.Children.Values.OrderBy(x => x.Name))
+                                AppendMenuTree(childTree, treeMenu);
+                            Ctrl.Visible = false;
+                        });
+                    } else
+                    {
+                        foreach (Tree<T> childTree in tree.Children.Values.OrderBy(x => x.Name))
+                            AppendMenuTree(childTree, treeMenu);
+                    }
                 }
                 else
                 {
@@ -90,6 +103,13 @@ namespace BH.UI.Excel.Templates
             {
                 Compute.RecordError(e.Message);
             }
+        }
+
+        private int TreeSize(Tree<T> tree)
+        {
+            // Count the number of leaf nodes in a tree
+            if (tree.Children.Count == 0) return 1;
+            return tree.Children.Sum(t => TreeSize(t.Value));
         }
 
         /*******************************************/
