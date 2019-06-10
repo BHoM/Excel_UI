@@ -118,7 +118,11 @@ namespace BH.UI.Excel.Templates
                 Menus.Add(menu);
             }
 
-            foreach (var menu in Menus) Caller.AddToMenu(menu.Controls);
+            using (Engine.Excel.Profiling.Timer timer = new Engine.Excel.Profiling.Timer("AddToMenu"))
+            {
+                foreach (var menu in Menus) Caller.AddToMenu(menu.Controls);
+            }
+
             Caller.ItemSelected += Caller_ItemSelected;
         }
 
@@ -168,6 +172,5 @@ namespace BH.UI.Excel.Templates
         /*******************************************/
 
         private FormulaDataAccessor m_dataAccessor;
-        private CommandBarButton m_lazybtn;
     }
 }
