@@ -61,25 +61,33 @@ namespace BH.UI.Excel.Global
             Dictionary<string, int> dups = new Dictionary<string, int>();
             foreach(var item in PossibleItems)
             {
-                try
+                using (Engine.Excel.Profiling.Timer timer = new Engine.Excel.Profiling.Timer("CreateDelegates"))
                 {
-                    var proxy = CreateDelegate(item);
-                    if (proxy == null) continue;
-                    var name = proxy.Item2.Name;
-                    if (!dups.ContainsKey(name))
+                    try
                     {
-                        dups.Add(name, 1);
-                        delegates.Add(proxy.Item1);
-                        funcAttrs.Add(proxy.Item2);
-                        argAttrs.Add(proxy.Item3);
+                        var proxy = CreateDelegate(item);
+                        if (proxy == null) continue;
+                        var name = proxy.Item2.Name;
+                        if (!dups.ContainsKey(name))
+                        {
+                            dups.Add(name, 1);
+                            delegates.Add(proxy.Item1);
+                            funcAttrs.Add(proxy.Item2);
+                            argAttrs.Add(proxy.Item3);
+                        }
                     }
-                } catch (Exception e) {
-                    Console.WriteLine(e.Message);
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e.Message);
+                    }
                 }
             }
             try
             {
-                ExcelIntegration.RegisterDelegates(delegates, funcAttrs.Cast<object>().ToList(), argAttrs);
+                using (Engine.Excel.Profiling.Timer timer = new Engine.Excel.Profiling.Timer("RegisterDelegates"))
+                {
+                    ExcelIntegration.RegisterDelegates(delegates, funcAttrs.Cast<object>().ToList(), argAttrs);
+                }
             } catch
             {
                 return false;

@@ -55,21 +55,24 @@ namespace BH.UI.Excel
 
         public void AutoOpen()
         {
-            m_menus = new List<CommandBar>();
+            using (Engine.Excel.Profiling.Timer timer = new Engine.Excel.Profiling.Timer("open"))
+            {
+                m_menus = new List<CommandBar>();
 
-            m_menus.Add((ExcelDnaUtil.Application as Application).CommandBars["Cell"]);
+                m_menus.Add((ExcelDnaUtil.Application as Application).CommandBars["Cell"]);
 
-            RegisterExcelMethods();
-            RegisterBHoMMethods();
-            AddInternalise();
+                RegisterExcelMethods();
+                RegisterBHoMMethods();
+                AddInternalise();
 
-            //Hide error box showing methods not working properly
-            if (!DebugConfig.ShowExcelDNALog)
-                ExcelDna.Logging.LogDisplay.Hide();
+                //Hide error box showing methods not working properly
+                if (!DebugConfig.ShowExcelDNALog)
+                    ExcelDna.Logging.LogDisplay.Hide();
 
-            var app = ExcelDnaUtil.Application as Application;
-            app.WorkbookOpen += App_WorkbookOpen;
-            ExcelDna.IntelliSense.IntelliSenseServer.Install();
+                var app = ExcelDnaUtil.Application as Application;
+                app.WorkbookOpen += App_WorkbookOpen;
+                ExcelDna.IntelliSense.IntelliSenseServer.Install();
+            }
         }
 
         private void AddInternalise()
