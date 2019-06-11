@@ -20,6 +20,7 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
+using BH.oM.Base;
 using BH.UI.Components;
 using BH.UI.Excel.Templates;
 using BH.UI.Templates;
@@ -49,9 +50,14 @@ namespace BH.UI.Excel.Components
                 if (Caller is MethodCaller && Caller.SelectedItem != null)
                 {
                     Type decltype = (Caller as MethodCaller).OutputParams.First().DataType;
-                    string ns = decltype.Namespace;
-                    if (ns.StartsWith("BH")) ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
-                    return "Create." + ns + "." + Caller.Name;
+                    if (decltype.IsSubclassOf(typeof(IObject)))
+                    {
+                        string ns = decltype.Namespace;
+                        if (ns.StartsWith("BH")) ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
+                        return "Create." + ns + "." + Caller.Name;
+                    }
+                    return base.Name;
+
                 }
                 return Category + "." + Caller.Name;
             }
