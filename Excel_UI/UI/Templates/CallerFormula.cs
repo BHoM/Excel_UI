@@ -93,43 +93,6 @@ namespace BH.UI.Excel.Templates
         {
             m_dataAccessor = accessor;
             Caller.SetDataAccessor(m_dataAccessor);
-
-            if (Caller.Selector != null)
-            {
-                var smenu = SelectorMenuUtil.ISetExcelSelectorMenu(Caller.Selector);
-                smenu.RootName = MenuRoot;
-            }
-
-            Application = ExcelDna.Integration.ExcelDnaUtil.Application as Application;
-
-            foreach (CommandBar commandBar in ctxMenus)
-            {
-
-                var menu = commandBar.FindControl(
-                    Type: MsoControlType.msoControlPopup,
-                    Tag: Category
-                    ) as CommandBarPopup;
-                if (menu == null)
-                {
-                    menu = commandBar.Controls.Add(MsoControlType.msoControlPopup, Temporary: true) as CommandBarPopup;
-                    menu.Caption = "BH." + Category;
-                    menu.Tag = Category;
-                }
-                Menus.Add(menu);
-            }
-
-            using (Engine.Excel.Profiling.Timer timer = new Engine.Excel.Profiling.Timer("AddToMenu"))
-            {
-                foreach (var menu in Menus) Caller.AddToMenu(menu.Controls);
-            }
-
-            Caller.ItemSelected += Caller_ItemSelected;
-        }
-
-        private void LoadFullMenu(CommandBarButton Ctrl, ref bool CancelDefault)
-        {
-            Ctrl.Delete();
-            CancelDefault = true;
         }
 
         /*******************************************/

@@ -42,14 +42,6 @@ namespace BH.UI.Excel.Templates
 
         public SingleOptionCallerFormula(FormulaDataAccessor accessor, List<CommandBar> ctxMenus) : base(accessor, ctxMenus)
         {
-            foreach (var menu in Menus)
-            {
-                var btn = menu.Controls.Add(MsoControlType.msoControlButton, Temporary: true) as CommandBarButton;
-                btn.Tag = Guid.NewGuid().ToString();
-                btn.Caption = Caller.Name;
-                btn.Click += OnClick;
-                m_btns.Add(btn);
-            }
         }
 
         /*******************************************/
