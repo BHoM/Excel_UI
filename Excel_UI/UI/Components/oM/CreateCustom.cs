@@ -45,7 +45,9 @@ namespace BH.UI.Excel.Components
                 Type t = Caller.SelectedItem as Type;
                 if (t != null)
                 {
-                    return "CreateCustom." + t.Namespace.Split('.').Last() + "." + t.ToText();
+                    string ns = t.Namespace;
+                    if (ns.StartsWith("BH")) ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
+                    return "CreateCustom." + ns + "." + t.ToText();
                 }
                 return base.Name;
             }
