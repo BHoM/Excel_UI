@@ -28,6 +28,7 @@ using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace BH.UI.Excel.Templates
 {
@@ -41,7 +42,7 @@ namespace BH.UI.Excel.Templates
             }
         }
 
-        public CallerValueListFormula(FormulaDataAccessor accessor, List<CommandBar> ctxMenus) : base(accessor, ctxMenus)
+        public CallerValueListFormula(FormulaDataAccessor accessor) : base(accessor)
         {
 
         }
@@ -49,19 +50,36 @@ namespace BH.UI.Excel.Templates
         public override bool Run()
         {
             var options = GetChoices().ToArray();
-            var app = Application;
 
-            var name = $"RANGE_{Function}__";
+            Application app = null;
+            Range cell = null;
+            Worksheet validation_ws = null;
+            Worksheet worksheet = null;
+            Workbook workbook = null;
+            Sheets sheets = null;
+            Names names = null;
+            Name n = null;
+
+            bool success = false;
+
             try
             {
+                var name = $"RANGE_{Function}__";
+
+                app = ExcelDnaUtil.Application as Application;
+                workbook = app.ActiveWorkbook;
+                sheets = workbook.Sheets;
+                names = workbook.Names;
+
                 if (options.Count() > 0)
                 {
                     ExcelReference xlref = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
                     if (xlref != null)
                     {
                         var reftext = XlCall.Excel(XlCall.xlfReftext, xlref, true);
-                        Range cell = app.Range[reftext];
-                        if (cell.Worksheet.Name == "BHoM_ValidationHidden")
+                        cell = app.Range[reftext];
+                        worksheet = cell.Worksheet;
+                        if (worksheet.Name == "BHoM_ValidationHidden")
                         {
                             ExcelReference target;
                             Caller.DataAccessor.SetDataItem(0, ArrayResizer.Resize(options, out target));
@@ -73,49 +91,59 @@ namespace BH.UI.Excel.Templates
                                 }
                                 catch { }
                             });
-                            return true;
+                            success = true;
                         }
                         else
                         {
                             try
                             {
-                                var n = app.ActiveWorkbook.Names.Item(name);
+                                n = names.Item(name);
                             }
                             catch
                             {
-                                Worksheet validation;
                                 try
                                 {
-                                    validation = app.ActiveWorkbook.Sheets["BHoM_ValidationHidden"];
+                                    validation_ws = sheets["BHoM_ValidationHidden"];
                                 }
                                 catch
                                 {
-                                    validation = app.ActiveWorkbook.Sheets.Add();
-                                    validation.Name = "BHoM_ValidationHidden";
+                                    validation_ws = sheets.Add();
+                                    validation_ws.Name = "BHoM_ValidationHidden";
                                 }
-                                validation.Visible = XlSheetVisibility.xlSheetHidden;
+                                validation_ws.Visible = XlSheetVisibility.xlSheetHidden;
 
                                 int row = 1;
-                                Range listcell = validation.Cells[row,1];
-                                while(listcell.Value != null)
+                                Range listcell = validation_ws.Cells[row, 1];
+                                while (listcell.Value != null)
                                 {
                                     row++;
-                                    listcell = validation.Cells[row, 1];
+                                    listcell = validation_ws.Cells[row, 1];
                                 }
                                 listcell.Formula = $"={Function}()";
-                                Application.ActiveWorkbook.Names.Add(name, listcell);
+                                names.Add(name, listcell);
                             }
 
                             ExcelAsyncUtil.QueueAsMacro(() =>
                             {
-                                cell.Value = options.FirstOrDefault();
-                                cell.Validation.Delete();
-                                cell.Validation.Add(XlDVType.xlValidateList, Formula1: $"={name}");
-                                cell.Validation.IgnoreBlank = true;
+                                Validation validation = null;
+                                try
+                                {
+                                    cell.Value = options.FirstOrDefault();
+                                    validation = cell.Validation;
+                                    validation.Delete();
+                                    validation.Add(XlDVType.xlValidateList, Formula1: $"={name}");
+                                    validation.IgnoreBlank = true;
+                                }
+                                finally
+                                {
+                                    if (cell != null) Marshal.ReleaseComObject(cell);
+                                    if (validation != null) Marshal.ReleaseComObject(validation);
+                                }
                             });
-                            Caller.DataAccessor.SetDataItem(0, "");
-                            return true;
 
+                            Caller.DataAccessor.SetDataItem(0, "");
+
+                            success = true;
                         }
                     }
                 }
@@ -124,15 +152,36 @@ namespace BH.UI.Excel.Templates
             {
                 Compute.RecordError(e.GetType().ToText() + ": " + e.Message);
             }
-            return false;
+            finally
+            {
+                if (app != null) Marshal.ReleaseComObject(app);
+                if (validation_ws != null) Marshal.ReleaseComObject(validation_ws);
+                if (workbook != null) Marshal.ReleaseComObject(workbook);
+                if (worksheet != null) Marshal.ReleaseComObject(worksheet);
+                if (sheets != null) Marshal.ReleaseComObject(sheets);
+                if (names != null) Marshal.ReleaseComObject(names);
+                if (n != null) Marshal.ReleaseComObject(n);
+            }
+            return success;
         }
 
         protected abstract List<string> GetChoices();
 
         protected override void Caller_ItemSelected(object sender, object e)
         {
-            Range cell = Application.Selection as Range;
-            cell.Formula = "=" + Function + "()";
+            Application app = null;
+            Range cell = null;
+            try
+            {
+                app = ExcelDnaUtil.Application as Application;
+                cell = app.Selection as Range;
+                cell.Formula = "=" + Function + "()";
+            }
+            finally
+            {
+                if (app != null) Marshal.ReleaseComObject(app);
+                if (cell != null) Marshal.ReleaseComObject(cell);
+            }
         }
     }
 }

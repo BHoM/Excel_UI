@@ -47,7 +47,7 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public ExplodeFormula(FormulaDataAccessor accessor, List<CommandBar> ctxMenus) : base(accessor, ctxMenus) { }
+        public ExplodeFormula(FormulaDataAccessor accessor) : base(accessor) { }
 
         /*******************************************/
     }

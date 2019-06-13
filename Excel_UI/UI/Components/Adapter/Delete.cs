@@ -44,7 +44,7 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public DeleteFormula(FormulaDataAccessor accessor, List<CommandBar> ctxMenus) : base(accessor, ctxMenus) { }
+        public DeleteFormula(FormulaDataAccessor accessor) : base(accessor) { }
 
         /*******************************************/
     }

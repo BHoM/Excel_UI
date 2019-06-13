@@ -60,7 +60,7 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public CreateEnumFormula(FormulaDataAccessor accessor, List<CommandBar> ctxMenus) : base(accessor, ctxMenus) { }
+        public CreateEnumFormula(FormulaDataAccessor accessor) : base(accessor) { }
 
         protected override List<string> GetChoices()
         {

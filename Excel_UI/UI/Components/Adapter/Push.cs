@@ -42,7 +42,7 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public PushFormula(FormulaDataAccessor accessor, List<CommandBar> ctxMenus) : base(accessor, ctxMenus) { }
+        public PushFormula(FormulaDataAccessor accessor) : base(accessor) { }
 
         /*******************************************/
     }

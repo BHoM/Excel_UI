@@ -39,6 +39,7 @@ using BH.UI.Components;
 using Microsoft.Office.Interop.Excel;
 using Microsoft.Office.Core;
 using BH.Engine.Serialiser;
+using System.Runtime.InteropServices;
 
 namespace BH.UI.Excel
 {
@@ -90,24 +91,37 @@ namespace BH.UI.Excel
 
         private void Internalise_Click(CommandBarButton Ctrl, ref bool CancelDefault)
         {
-            var app = ExcelDnaUtil.Application as Application;
-            Range selected = app.Selection;
+            Application app = null;
+            Range selected = null;
 
-            foreach (Range objcell in selected)
+            try
             {
-                string value;
-                try
+                app = ExcelDnaUtil.Application as Application;
+                selected = app.Selection;
+
+                foreach (Range objcell in selected)
                 {
-                    value = (string)objcell.Value;
-                    if (value == null || value.Length == 0) continue;
-                } catch { continue; }
+                    string value;
+                    try
+                    {
+                        value = (string)objcell.Value;
+                        if (value == null || value.Length == 0) continue;
+                    }
+                    catch { continue; }
 
-                Project proj = Project.ForIDs(new string[] { value });
+                    Project proj = Project.ForIDs(new string[] { value });
 
-                if (proj.Count((o) => !(o is Adapter.BHoMAdapter)) == 0) continue;
-                proj.SaveData(app.ActiveWorkbook);
+                    if (proj.Count((o) => !(o is Adapter.BHoMAdapter)) == 0) continue;
+                    proj.SaveData(app.ActiveWorkbook);
 
-                objcell.Value = value;
+                    objcell.Value = value;
+                    Marshal.ReleaseComObject(objcell);
+                }
+            }
+            finally
+            {
+                if (selected != null) Marshal.ReleaseComObject(selected);
+                if (app != null) Marshal.ReleaseComObject(app);
             }
         }
 
@@ -117,7 +131,10 @@ namespace BH.UI.Excel
         private void App_WorkbookOpen(Workbook Wb)
         {
             List<string> json = new List<string>();
-            _Worksheet newsheet;
+            _Worksheet newsheet = null;
+            Range used = null;
+            Range cell = null;
+            Range next = null;
             try
             {
                 try
@@ -128,28 +145,38 @@ namespace BH.UI.Excel
                     // Backwards compatibility
                     newsheet = Wb.Sheets["BHoM_Data"];
                 }
-                foreach (Range row in newsheet.UsedRange.Rows)
+                used = newsheet.UsedRange;
+                foreach (Range row in used.Rows)
                 {
                     string str = "";
                     try
                     {
-                        Range cell = row.Cells[1, 1];
+                        cell = row.Cells[1, 1];
                         while (cell.Value != null && cell.Value is string && (cell.Value as string).Length > 0)
                         {
                             str += cell.Value;
-                            cell = cell.Next;
+                            next = cell.Next;
+                            Marshal.ReleaseComObject(cell);
+                            cell = next;
                         }
                     }
                     catch { }
+
                     if (str.Length > 0)
                     {
                         json.Add(str);
                     }
+
+                    Marshal.ReleaseComObject(row);
                 }
                 Project.ActiveProject.Deserialize(json);
             }
-            catch
+            finally
             {
+                if (newsheet != null) Marshal.ReleaseComObject(newsheet);
+                if (cell != null) Marshal.ReleaseComObject(cell);
+                if (used != null) Marshal.ReleaseComObject(used);
+                if (next != null) Marshal.ReleaseComObject(next);
             }
         }
 
@@ -206,8 +233,8 @@ namespace BH.UI.Excel
                 Type fda = typeof(FormulaDataAccessor);
                 Type callform = typeof(CallerFormula);
 
-                Type[] constrtypes = new Type[] { fda, m_menus.GetType() };
-                object[] args = new object[] { m_da, m_menus };
+                Type[] constrtypes = new Type[] { fda };
+                object[] args = new object[] { m_da };
 
                 m_formulea = ExcelIntegration.GetExportedAssemblies()
                     .SelectMany(a => a.GetTypes())
