@@ -42,7 +42,7 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public ToJsonFormula(FormulaDataAccessor accessor, List<CommandBar> ctxMenus) : base(accessor, ctxMenus) { }
+        public ToJsonFormula(FormulaDataAccessor accessor) : base(accessor) { }
 
         /*******************************************/
     }

@@ -44,7 +44,7 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public UpdatePropertyFormula(FormulaDataAccessor accessor, List<CommandBar> ctxMenus) : base(accessor, ctxMenus) { }
+        public UpdatePropertyFormula(FormulaDataAccessor accessor) : base(accessor) { }
 
         /*******************************************/
     }

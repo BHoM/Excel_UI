@@ -23,11 +23,13 @@
 using BH.Engine.Reflection;
 using BH.oM.UI;
 using BH.UI.Templates;
+using ExcelDna.Integration;
 using Microsoft.Office.Core;
 using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace BH.UI.Excel.Templates
 {
@@ -89,7 +91,7 @@ namespace BH.UI.Excel.Templates
         /**** Constructors                      ****/
         /*******************************************/
 
-        public CallerFormula(FormulaDataAccessor accessor, List<CommandBar> ctxMenus)
+        public CallerFormula(FormulaDataAccessor accessor)
         {
             m_dataAccessor = accessor;
             Caller.SetDataAccessor(m_dataAccessor);
@@ -101,17 +103,28 @@ namespace BH.UI.Excel.Templates
 
         protected virtual void Caller_ItemSelected(object sender, object e)
         {
-            Range cell = Application.Selection as Range;
-            var cellcontents = "=" + Function;
-            if (Caller.InputParams.Count == 0)
+            Application app = null;
+            Range cell = null;
+
+            try
             {
-                cellcontents += "()";
-                if (cell != null) cell.Formula = cellcontents;
-            }
-            else
+                app = ExcelDnaUtil.Application as Application;
+                cell = app.Selection as Range;
+                var cellcontents = "=" + Function;
+                if (Caller.InputParams.Count == 0)
+                {
+                    cellcontents += "()";
+                    if (cell != null) cell.Formula = cellcontents;
+                }
+                else
+                {
+                    if (cell != null) cell.Formula = cellcontents;
+                    app.SendKeys("{F2}{(}", true);
+                }
+            } finally
             {
-                if (cell != null) cell.Formula = cellcontents;
-                Application.SendKeys("{F2}{(}", true);
+                if (app != null) Marshal.ReleaseComObject(app);
+                if (cell != null) Marshal.ReleaseComObject(cell);
             }
         }
 
@@ -122,13 +135,6 @@ namespace BH.UI.Excel.Templates
         {
             return Caller.Run();
         }
-
-        /*******************************************/
-        /**** Private Properties                ****/
-        /*******************************************/
-
-        protected Application Application { get; private set; }
-        protected List<CommandBarPopup> Menus { get; private set; } = new List<CommandBarPopup>();
 
         /*******************************************/
         /**** Private Fields                    ****/

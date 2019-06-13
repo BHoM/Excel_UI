@@ -42,7 +42,7 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public CreateDictionaryFormula(FormulaDataAccessor accessor, List<CommandBar> ctxMenus) : base(accessor, ctxMenus) { }
+        public CreateDictionaryFormula(FormulaDataAccessor accessor) : base(accessor) { }
 
         /*******************************************/
     }

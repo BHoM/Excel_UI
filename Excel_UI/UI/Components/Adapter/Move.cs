@@ -46,7 +46,7 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public MoveFormula(FormulaDataAccessor accessor, List<CommandBar> ctxMenus) : base(accessor, ctxMenus) { }
+        public MoveFormula(FormulaDataAccessor accessor) : base(accessor) { }
 
         /*******************************************/
     }

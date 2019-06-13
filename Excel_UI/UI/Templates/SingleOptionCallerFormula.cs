@@ -40,35 +40,13 @@ namespace BH.UI.Excel.Templates
         /**** Constructors                      ****/
         /*******************************************/
 
-        public SingleOptionCallerFormula(FormulaDataAccessor accessor, List<CommandBar> ctxMenus) : base(accessor, ctxMenus)
+        public SingleOptionCallerFormula(FormulaDataAccessor accessor) : base(accessor)
         {
-        }
-
-        /*******************************************/
-        /**** Private Methods                   ****/
-        /*******************************************/
-
-        private void OnClick(CommandBarButton Ctrl, ref bool CancelDefault)
-        {
-            Range cell = Application.Selection as Range;
-            var cellcontents = "=" + Function;
-            if (Caller.InputParams.Count == 0)
-            {
-                cellcontents += "()";
-                if (cell != null) cell.Formula = cellcontents;
-            }
-            else
-            {
-                if (cell != null) cell.Formula = cellcontents;
-                Application.SendKeys("{F2}{(}", true);
-            }
         }
 
         /*******************************************/
         /**** Private Fields                    ****/
         /*******************************************/
-
-        private List<CommandBarButton> m_btns = new List<CommandBarButton>();
 
         public override string MenuRoot => "";
     }
