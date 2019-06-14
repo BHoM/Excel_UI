@@ -50,7 +50,7 @@ namespace BH.UI.Excel.Components
                 if (Caller is MethodCaller && Caller.SelectedItem != null)
                 {
                     Type decltype = (Caller as MethodCaller).OutputParams.First().DataType;
-                    if (decltype.IsSubclassOf(typeof(IObject)))
+                    if (typeof(IObject).IsAssignableFrom(decltype))
                     {
                         string ns = decltype.Namespace;
                         if (ns.StartsWith("BH")) ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
