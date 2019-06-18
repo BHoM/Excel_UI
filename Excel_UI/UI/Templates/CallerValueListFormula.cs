@@ -167,7 +167,7 @@ namespace BH.UI.Excel.Templates
 
         protected abstract List<string> GetChoices();
 
-        protected override void Caller_ItemSelected(object sender, object e)
+        public override void FillFormula()
         {
             Application app = null;
             Range cell = null;

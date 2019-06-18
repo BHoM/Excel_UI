@@ -101,7 +101,7 @@ namespace BH.UI.Excel.Templates
         /**** Private Methods                   ****/
         /*******************************************/
 
-        protected virtual void Caller_ItemSelected(object sender, object e)
+        public virtual void FillFormula()
         {
             Application app = null;
             Range cell = null;
