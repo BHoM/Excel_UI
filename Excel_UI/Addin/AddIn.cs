@@ -64,6 +64,7 @@ namespace BH.UI.Excel
 
                 RegisterExcelMethods();
                 RegisterBHoMMethods();
+                ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
                 AddInternalise();
 
                 //Hide error box showing methods not working properly
@@ -73,6 +74,7 @@ namespace BH.UI.Excel
                 var app = ExcelDnaUtil.Application as Application;
                 app.WorkbookOpen += App_WorkbookOpen;
                 ExcelDna.IntelliSense.IntelliSenseServer.Install();
+                
             }
         }
 
@@ -179,7 +181,7 @@ namespace BH.UI.Excel
                 if (next != null) Marshal.ReleaseComObject(next);
             }
         }
-
+        
         /***************************************************/
 
         public void AutoClose()
@@ -246,8 +248,8 @@ namespace BH.UI.Excel
                 var searcher = new FormulaSearchMenu(m_da, m_formulea);
                 searcher.SetParent(null);
 
-                searcher.ItemSelected += GlobalSearch_ItemSelected;
-
+                searcher.ItemSelected += Formula_ItemSelected;
+                globalSearch.ItemSelected += GlobalSearch_ItemSelected;
             }
             catch (Exception e)
             {
@@ -255,7 +257,7 @@ namespace BH.UI.Excel
             }
         }
 
-        private void GlobalSearch_ItemSelected(object sender, oM.UI.ComponentRequest e)
+        private void Formula_ItemSelected(object sender, oM.UI.ComponentRequest e)
         {
             if (m_formulea.ContainsKey(e.CallerType.Name))
             {
@@ -264,6 +266,30 @@ namespace BH.UI.Excel
                 formula.Run();
             }
         }
+        
+        /*****************************************************************/
+      
+        [ExcelCommand(ShortCut = "^B")]
+        public static void InitGlobalSearch()
+        {
+            var control = new System.Windows.Forms.ContainerControl();
+            globalSearch.SetParent(control);
+        }
+        private static SearchMenu globalSearch = new SearchMenu_WinForm();
+
+        /*****************************************************************/
+
+        private void GlobalSearch_ItemSelected(object sender, oM.UI.ComponentRequest e)
+        {
+
+            if (m_formulea.ContainsKey(e.CallerType.Name))
+            {
+                CallerFormula formula = m_formulea[e.CallerType.Name];
+                formula.Caller.SetItem(e.SelectedItem);
+                formula.FillFormula();
+            }
+        }
+
 
         /*****************************************************************/
 
