@@ -56,7 +56,7 @@ namespace BH.UI.Excel.Templates
             Type type = typeof(T);
             object item = inputs[index];
 
-            if(item is ExcelEmpty || item is ExcelMissing) {
+            if (item is ExcelEmpty || item is ExcelMissing) {
                 object def = defaults[index];
                 return def == null ? default(T) : (T)(def as dynamic);
             }
@@ -145,7 +145,7 @@ namespace BH.UI.Excel.Templates
                 List<List<T>> list = new List<List<T>>();
                 int height = (item as object[,]).GetLength(0);
                 int width = (item as object[,]).GetLength(1);
-                for(int i = 0; i < width; i++)
+                for (int i = 0; i < width; i++)
                 {
                     list.Add(new List<T>());
                     for (int j = 0; j < height; j++)
@@ -167,7 +167,7 @@ namespace BH.UI.Excel.Templates
                             .Cast<object>()
                             .Select(inner => (T)(inner as dynamic))
                             .ToList()
-                            : null as List<T> )
+                            : null as List<T>)
                     .ToList();
 
             }
@@ -182,14 +182,14 @@ namespace BH.UI.Excel.Templates
             {
                 if (data.GetType().IsPrimitive || data is string || data is object[,])
                 {
-                    output = data;
+                    output_cache[current_op] = data;
                     return true;
                 }
                 if (data is Guid)
                 {
                     return SetDataItem(index, data.ToString());
                 }
-                if(data is IEnumerable && !(data is ICollection) )
+                if (data is IEnumerable && !(data is ICollection))
                 {
                     return SetDataItem(index, (data as IEnumerable).Cast<object>().ToList());
                 }
@@ -197,7 +197,7 @@ namespace BH.UI.Excel.Templates
                 {
                     return SetDataItem(index, Enum.GetName(data.GetType(), data));
                 }
-                if(data is DateTime)
+                if (data is DateTime)
                 {
                     DateTime? date = data as DateTime?;
                     if (date.HasValue)
@@ -210,7 +210,7 @@ namespace BH.UI.Excel.Templates
                 );
             } catch
             {
-                output = ExcelError.ExcelErrorNA;
+                output_cache[current_op] = ExcelError.ExcelErrorNA;
                 return false;
             }
         }
@@ -235,12 +235,12 @@ namespace BH.UI.Excel.Templates
             {
                 return SetDataItem(index, data);
             }
-            return SetDataItem(index, data.Select(sub=>sub.ToList()).ToList());
+            return SetDataItem(index, data.Select(sub => sub.ToList()).ToList());
         }
 
         /*******************************************/
 
-        public void StoreDefaults(object [] params_)
+        public void StoreDefaults(object[] params_)
         {
             // Collect default values from ParamInfo so defaultable
             // arguments can be ommited in excel
@@ -249,8 +249,32 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
-        public void Store(params object[] in_)
+        public bool Store(string function, params object[] in_)
         {
+            string reference = Engine.Excel.Query.Caller().RefText();
+            string key = $"{reference}:::{function}";
+
+            current_op = key;
+
+            if(input_cache.ContainsKey(key))
+            {
+                var cached = input_cache[key];
+                if (in_.Length == cached.Length)
+                {
+                    bool same = true;
+                    for (int i = 0; i < in_.Length; i++)
+                    {
+                        if (!in_[i].Equals(cached[i]))
+                        {
+                            same = false;
+                            break;
+                        }
+                    }
+                    if (same) return false;
+                }
+            }
+            input_cache[key] = in_;
+
             // Store some inputs in this DataAccessor
             // convert Guid strings to objects
             inputs = new object[in_.Length];
@@ -258,12 +282,16 @@ namespace BH.UI.Excel.Templates
             {
                 inputs[i] = Evaluate(in_[i]);
             }
+            return true;
         }
 
         /*******************************************/
 
         public object GetOutput()
         {
+            object output = null;
+            output_cache.TryGetValue(current_op, out output);
+
             // Retrieve the output from this DataAccessor
             var errors = Engine.Reflection.Query.CurrentEvents()
                 .Where(e => e.Type == oM.Reflection.Debugging.EventType.Error);
@@ -272,7 +300,11 @@ namespace BH.UI.Excel.Templates
                     .Select(e => e.Message)
                     .Aggregate((a, b) => a + "\n" + b);
                 Engine.Excel.Query.Caller().SetNote(msg);
+            } else
+            {
+                Engine.Excel.Query.Caller().SetNote("");
             }
+
             if (output == null)
             {
                 return ExcelError.ExcelErrorNull;
@@ -284,12 +316,10 @@ namespace BH.UI.Excel.Templates
 
         public void ResetOutput()
         {
-            Engine.Excel.Query.Caller().SetNote("");
-            output = null;
         }
-        
+
         /*******************************************/
-         
+
         public Tuple<Delegate, ExcelFunctionAttribute, List<object>>
             Wrap(CallerFormula caller, Expression<Action> action)
         {
@@ -305,6 +335,8 @@ namespace BH.UI.Excel.Templates
 
 
             // Create an array of [n] parameters
+            string fn = caller.Function;
+
             var rawParams = caller.Caller.InputParams;
             ParameterExpression[] lambdaParams = rawParams
                 .Select(p => Expression.Parameter(typeof(object)))
@@ -322,13 +354,6 @@ namespace BH.UI.Excel.Templates
             // Invoke action
             Expression actionCall = Expression.Invoke(action);
 
-            // Call FormulaDataAccessor.ResetOutput 
-            MethodInfo resetMethod = accessorType.GetMethod("ResetOutput");
-            Expression resetCall = Expression.Call(
-                accessorInstance, // (FormulaDataAccessor)DataAccessor
-                resetMethod       // void Reset()
-            );
-
             MethodInfo storeDefMethod = accessorType.GetMethod("StoreDefaults");
             Expression storeDefCall = Expression.Call(
                 accessorInstance, // FormulaDataAccessor
@@ -340,9 +365,11 @@ namespace BH.UI.Excel.Templates
             MethodInfo storeMethod = accessorType.GetMethod("Store");
             Expression storeCall = Expression.Call(
                 accessorInstance, // (FormulaDataAccessor)DataAccessor
-                storeMethod,      // void Store(object[])
+                storeMethod,      // void Store(string, object[])
+                Expression.Constant(fn), // fn
                 newArr            // new [] { ... }
             );
+
             // Return call FormulaDataAccessor.GetOutput()
             MethodInfo returnMethod = accessorType.GetMethod("GetOutput");
             Expression returnCall = Expression.Call(
@@ -352,10 +379,12 @@ namespace BH.UI.Excel.Templates
 
             // Chain them together
             Expression tree = Expression.Block(
-                resetCall,
                 storeDefCall,
-                storeCall,
-                actionCall,
+                Expression.Condition(
+                    storeCall,
+                    actionCall,
+                    Expression.Empty()
+                ),
                 returnCall
             );
             LambdaExpression lambda = Expression.Lambda(tree, lambdaParams);
@@ -399,12 +428,12 @@ namespace BH.UI.Excel.Templates
             {
                 return input;
             }
-            if(input is string)
+            if (input is string)
             {
                 object obj = Project.ActiveProject.GetAny(input as string);
                 return obj == null ? input : obj;
             }
-            if(input is object[,])
+            if (input is object[,])
             {
                 // Keep the 2D array layout but evaluate members recursively
                 // to convert Guid strings into objects from the Project
@@ -421,11 +450,11 @@ namespace BH.UI.Excel.Templates
             int width = input.GetLength(1);
 
             object[,] evaluated = new object[height, width];
-            for(int i = 0; i < width; i++)
+            for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < height; j++)
                 {
-                    evaluated[j,i] = Evaluate(input[j,i]);
+                    evaluated[j, i] = Evaluate(input[j, i]);
                 }
             }
             return evaluated;
@@ -459,8 +488,10 @@ namespace BH.UI.Excel.Templates
         /**** Private Fields                    ****/
         /*******************************************/
 
+        private string current_op;
         private object[] inputs;
         private object[] defaults;
-        private object output;
+        private Dictionary<string, object[]> input_cache = new Dictionary<string, object[]>();
+        private Dictionary<string, object> output_cache = new Dictionary<string, object>();
     }
 }
