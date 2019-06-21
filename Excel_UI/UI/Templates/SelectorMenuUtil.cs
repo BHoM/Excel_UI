@@ -28,7 +28,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BH.oM.DataStructure;
+using BH.oM.Data;
 using BH.Engine.Reflection;
 
 namespace BH.UI.Excel.Templates
