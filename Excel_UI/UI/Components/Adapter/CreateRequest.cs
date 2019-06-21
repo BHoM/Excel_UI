@@ -30,15 +30,15 @@ using System.Collections.Generic;
 
 namespace BH.UI.Excel.Components
 {
-    public class CreateQueryFormula : CallerFormula
+    public class CreateRequestFormula : CallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/
         /*******************************************/
 
-        public override string Name => "Adapter.Query." + Caller.Name;
+        public override string Name => "Adapter.Request." + Caller.Name;
 
-        public override Caller Caller { get; } = new CreateQueryCaller();
+        public override Caller Caller { get; } = new CreateRequestCaller();
 
         public override string MenuRoot { get; } = "Create Query";
 
@@ -46,7 +46,7 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public CreateQueryFormula(FormulaDataAccessor accessor) : base(accessor) { }
+        public CreateRequestFormula(FormulaDataAccessor accessor) : base(accessor) { }
 
         /*******************************************/
     }

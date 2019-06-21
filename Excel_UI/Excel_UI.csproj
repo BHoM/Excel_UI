@@ -42,9 +42,9 @@
     <Reference Include="BHoM_UI">
       <HintPath>..\..\BHoM_UI\Build\BHoM_UI.dll</HintPath>
     </Reference>
-    <Reference Include="DataStructure_oM, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Data_oM, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\BHoM\Build\DataStructure_oM.dll</HintPath>
+      <HintPath>..\..\BHoM\Build\Data_oM.dll</HintPath>
     </Reference>
     <Reference Include="ExcelDna.Integration, Version=0.34.6373.42344, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ExcelDna.Integration.0.34.6\lib\ExcelDna.Integration.dll</HintPath>
@@ -97,7 +97,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="UI\Callers\CreateCustom.cs" />
     <Compile Include="UI\Components\Adapter\CreateAdapter.cs" />
-    <Compile Include="UI\Components\Adapter\CreateQuery.cs" />
+    <Compile Include="UI\Components\Adapter\CreateRequest.cs" />
     <Compile Include="UI\Components\Adapter\Delete.cs" />
     <Compile Include="UI\Components\Adapter\Execute.cs" />
     <Compile Include="UI\Components\Adapter\Move.cs" />
