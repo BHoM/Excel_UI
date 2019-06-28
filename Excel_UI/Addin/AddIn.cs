@@ -133,19 +133,41 @@ namespace BH.UI.Excel
         private void App_WorkbookOpen(Workbook Wb)
         {
             List<string> json = new List<string>();
+            Sheets sheets = null;
             _Worksheet newsheet = null;
             Range used = null;
             Range cell = null;
             Range next = null;
             try
             {
+                sheets = Wb.Sheets;
+
+                if (sheets.OfType<Worksheet>()
+                    .FirstOrDefault(s => s.Name == "BHoM_Used") != null)
+                {
+                    foreach (Worksheet sheet in sheets.OfType<Worksheet>())
+                    {
+                        try
+                        {
+                            bool before = sheet.EnableCalculation;
+                            sheet.EnableCalculation = false;
+                            sheet.Calculate();
+                            sheet.EnableCalculation = before;
+                        }
+                        finally
+                        {
+                            Marshal.ReleaseComObject(sheet);
+                        }
+                    }
+                }
+
                 try
                 {
-                    newsheet = Wb.Sheets["BHoM_DataHidden"];
+                    newsheet = sheets["BHoM_DataHidden"];
                 } catch
                 {
                     // Backwards compatibility
-                    newsheet = Wb.Sheets["BHoM_Data"];
+                    newsheet = sheets["BHoM_Data"];
                 }
                 used = newsheet.UsedRange;
                 foreach (Range row in used.Rows)
@@ -172,6 +194,7 @@ namespace BH.UI.Excel
                     Marshal.ReleaseComObject(row);
                 }
                 Project.ActiveProject.Deserialize(json);
+
             }
             finally
             {
@@ -264,9 +287,38 @@ namespace BH.UI.Excel
                 CallerFormula formula = m_formulea[e.CallerType.Name];
                 formula.Caller.SetItem(e.SelectedItem);
                 formula.Run();
+                FlagUsed();
             }
         }
         
+        /*****************************************************************/
+        private void FlagUsed()
+        {
+            Application app = null;
+            Workbook Wb = null;
+            Sheets sheets = null;
+            Worksheet sheet = null;
+            try
+            {
+                app = ExcelDnaUtil.Application as Application;
+                Wb = app.ActiveWorkbook;
+                sheets = Wb.Worksheets;
+                if (sheets.OfType<Worksheet>()
+                    .FirstOrDefault(s => s.Name == "BHoM_Used") == null)
+                {
+                    sheet = sheets.Add();
+                    sheet.Visible = XlSheetVisibility.xlSheetVeryHidden;
+                    sheet.Name = "BHoM_Used";
+                }
+            } finally
+            {
+                if (app != null) Marshal.ReleaseComObject(app);
+                if (Wb != null) Marshal.ReleaseComObject(Wb);
+                if (sheet != null) Marshal.ReleaseComObject(sheet);
+                if (sheets != null) Marshal.ReleaseComObject(sheets);
+            }
+        }
+
         /*****************************************************************/
       
         [ExcelCommand(ShortCut = "^B")]
