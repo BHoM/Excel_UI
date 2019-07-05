@@ -46,7 +46,7 @@ namespace BH.UI.Excel.Components
 
                     string ns = t.Namespace;
                     if (ns.StartsWith("BH")) ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
-                    return "CreateType." + ns + "." + t.ToText();
+                    return "CreateType." + ns + "." + t.ToText(genericStart: "?",genericSeparator:"_",genericEnd:"");
                 }
                 return base.Name;
             }

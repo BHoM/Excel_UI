@@ -393,10 +393,11 @@ namespace BH.UI.Excel.Templates
             var argAttrs = rawParams
                         .Select(p =>
                         {
-                            string desc = p.Description + " " + p.DataType.ToText();
+                            string name = p.HasDefaultValue ? $"[{p.Name}]" : p.Name;
+                            string postfix = string.Empty;
                             if (p.HasDefaultValue)
                             {
-                                desc += " [default: " +
+                                postfix += " [default: " +
                                 (p.DefaultValue is string
                                     ? $"\"{p.DefaultValue}\""
                                     : p.DefaultValue == null
@@ -405,9 +406,11 @@ namespace BH.UI.Excel.Templates
                                 ) + "]";
                             }
 
+                            string desc = p.Description.Substring(0, 253 - postfix.Length - name.Length) + postfix;
+
                             return new ExcelArgumentAttribute()
                             {
-                                Name = p.HasDefaultValue ? $"[{p.Name}]" : p.Name,
+                                Name = name,
                                 Description = desc
                             };
                         }).ToList<object>();
