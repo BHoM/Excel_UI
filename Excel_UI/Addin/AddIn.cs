@@ -67,10 +67,6 @@ namespace BH.UI.Excel
                 ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
                 AddInternalise();
 
-                //Hide error box showing methods not working properly
-                if (!DebugConfig.ShowExcelDNALog)
-                    ExcelDna.Logging.LogDisplay.Hide();
-
                 var app = ExcelDnaUtil.Application as Application;
                 app.WorkbookOpen += App_WorkbookOpen;
                 ExcelDna.IntelliSense.IntelliSenseServer.Install();
