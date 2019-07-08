@@ -15,10 +15,9 @@ namespace BH.UI.Excel.Callers
 
         public CreateCustomCaller() : base()
         {
-            InputParams = new List<oM.UI.ParamInfo>() {
-                GetParam("Properties", typeof(List<string>)),
-                GetParam("Values", typeof(List<object>)),
-            };
+            InputParams = new List<oM.UI.ParamInfo>();
+            AddInput(0, "Properties", typeof(List<string>));
+            AddInput(1, "Values", typeof(List<object>));
         }
 
         /*******************************************/
@@ -35,7 +34,7 @@ namespace BH.UI.Excel.Callers
 
             List<string> props = inputs[0] as List<string>;
             List<object> values = inputs[1] as List<object>;
-            if ( props.Count == values.Count )
+            if (props.Count == values.Count)
             {
                 for (int i = 0; i < props.Count; i++)
                     Engine.Reflection.Modify.SetPropertyValue(obj, props[i], values[i]);
