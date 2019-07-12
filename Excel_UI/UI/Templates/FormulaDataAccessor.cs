@@ -417,15 +417,18 @@ namespace BH.UI.Excel.Templates
                                 Description = desc
                             };
                         });
-            string argstring = argAttrs.Select(item=>item.Name).Aggregate((a, b) => $"{a}, {b}");
-            if(argstring.Length >= 254)
+            if (argAttrs.Count() > 0)
             {
-                int i = 0;
-                argAttrs = argAttrs.Select(attr => new ExcelArgumentAttribute
+                string argstring = argAttrs.Select(item => item.Name).Aggregate((a, b) => $"{a}, {b}");
+                if (argstring.Length >= 254)
                 {
-                    Description = attr.Description,
-                    Name = "arg"+i++
-                } );
+                    int i = 0;
+                    argAttrs = argAttrs.Select(attr => new ExcelArgumentAttribute
+                    {
+                        Description = attr.Description,
+                        Name = "arg" + i++
+                    });
+                }
             }
             return new Tuple<Delegate, ExcelFunctionAttribute, List<object>>(
                 lambda.Compile(),
