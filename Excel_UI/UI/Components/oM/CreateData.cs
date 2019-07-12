@@ -41,7 +41,8 @@ namespace BH.UI.Excel.Components
 
         public override string Name {
             get {
-                return "CreateData." + Caller.Name;
+                
+                return "CreateData." + valid.Replace(Caller.Name, "_");
             }
         }
         public override Caller Caller { get; } = new CreateDataCaller();
@@ -68,5 +69,6 @@ namespace BH.UI.Excel.Components
                 return names[i] + " " + output.Substring(brkt);
             }).ToList();
         }
+        private static System.Text.RegularExpressions.Regex valid = new System.Text.RegularExpressions.Regex("[^a-z0-9?_]", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
     }
 }

@@ -406,18 +406,31 @@ namespace BH.UI.Excel.Templates
                                 ) + "]";
                             }
 
-                            string desc = p.Description.Substring(0, 253 - postfix.Length - name.Length) + postfix;
+                            int limit = 253 - name.Length;
+                            string desc = p.Description + postfix;
+
+                            if (desc.Length >= limit) desc = p.Description.Substring(limit - postfix.Length) + postfix;
 
                             return new ExcelArgumentAttribute()
                             {
                                 Name = name,
                                 Description = desc
                             };
-                        }).ToList<object>();
+                        });
+            string argstring = argAttrs.Select(item=>item.Name).Aggregate((a, b) => $"{a}, {b}");
+            if(argstring.Length >= 254)
+            {
+                int i = 0;
+                argAttrs = argAttrs.Select(attr => new ExcelArgumentAttribute
+                {
+                    Description = attr.Description,
+                    Name = "arg"+i++
+                } );
+            }
             return new Tuple<Delegate, ExcelFunctionAttribute, List<object>>(
                 lambda.Compile(),
                 GetFunctionAttribute(caller),
-                argAttrs
+                argAttrs.ToList<object>()
             );
         }
 
@@ -478,10 +491,13 @@ namespace BH.UI.Excel.Templates
 
         private ExcelFunctionAttribute GetFunctionAttribute(CallerFormula caller)
         {
+            int limit = 254;
+            string description = caller.Caller.Description;
+            if (description.Length >= limit) description = description.Substring(0, limit-1);
             return new ExcelFunctionAttribute()
             {
                 Name = caller.Function,
-                Description = caller.Caller.Description,
+                Description = description,
                 Category = "BHoM." + caller.Caller.Category,
                 IsMacroType = true
             };
