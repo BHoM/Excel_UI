@@ -59,14 +59,11 @@ namespace BH.UI.Excel.Components
 
         protected override List<string> GetChoices()
         {
-            var dataAccessor = new FormulaDataAccessor();
             var names = MultiChoiceCaller.GetChoiceNames();
             return MultiChoiceCaller.Choices.Select((o, i) =>
             {
-                dataAccessor.SetDataItem(0, o);
-                string output = dataAccessor.GetOutput().ToString();
-                int brkt = output.LastIndexOf("[");
-                return names[i] + " " + output.Substring(brkt);
+                string id = Project.ActiveProject.IAdd(o);
+                return $"{names[i]} [{id}]";
             }).ToList();
         }
         private static System.Text.RegularExpressions.Regex valid = new System.Text.RegularExpressions.Regex("[^a-z0-9?_]", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
