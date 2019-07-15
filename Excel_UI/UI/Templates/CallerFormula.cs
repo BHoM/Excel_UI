@@ -24,12 +24,11 @@ using BH.Engine.Reflection;
 using BH.oM.UI;
 using BH.UI.Templates;
 using ExcelDna.Integration;
-using Microsoft.Office.Core;
-using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
+using NetOffice.ExcelApi;
 
 namespace BH.UI.Excel.Templates
 {
@@ -107,7 +106,7 @@ namespace BH.UI.Excel.Templates
 
             try
             {
-                app = ExcelDnaUtil.Application as Application;
+                app = Application.GetActiveInstance();
                 cell = app.Selection as Range;
                 var cellcontents = "=" + Function;
                 if (Caller.InputParams.Count == 0)
@@ -122,8 +121,8 @@ namespace BH.UI.Excel.Templates
                 }
             } finally
             {
-                if (app != null) Marshal.ReleaseComObject(app);
-                if (cell != null) Marshal.ReleaseComObject(cell);
+                if (app != null) app.Dispose();
+                if (cell != null) cell.Dispose();
             }
         }
 

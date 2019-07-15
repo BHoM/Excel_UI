@@ -25,6 +25,8 @@ using BH.UI.Templates;
 using ExcelDna.Integration;
 using Microsoft.Office.Core;
 using Microsoft.Office.Interop.Excel;
+using NetOffice.ExcelApi;
+using NetOffice.ExcelApi.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -66,7 +68,7 @@ namespace BH.UI.Excel.Templates
             {
                 var name = $"RANGE_{Function}__";
 
-                app = ExcelDnaUtil.Application as Application;
+                app = Application.GetActiveInstance();
                 workbook = app.ActiveWorkbook;
                 sheets = workbook.Sheets;
                 names = workbook.Names;
@@ -77,7 +79,7 @@ namespace BH.UI.Excel.Templates
                     if (xlref != null)
                     {
                         var reftext = XlCall.Excel(XlCall.xlfReftext, xlref, true);
-                        cell = app.Range[reftext];
+                        cell = app.Range(reftext);
                         worksheet = cell.Worksheet;
                         if (worksheet.Name == "BHoM_ValidationHidden")
                         {
@@ -95,19 +97,16 @@ namespace BH.UI.Excel.Templates
                         }
                         else
                         {
-                            try
-                            {
-                                n = names.Item(name);
-                            }
-                            catch
+                            n = names.FirstOrDefault(nam => nam.Name == name);
+                            if (n == null)
                             {
                                 try
                                 {
-                                    validation_ws = sheets["BHoM_ValidationHidden"];
+                                    validation_ws = sheets["BHoM_ValidationHidden"] as Worksheet;
                                 }
                                 catch
                                 {
-                                    validation_ws = sheets.Add();
+                                    validation_ws = sheets.Add() as Worksheet;
                                     validation_ws.Name = "BHoM_ValidationHidden";
                                 }
                                 validation_ws.Visible = XlSheetVisibility.xlSheetHidden;
@@ -128,16 +127,19 @@ namespace BH.UI.Excel.Templates
                                 Validation validation = null;
                                 try
                                 {
+                                    app = Application.GetActiveInstance();
+                                    cell = app.Range(reftext);
                                     cell.Value = options.FirstOrDefault();
                                     validation = cell.Validation;
                                     validation.Delete();
-                                    validation.Add(XlDVType.xlValidateList, Formula1: $"={name}");
+                                    validation.Add(XlDVType.xlValidateList, null, null, $"={name}");
                                     validation.IgnoreBlank = true;
                                 }
                                 finally
                                 {
-                                    if (cell != null) Marshal.ReleaseComObject(cell);
-                                    if (validation != null) Marshal.ReleaseComObject(validation);
+                                    if (app != null) app.Dispose();
+                                    if (cell != null) cell.Dispose();
+                                    if (validation != null) validation.Dispose();
                                 }
                             });
 
@@ -154,13 +156,14 @@ namespace BH.UI.Excel.Templates
             }
             finally
             {
-                if (app != null) Marshal.ReleaseComObject(app);
-                if (validation_ws != null) Marshal.ReleaseComObject(validation_ws);
-                if (workbook != null) Marshal.ReleaseComObject(workbook);
-                if (worksheet != null) Marshal.ReleaseComObject(worksheet);
-                if (sheets != null) Marshal.ReleaseComObject(sheets);
-                if (names != null) Marshal.ReleaseComObject(names);
-                if (n != null) Marshal.ReleaseComObject(n);
+                if (app != null) app.Dispose();
+                if (validation_ws != null) validation_ws.Dispose();
+                if (workbook != null) workbook.Dispose();
+                if (worksheet != null) worksheet.Dispose();
+                if (sheets != null) sheets.Dispose();
+                if (names != null) names.Dispose();
+                if (cell != null) cell.Dispose();
+                if (n != null) n.Dispose();
             }
             return success;
         }
@@ -173,14 +176,14 @@ namespace BH.UI.Excel.Templates
             Range cell = null;
             try
             {
-                app = ExcelDnaUtil.Application as Application;
+                app = Application.GetActiveInstance();
                 cell = app.Selection as Range;
                 cell.Formula = "=" + Function + "()";
             }
             finally
             {
-                if (app != null) Marshal.ReleaseComObject(app);
-                if (cell != null) Marshal.ReleaseComObject(cell);
+                if (app != null) app.Dispose();
+                if (cell != null) cell.Dispose();
             }
         }
     }
