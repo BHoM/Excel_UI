@@ -28,8 +28,9 @@ using System.Threading.Tasks;
 using BH.oM.Base;
 using BH.Engine.Reflection;
 using BH.Engine.Serialiser;
-using Microsoft.Office.Interop.Excel;
 using BH.Adapter;
+using NetOffice.ExcelApi;
+using NetOffice.ExcelApi.Enums;
 
 namespace BH.UI.Excel
 {
@@ -276,22 +277,22 @@ namespace BH.UI.Excel
 
         public void SaveData(Workbook Wb)
         {
-            _Worksheet newsheet;
+            Worksheet newsheet;
             try
             {
                 try
                 {
-                    newsheet = Wb.Sheets["BHoM_DataHidden"];
+                    newsheet = Wb.Sheets["BHoM_DataHidden"] as Worksheet;
                 }
                 catch
                 {
                     // Backwards compatibility
-                    newsheet = Wb.Sheets["BHoM_Data"];
+                    newsheet = Wb.Sheets["BHoM_Data"] as Worksheet;
                 }
             }
             catch
             {
-                newsheet = Wb.Sheets.Add();
+                newsheet = Wb.Sheets.Add() as Worksheet;
             }
             newsheet.Name = "BHoM_DataHidden";
             newsheet.Visible = XlSheetVisibility.xlSheetHidden;
@@ -307,7 +308,7 @@ namespace BH.UI.Excel
                     cell = newsheet.Cells[row, 1];
                     try
                     {
-                        contents = cell.Value;
+                        contents = cell.Value as string;
                     }
                     catch { }
                 } while (contents != null && contents.Length > 0);

@@ -36,10 +36,12 @@ using BH.UI.Excel.Components;
 using BH.UI.Excel.Global;
 using BH.UI.Global;
 using BH.UI.Components;
-using Microsoft.Office.Interop.Excel;
-using Microsoft.Office.Core;
 using BH.Engine.Serialiser;
 using System.Runtime.InteropServices;
+using NetOffice.ExcelApi;
+using NetOffice.OfficeApi;
+using NetOffice.OfficeApi.Enums;
+using NetOffice.ExcelApi.Enums;
 
 namespace BH.UI.Excel
 {
@@ -47,77 +49,73 @@ namespace BH.UI.Excel
     {
         private Dictionary<string, CallerFormula> m_formulea;
         private List<CommandBar> m_menus;
-        private List<CommandBarButton> m_internalise;
-
+        private Application m_application;
         /*****************************************************************/
         /******* Public methods                             **************/
         /*****************************************************************/
 
         public void AutoOpen()
         {
+            ExcelDna.IntelliSense.IntelliSenseServer.Install();
+            m_application = Application.GetActiveInstance();
             using (Engine.Excel.Profiling.Timer timer = new Engine.Excel.Profiling.Timer("open"))
             {
                 m_menus = new List<CommandBar>();
+                m_menus.Add(m_application.CommandBars["Cell"]);
 
-                m_menus.Add((ExcelDnaUtil.Application as Application).CommandBars["Cell"]);
 
                 RegisterBHoMMethods();
                 ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
                 AddInternalise();
 
-                var app = ExcelDnaUtil.Application as Application;
-                app.WorkbookOpen += App_WorkbookOpen;
-                ExcelDna.IntelliSense.IntelliSenseServer.Install();
-                
+                m_application.WorkbookOpenEvent += App_WorkbookOpen;
+
             }
         }
 
         private void AddInternalise()
         {
-            m_internalise = new List<CommandBarButton>();
             foreach (var cmb in m_menus)
             {
-                var btn = cmb.Controls.Add(MsoControlType.msoControlButton, Temporary: true) as CommandBarButton;
+                var btn = cmb.Controls.Add(MsoControlType.msoControlButton,null,null,null, true) as CommandBarButton; 
                 btn.Tag = "Internalise_Data";
                 btn.Caption = "Internalise Data";
-                btn.Click += Internalise_Click;
-                m_internalise.Add(btn);
+                btn.ClickEvent += Internalise_Click;
+                btn.Dispose(false);
             }
         }
 
         private void Internalise_Click(CommandBarButton Ctrl, ref bool CancelDefault)
         {
-            Application app = null;
             Range selected = null;
+            CancelDefault = true;
 
             try
             {
-                app = ExcelDnaUtil.Application as Application;
-                selected = app.Selection;
+                    selected = m_application.Selection as Range;
 
-                foreach (Range objcell in selected)
-                {
-                    string value;
-                    try
+                    foreach (Range objcell in selected)
                     {
-                        value = (string)objcell.Value;
-                        if (value == null || value.Length == 0) continue;
+                        string value;
+                        try
+                        {
+                            value = (string)objcell.Value;
+                            if (value == null || value.Length == 0) continue;
+                        }
+                        catch { continue; }
+
+                        Project proj = Project.ForIDs(new string[] { value });
+
+                        if (proj.Count((o) => !(o is Adapter.BHoMAdapter)) == 0) continue;
+                        proj.SaveData(m_application.ActiveWorkbook);
+
+                        objcell.Value = value;
+                        objcell.Dispose();
                     }
-                    catch { continue; }
-
-                    Project proj = Project.ForIDs(new string[] { value });
-
-                    if (proj.Count((o) => !(o is Adapter.BHoMAdapter)) == 0) continue;
-                    proj.SaveData(app.ActiveWorkbook);
-
-                    objcell.Value = value;
-                    Marshal.ReleaseComObject(objcell);
-                }
             }
             finally
             {
-                if (selected != null) Marshal.ReleaseComObject(selected);
-                if (app != null) Marshal.ReleaseComObject(app);
+                if (selected != null) selected.Dispose();
             }
         }
 
@@ -150,18 +148,18 @@ namespace BH.UI.Excel
                         }
                         finally
                         {
-                            Marshal.ReleaseComObject(sheet);
+                            sheet.Dispose();
                         }
                     }
                 }
 
                 try
                 {
-                    newsheet = sheets["BHoM_DataHidden"];
+                    newsheet = sheets["BHoM_DataHidden"] as Worksheet;
                 } catch
                 {
                     // Backwards compatibility
-                    newsheet = sheets["BHoM_Data"];
+                    newsheet = sheets["BHoM_Data"] as Worksheet;
                 }
                 used = newsheet.UsedRange;
                 foreach (Range row in used.Rows)
@@ -174,7 +172,7 @@ namespace BH.UI.Excel
                         {
                             str += cell.Value;
                             next = cell.Next;
-                            Marshal.ReleaseComObject(cell);
+                            cell.Dispose();
                             cell = next;
                         }
                     }
@@ -185,17 +183,17 @@ namespace BH.UI.Excel
                         json.Add(str);
                     }
 
-                    Marshal.ReleaseComObject(row);
+                    row.Dispose();
                 }
                 Project.ActiveProject.Deserialize(json);
 
             }
             finally
             {
-                if (newsheet != null) Marshal.ReleaseComObject(newsheet);
-                if (cell != null) Marshal.ReleaseComObject(cell);
-                if (used != null) Marshal.ReleaseComObject(used);
-                if (next != null) Marshal.ReleaseComObject(next);
+                if (newsheet != null) newsheet.Dispose();
+                if (cell != null) cell.Dispose();
+                if (used != null) used.Dispose();
+                if (next != null) next.Dispose();
             }
         }
         
@@ -255,28 +253,25 @@ namespace BH.UI.Excel
         /*****************************************************************/
         private void FlagUsed()
         {
-            Application app = null;
             Workbook Wb = null;
             Sheets sheets = null;
             Worksheet sheet = null;
             try
             {
-                app = ExcelDnaUtil.Application as Application;
-                Wb = app.ActiveWorkbook;
+                Wb = m_application.ActiveWorkbook;
                 sheets = Wb.Worksheets;
                 if (sheets.OfType<Worksheet>()
                     .FirstOrDefault(s => s.Name == "BHoM_Used") == null)
                 {
-                    sheet = sheets.Add();
+                    sheet = sheets.Add() as Worksheet;
                     sheet.Visible = XlSheetVisibility.xlSheetVeryHidden;
                     sheet.Name = "BHoM_Used";
                 }
             } finally
             {
-                if (app != null) Marshal.ReleaseComObject(app);
-                if (Wb != null) Marshal.ReleaseComObject(Wb);
-                if (sheet != null) Marshal.ReleaseComObject(sheet);
-                if (sheets != null) Marshal.ReleaseComObject(sheets);
+                if (Wb != null) Wb.Dispose();
+                if (sheet != null) sheet.Dispose();
+                if (sheets != null) sheets.Dispose();
             }
         }
 

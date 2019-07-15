@@ -30,6 +30,8 @@ using System.Text;
 using System.Threading.Tasks;
 using BH.Engine.Reflection;
 using BH.oM.Data.Collections;
+using NetOffice.OfficeApi;
+using NetOffice.OfficeApi.Enums;
 
 namespace BH.UI.Excel.Templates
 {
@@ -106,11 +108,11 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
-        private CommandBarButton AppendMenuItem(CommandBarControls menu, string name, _CommandBarButtonEvents_ClickEventHandler onClick)
+        private CommandBarButton AppendMenuItem(CommandBarControls menu, string name, CommandBarButton_ClickEventHandler onClick)
         {
-            CommandBarButton btn = menu.Add(MsoControlType.msoControlButton, Temporary: true) as CommandBarButton;
+            CommandBarButton btn = menu.Add(MsoControlType.msoControlButton, null, null, null, true) as CommandBarButton;
             btn.Caption = name;
-            btn.Click += onClick;
+            btn.ClickEvent += onClick;
             // Otherwise it's GC'd and the click handler isn't run
             m_buttons.Add(btn); 
             return btn;
@@ -120,7 +122,7 @@ namespace BH.UI.Excel.Templates
 
         private CommandBarControls AppendMenuItem(CommandBarControls menu, string name)
         {
-            CommandBarPopup popup = menu.Add(MsoControlType.msoControlPopup, Temporary: true) as CommandBarPopup;
+            CommandBarPopup popup = menu.Add(MsoControlType.msoControlPopup, null, null, null, true) as CommandBarPopup;
             popup.Caption = name;
             return popup.Controls;
         }
