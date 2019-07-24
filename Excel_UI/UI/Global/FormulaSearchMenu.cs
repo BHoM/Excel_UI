@@ -43,9 +43,8 @@ namespace BH.UI.Excel.Global
         /**** Constructors                      ****/
         /*******************************************/
 
-        public FormulaSearchMenu(FormulaDataAccessor accessor, Dictionary<string, CallerFormula> callers) : base()
+        public FormulaSearchMenu(Dictionary<string, CallerFormula> callers) : base()
         {
-            m_accessor = accessor;
             m_callers = callers;
         }
 
@@ -118,7 +117,8 @@ namespace BH.UI.Excel.Global
             {
                 CallerFormula caller = m_callers[item.CallerType.Name];
                 caller.Caller.SetItem(item.Item);
-                return m_accessor.Wrap(caller, () => NotifySelection(item));
+                FormulaDataAccessor accessor = caller.Caller.DataAccessor as FormulaDataAccessor;
+                if(accessor != null) return accessor.Wrap(caller, () => NotifySelection(item));
             }
             return null;
         }
@@ -127,7 +127,6 @@ namespace BH.UI.Excel.Global
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private FormulaDataAccessor m_accessor;
         private Dictionary<string, CallerFormula> m_callers;
     }
 }

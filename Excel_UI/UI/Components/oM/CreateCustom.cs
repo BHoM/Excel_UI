@@ -63,7 +63,7 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public CreateCustomFormula(FormulaDataAccessor accessor) : base(accessor) { }
+        public CreateCustomFormula() : base() { }
 
         /*******************************************/
     }

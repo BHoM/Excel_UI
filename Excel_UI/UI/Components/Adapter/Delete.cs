@@ -44,7 +44,10 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public DeleteFormula(FormulaDataAccessor accessor) : base(accessor) { }
+        public DeleteFormula() : base()
+        { 
+            Caller.SetDataAccessor(new CacheingDataAccessor());
+        }
 
         /*******************************************/
     }

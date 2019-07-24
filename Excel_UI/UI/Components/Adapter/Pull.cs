@@ -44,7 +44,10 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public PullFormula(FormulaDataAccessor accessor) : base(accessor) { }
+        public PullFormula() : base() 
+        {
+            Caller.SetDataAccessor(new CacheingDataAccessor());
+        }
 
         /*******************************************/
     }

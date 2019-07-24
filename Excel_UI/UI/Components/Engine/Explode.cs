@@ -47,7 +47,7 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public ExplodeFormula(FormulaDataAccessor accessor) : base(accessor) { }
+        public ExplodeFormula() : base() { }
 
         /*******************************************/
     }

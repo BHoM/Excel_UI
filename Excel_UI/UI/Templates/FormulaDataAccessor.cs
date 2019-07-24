@@ -182,7 +182,7 @@ namespace BH.UI.Excel.Templates
             {
                 if (data.GetType().IsPrimitive || data is string || data is object[,])
                 {
-                    output_cache[current_op] = data;
+                    output = data;
                     return true;
                 }
                 if (data is Guid)
@@ -210,7 +210,7 @@ namespace BH.UI.Excel.Templates
                 );
             } catch
             {
-                output_cache[current_op] = ExcelError.ExcelErrorNA;
+                output = ExcelError.ExcelErrorNA;
                 return false;
             }
         }
@@ -249,32 +249,8 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
-        public bool Store(string function, params object[] in_)
+        public virtual bool Store(string function, params object[] in_)
         {
-            string reference = Engine.Excel.Query.Caller().RefText();
-            string key = $"{reference}:::{function}";
-
-            current_op = key;
-
-            if(input_cache.ContainsKey(key))
-            {
-                var cached = input_cache[key];
-                if (in_.Length == cached.Length)
-                {
-                    bool same = true;
-                    for (int i = 0; i < in_.Length; i++)
-                    {
-                        if (!in_[i].Equals(cached[i]))
-                        {
-                            same = false;
-                            break;
-                        }
-                    }
-                    if (same) return false;
-                }
-            }
-            input_cache[key] = in_;
-
             // Store some inputs in this DataAccessor
             // convert Guid strings to objects
             inputs = new object[in_.Length];
@@ -282,16 +258,14 @@ namespace BH.UI.Excel.Templates
             {
                 inputs[i] = Evaluate(in_[i]);
             }
+            ResetOutput();
             return true;
         }
 
         /*******************************************/
 
-        public object GetOutput()
+        public virtual object GetOutput()
         {
-            object output = null;
-            output_cache.TryGetValue(current_op, out output);
-
             // Retrieve the output from this DataAccessor
             var errors = Engine.Reflection.Query.CurrentEvents()
                 .Where(e => e.Type == oM.Reflection.Debugging.EventType.Error);
@@ -314,8 +288,10 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
-        public void ResetOutput()
+        public virtual void ResetOutput()
         {
+            Engine.Excel.Query.Caller().SetNote("");
+            output = null;
         }
 
         /*******************************************/
@@ -510,10 +486,8 @@ namespace BH.UI.Excel.Templates
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private string current_op;
         private object[] inputs;
         private object[] defaults;
-        private Dictionary<string, object[]> input_cache = new Dictionary<string, object[]>();
-        private Dictionary<string, object> output_cache = new Dictionary<string, object>();
+        private object output;
     }
 }

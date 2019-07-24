@@ -55,7 +55,7 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public CreateDataFormula(FormulaDataAccessor accessor) : base(accessor) { }
+        public CreateDataFormula() : base() { }
 
         protected override List<string> GetChoices()
         {

@@ -45,7 +45,6 @@ namespace BH.UI.Excel
 {
     public class AddIn : IExcelAddIn
     {
-        private FormulaDataAccessor m_da;
         private Dictionary<string, CallerFormula> m_formulea;
         private List<CommandBar> m_menus;
         private List<CommandBarButton> m_internalise;
@@ -249,13 +248,11 @@ namespace BH.UI.Excel
             try
             {
                 Compute.LoadAllAssemblies(Environment.GetEnvironmentVariable("APPDATA") + @"\BHoM\Assemblies");
-                m_da = new FormulaDataAccessor();
 
-                Type fda = typeof(FormulaDataAccessor);
                 Type callform = typeof(CallerFormula);
 
-                Type[] constrtypes = new Type[] { fda };
-                object[] args = new object[] { m_da };
+                Type[] constrtypes = new Type[] { };
+                object[] args = new object[] { };
 
                 m_formulea = ExcelIntegration.GetExportedAssemblies()
                     .SelectMany(a => a.GetTypes())
@@ -264,7 +261,7 @@ namespace BH.UI.Excel
                     .Select(t => t.GetConstructor(constrtypes).Invoke(args) as CallerFormula)
                     .ToDictionary(o => o.Caller.GetType().Name);
 
-                var searcher = new FormulaSearchMenu(m_da, m_formulea);
+                var searcher = new FormulaSearchMenu(m_formulea);
                 searcher.SetParent(null);
 
                 searcher.ItemSelected += Formula_ItemSelected;

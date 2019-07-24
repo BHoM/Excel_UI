@@ -42,7 +42,7 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public GetInfoFormula(FormulaDataAccessor accessor) : base(accessor) { }
+        public GetInfoFormula() : base() { }
 
         /*******************************************/
     }
