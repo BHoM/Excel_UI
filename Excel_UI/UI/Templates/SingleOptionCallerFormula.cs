@@ -49,5 +49,6 @@ namespace BH.UI.Excel.Templates
         /*******************************************/
 
         public override string MenuRoot => "";
+        public override string Function => Name;
     }
 }
