@@ -42,7 +42,7 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public FromJsonFormula(FormulaDataAccessor accessor) : base(accessor) { }
+        public FromJsonFormula() : base() { }
 
         /*******************************************/
     }

@@ -91,10 +91,9 @@ namespace BH.UI.Excel.Templates
         /**** Constructors                      ****/
         /*******************************************/
 
-        public CallerFormula(FormulaDataAccessor accessor)
+        public CallerFormula()
         {
-            m_dataAccessor = accessor;
-            Caller.SetDataAccessor(m_dataAccessor);
+            Caller.SetDataAccessor(new FormulaDataAccessor());
         }
 
         /*******************************************/
@@ -135,11 +134,5 @@ namespace BH.UI.Excel.Templates
         {
             return Caller.Run();
         }
-
-        /*******************************************/
-        /**** Private Fields                    ****/
-        /*******************************************/
-
-        private FormulaDataAccessor m_dataAccessor;
     }
 }

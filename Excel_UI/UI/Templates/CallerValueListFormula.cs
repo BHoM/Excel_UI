@@ -42,7 +42,7 @@ namespace BH.UI.Excel.Templates
             }
         }
 
-        public CallerValueListFormula(FormulaDataAccessor accessor) : base(accessor)
+        public CallerValueListFormula() : base()
         {
 
         }

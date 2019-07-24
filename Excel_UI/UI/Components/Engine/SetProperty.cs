@@ -42,7 +42,7 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public SetPropertyFormula(FormulaDataAccessor accessor) : base(accessor) { }
+        public SetPropertyFormula() : base() { }
 
         /*******************************************/
     }

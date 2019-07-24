@@ -44,7 +44,7 @@ namespace BH.UI.Excel.Components
         /**** Constructors                      ****/
         /*******************************************/
 
-        public ConvertFormula(FormulaDataAccessor accessor) : base(accessor) { }
+        public ConvertFormula() : base() { }
 
         /*******************************************/
     }
