@@ -54,6 +54,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Compute\Contents.cs" />
     <Compile Include="Compute\Note.cs" />
     <Compile Include="Timer.cs" />
     <Compile Include="Compute\NumberFormat.cs" />
