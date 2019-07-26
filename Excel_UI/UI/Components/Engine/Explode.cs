@@ -24,9 +24,9 @@ using System;
 using BH.oM.Base;
 using BH.UI.Excel.Templates;
 using BH.UI.Templates;
-using BH.UI.Components;
 using Microsoft.Office.Core;
 using System.Collections.Generic;
+using BH.UI.Excel.Callers;
 
 namespace BH.UI.Excel.Components
 {
@@ -37,7 +37,7 @@ namespace BH.UI.Excel.Components
         /*******************************************/
 
         // Bespoke Excel explode method
-        public override Caller Caller { get; } = new MethodCaller(typeof(Properties).GetMethod("Explode"));
+        public override Caller Caller { get; } = new ExplodeCaller();
 
         public override string Function { get; } = "BHoM.Explode";
             

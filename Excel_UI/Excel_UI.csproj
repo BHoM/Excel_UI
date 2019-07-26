@@ -95,6 +95,7 @@
     <Compile Include="Methods\Properties.cs" />
     <Compile Include="Project\Project.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UI\Callers\Explode.cs" />
     <Compile Include="UI\Callers\CreateCustom.cs" />
     <Compile Include="UI\Components\Adapter\CreateAdapter.cs" />
     <Compile Include="UI\Components\Adapter\CreateRequest.cs" />
