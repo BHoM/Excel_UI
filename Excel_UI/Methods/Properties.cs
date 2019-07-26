@@ -30,6 +30,7 @@ using System.Reflection;
 using BH.oM.Base;
 using BH.Engine.Reflection;
 using System.Collections;
+using BH.Engine.Excel;
 using BH.UI.Global;
 
 namespace BH.UI.Excel
@@ -42,32 +43,14 @@ namespace BH.UI.Excel
 
         [ExcelFunction(Description = "Get all properties from an object. WARNING This is an array formula and will take up more than one cell!", Category = "BHoM")]
         public static object Explode(
-                [ExcelArgument(Name = "object ids")] object objectIds,
+                [ExcelArgument(Name = "object ids")] List<object> objects,
                 [ExcelArgument(Name = "Include the name of the properties")] bool includePropertyNames = false,
                 [ExcelArgument(Name = "Explode inner objects")] bool goDeep = false)
         {
-            Compute.ClearCurrentEvents();
+            Engine.Reflection.Compute.ClearCurrentEvents();
 
-            object[] _objectIds = new object[] { };
-            if (objectIds is object[,])
-            {
-                 _objectIds = (objectIds as object[,]).Cast<object>().ToArray().CleanArray();
-            } else if (objectIds is object[])
-            {
-                _objectIds = (objectIds as object[]);
-            } else if (objectIds is string)
-            {
-                _objectIds = new[] { objectIds };
-            }
-
-            //Clean the array
-            _objectIds = _objectIds.CleanArray();
-
-            //Get the object
-            List<object> objs = _objectIds.Select(x => {
-                var obj = Project.ActiveProject.GetAny(x.ToString());
-                return obj == null ? x : obj;
-            }).ToList();
+            // Clean the list
+            List<object> objs = objects.CleanList();
 
             if (objs == null)
                 return "Failed to get object";

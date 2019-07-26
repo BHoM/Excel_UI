@@ -61,7 +61,6 @@ namespace BH.UI.Excel
 
                 m_menus.Add((ExcelDnaUtil.Application as Application).CommandBars["Cell"]);
 
-                RegisterExcelMethods();
                 RegisterBHoMMethods();
                 ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
                 AddInternalise();
@@ -211,38 +210,7 @@ namespace BH.UI.Excel
         /******* Private methods                            **************/
         /*****************************************************************/
 
-        private void RegisterExcelMethods()
-        {
-            //Get out all the methods marked with the excel attributes
-            IEnumerable<MethodInfo> allExcelMethods = ExcelIntegration.GetExportedAssemblies()
-                .SelectMany(x => x.GetTypes().SelectMany(y => y.GetMethods(BindingFlags.Public | BindingFlags.Static)))
-                .Where(x => x.GetCustomAttribute<ExcelFunctionAttribute>() != null);
 
-            List<MethodInfo> otherMethods = new List<MethodInfo>();
-
-            foreach (MethodInfo mi in allExcelMethods)
-            {
-                otherMethods.Add(mi);
-            }
-
-            List<object> fattrs = new List<object>();
-            List<List<object>> attrs = new List<List<object>>();
-            foreach (MethodInfo method in otherMethods)
-            {
-                var fa = method.GetCustomAttribute<ExcelFunctionAttribute>();
-                fa.Name = "BHoM." + (fa.Name != null ? fa.Name : method.Name);
-
-                fattrs.Add(fa);
-                attrs.Add(
-                    method.GetParameters()
-                        .Select(p => p.GetCustomAttribute<ExcelArgumentAttribute>() as object)
-                        .ToList()
-                );
-            }
-            ExcelIntegration.RegisterMethods(otherMethods,fattrs,attrs);
-        }
-
-        /*****************************************************************/
         private void RegisterBHoMMethods()
         {
             try
