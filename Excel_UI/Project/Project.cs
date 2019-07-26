@@ -130,7 +130,7 @@ namespace BH.UI.Excel
 
         public string Add(IBHoMObject obj)
         {
-            string guid = ToString(obj.BHoM_Guid);
+            string guid = ToString(Guid.NewGuid());
             if (m_objects.ContainsKey(guid))
                 return guid;
 
