@@ -56,7 +56,6 @@ namespace BH.UI.Excel
 
         public void AutoOpen()
         {
-            ExcelDna.IntelliSense.IntelliSenseServer.Install();
             m_application = Application.GetActiveInstance();
             using (Engine.Excel.Profiling.Timer timer = new Engine.Excel.Profiling.Timer("open"))
             {
@@ -71,6 +70,8 @@ namespace BH.UI.Excel
                 m_application.WorkbookOpenEvent += App_WorkbookOpen;
 
             }
+
+            ExcelDna.IntelliSense.IntelliSenseServer.Install();
         }
 
         private void AddInternalise()
