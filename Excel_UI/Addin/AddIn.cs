@@ -56,6 +56,8 @@ namespace BH.UI.Excel
 
         public void AutoOpen()
         {
+            Instance = this;
+
             ExcelDna.IntelliSense.IntelliSenseServer.Install();
             m_application = Application.GetActiveInstance();
             using (Engine.Excel.Profiling.Timer timer = new Engine.Excel.Profiling.Timer("open"))
@@ -63,14 +65,9 @@ namespace BH.UI.Excel
                 m_menus = new List<CommandBar>();
                 m_menus.Add(m_application.CommandBars["Cell"]);
 
-
-                RegisterBHoMMethods();
-                ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
-                AddInternalise();
-
                 m_application.WorkbookOpenEvent += App_WorkbookOpen;
-
             }
+            
         }
 
         private void AddInternalise()
@@ -137,20 +134,24 @@ namespace BH.UI.Excel
                 if (sheets.OfType<Worksheet>()
                     .FirstOrDefault(s => s.Name == "BHoM_Used") != null)
                 {
-                    foreach (Worksheet sheet in sheets.OfType<Worksheet>())
+                    ExcelAsyncUtil.QueueAsMacro(() =>
                     {
-                        try
+                        InitBHoMAddin();
+                        foreach (Worksheet sheet in sheets.OfType<Worksheet>())
                         {
-                            bool before = sheet.EnableCalculation;
-                            sheet.EnableCalculation = false;
-                            sheet.Calculate();
-                            sheet.EnableCalculation = before;
+                            try
+                            {
+                                bool before = sheet.EnableCalculation;
+                                sheet.EnableCalculation = false;
+                                sheet.Calculate();
+                                sheet.EnableCalculation = before;
+                            }
+                            finally
+                            {
+                                sheet.Dispose();
+                            }
                         }
-                        finally
-                        {
-                            sheet.Dispose();
-                        }
-                    }
+                    });
                 }
 
                 try
@@ -284,6 +285,25 @@ namespace BH.UI.Excel
             globalSearch.SetParent(control);
         }
         private static SearchMenu globalSearch = new SearchMenu_WinForm();
+        
+        public static void EnableBHoM(Action<bool> callback)
+        {
+            ExcelAsyncUtil.QueueAsMacro(() => callback(Instance.InitBHoMAddin()));
+        }
+
+        public bool InitBHoMAddin()
+        {
+            if (initialised) return true;
+            RegisterBHoMMethods();
+            ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
+            AddInternalise();
+            ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
+            initialised = true;
+            return true;
+        }
+        private bool initialised = false;
+        public static bool Enabled { get { return Instance.initialised; } }
+
 
         /*****************************************************************/
 
@@ -317,5 +337,7 @@ namespace BH.UI.Excel
 
             return false;
         }
+
+        private static AddIn Instance { get; set; }
     }
 }

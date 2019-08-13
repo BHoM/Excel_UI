@@ -105,6 +105,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Addin\AddIn.cs" />
+    <Compile Include="Addin\Ribbon.cs" />
     <Compile Include="ArrayResizer.cs" />
     <Compile Include="DebugConfig.cs" />
     <Compile Include="IO\InOutHelp.cs" />
