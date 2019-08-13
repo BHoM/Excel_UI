@@ -5,7 +5,7 @@
 
 Exposes BHoM functionality as Excel functions.
 
-Load the add-ins from the options menu. Browse to `AppData\Roaming\BHoM\Assemblies` and load `BHoM-AddIn.xll`.
+Load the add-in from the options menu. Browse to `AppData\Roaming\BHoM\Assemblies` and load `BHoM-AddIn.xll`.
 
 Start by typing `=` in a cell and then `Create`, `CreateType`, `Query`, `Compute`, `Convert`, `Modify`, or `BHoM`. The available functions will appear in a dropdown.
 
