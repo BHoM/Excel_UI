@@ -32,10 +32,11 @@ using BH.Engine.Reflection;
 using BH.oM.Data.Collections;
 using NetOffice.OfficeApi;
 using NetOffice.OfficeApi.Enums;
+using System.Xml;
 
 namespace BH.UI.Excel.Templates
 {
-    public class SelectorMenu_CommandBar<T> : SelectorMenu<T, CommandBarControls>, IExcelSelectorMenu
+    public class SelectorMenu_RibbonXml<T> : SelectorMenu<T, XmlElement>, IExcelSelectorMenu
     {
         /*******************************************/
         /**** Properties                        ****/
@@ -47,22 +48,23 @@ namespace BH.UI.Excel.Templates
         /**** Constructors                      ****/
         /*******************************************/
 
-        public SelectorMenu_CommandBar() : base(null, null) { }
+        public SelectorMenu_RibbonXml() : base(null, null)
+        {
+        }
 
         /*******************************************/
         /**** Protected Methods                 ****/
         /*******************************************/
 
-        protected override void AddSearchBox(CommandBarControls menu, List<SearchItem> itemList)
+        protected override void AddSearchBox(XmlElement menu, List<SearchItem> itemList)
         {
             // Noop
         }
 
         /*******************************************/
 
-        protected override void AddTree(CommandBarControls menu, Tree<T> itemTree)
+        protected override void AddTree(XmlElement menu, Tree<T> itemTree)
         {
-            itemTree.Name = RootName;
             AppendMenuTree(itemTree, menu);
         }
 
@@ -70,61 +72,34 @@ namespace BH.UI.Excel.Templates
         /**** Private Methods                   ****/
         /*******************************************/
 
-        private void AppendMenuTree(Tree<T> tree, CommandBarControls menu)
+        private void AppendMenuTree(Tree<T> tree, XmlElement menu)
         {
-            try
+            XmlDocument document = menu.OwnerDocument;
+            XmlElement element;
+            string id = "id"+Guid.NewGuid().ToString();
+            if (tree.Children.Count > 0)
             {
-                if (tree.Children.Count > 0)
-                {
-                    CommandBarControls treeMenu = AppendMenuItem(menu, tree.Name);
-                    foreach (Tree<T> childTree in tree.Children.Values.OrderBy(x => x.Name))
-                        AppendMenuTree(childTree, treeMenu);
-                }
-                else
-                {
-                    T method = tree.Value;
-                    CommandBarButton methodItem = AppendMenuItem(menu, tree.Name, Item_Click);
-                    methodItem.Tag = Guid.NewGuid().ToString();
-                    m_ItemLinks[methodItem.Tag] = method;
-                }
+                element = document.CreateElement("menu");
+                foreach (Tree<T> childTree in tree.Children.Values.OrderBy(x => x.Name))
+                    AppendMenuTree(childTree, element);
             }
-            catch (Exception e)
+            else
             {
-                Compute.RecordError(e.Message);
+                T method = tree.Value;
+                element = document.CreateElement("button");
+                element.SetAttribute("onAction", "FillFormula");
+                m_ItemLinks[id] = method;
             }
+            element.SetAttribute("label", tree.Name);
+            element.SetAttribute("id", id);
+            element.SetAttribute("tag", RootName);
+            menu.AppendChild(element);
         }
 
-        /*******************************************/
-
-        private void Item_Click(CommandBarButton Ctrl, ref bool CancelDefault)
+        public void Select(string id)
         {
-            try
-            {
-                T method = m_ItemLinks[Ctrl.Tag];
-                ReturnSelectedItem(method);
-            }
-            catch { }
-        }
-
-        /*******************************************/
-
-        private CommandBarButton AppendMenuItem(CommandBarControls menu, string name, CommandBarButton_ClickEventHandler onClick)
-        {
-            CommandBarButton btn = menu.Add(MsoControlType.msoControlButton, null, null, null, true) as CommandBarButton;
-            btn.Caption = name;
-            btn.ClickEvent += onClick;
-            // Otherwise it's GC'd and the click handler isn't run
-            m_buttons.Add(btn); 
-            return btn;
-        }
-
-        /*******************************************/
-
-        private CommandBarControls AppendMenuItem(CommandBarControls menu, string name)
-        {
-            CommandBarPopup popup = menu.Add(MsoControlType.msoControlPopup, null, null, null, true) as CommandBarPopup;
-            popup.Caption = name;
-            return popup.Controls;
+            if(m_ItemLinks.ContainsKey(id))
+                ReturnSelectedItem(m_ItemLinks[id]);
         }
 
         /*******************************************/
@@ -132,6 +107,5 @@ namespace BH.UI.Excel.Templates
         /*******************************************/
 
         private Dictionary<string, T> m_ItemLinks = new Dictionary<string, T>();
-        private List<CommandBarControl> m_buttons = new List<CommandBarControl>();
     }
 }

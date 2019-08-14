@@ -48,7 +48,7 @@ namespace BH.UI.Excel.Templates
 
         public static IExcelSelectorMenu SetExcelSelectorMenu<T>(Selector<T> selector)
         {
-            var menu = new SelectorMenu_CommandBar<T>();
+            var menu = new SelectorMenu_RibbonXml<T>();
             selector.SetSelectorMenu(menu);
             return menu;
         }

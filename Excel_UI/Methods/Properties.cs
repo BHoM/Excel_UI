@@ -33,7 +33,7 @@ using System.Collections;
 using BH.Engine.Excel;
 using BH.UI.Global;
 
-namespace BH.UI.Excel
+namespace BH.UI.Excel.Methods
 {
     public static class Properties
     {
