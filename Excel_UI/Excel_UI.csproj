@@ -160,7 +160,6 @@
     <None Include="BHoM-AddIn.dna">
       <SubType>Designer</SubType>
     </None>
-    <None Include="Properties\Resources\BHoM_Logo-40x40.png" />
   </ItemGroup>
   <ItemGroup>
     <COMReference Include="VBIDE">
@@ -190,9 +189,6 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Properties\Resources\BHoM_Logo-32x32.png" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\Resources\BHoM_Logo-48x48.png" />

@@ -354,6 +354,7 @@ namespace BH.UI.Excel
         public static string GetRibbonXml()
         {
             Dictionary<string, XmlElement> groups = new Dictionary<string, XmlElement>();
+            Dictionary<string, Dictionary<int, XmlElement>> boxes = new Dictionary<string, Dictionary<int, XmlElement>>();
             XmlDocument doc = new XmlDocument();
             XmlElement root = doc.CreateElement("root");
             doc.AppendChild(root);
@@ -370,13 +371,31 @@ namespace BH.UI.Excel
                         group.SetAttribute("label", caller.Category);
                         group.SetAttribute("getVisible", "GetVisible");
                         groups.Add(caller.Category, group);
+                        boxes.Add(caller.Category, new Dictionary<int, XmlElement>());
                     }
+                    if (!boxes[caller.Category].ContainsKey(caller.Caller.GroupIndex))
+                        boxes[caller.Category].Add(caller.Caller.GroupIndex, doc.CreateElement("box"));
+
+                    XmlElement box = boxes[caller.Category][caller.Caller.GroupIndex];
+                    box.SetAttribute("id", caller.Category+"-group" + caller.Caller.GroupIndex);
+                    box.SetAttribute("boxStyle", "vertical");
+
                     XmlDocument tmp = new XmlDocument();
                     tmp.LoadXml(caller.GetRibbonXml());
-                    group.AppendChild(doc.ImportNode(tmp.DocumentElement, true));
+                    box.AppendChild(doc.ImportNode(tmp.DocumentElement, true));
                 } catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
+                }
+            }
+
+            foreach(var kvp in boxes)
+            {
+                List<int> ordered = kvp.Value.Keys.ToList();
+                ordered.Sort();
+                foreach(int i in ordered)
+                {
+                    groups[kvp.Key].AppendChild(kvp.Value[i]);
                 }
             }
             return root.InnerXml;
