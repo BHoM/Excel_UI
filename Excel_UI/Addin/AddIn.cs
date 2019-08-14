@@ -42,6 +42,8 @@ using NetOffice.ExcelApi;
 using NetOffice.OfficeApi;
 using NetOffice.OfficeApi.Enums;
 using NetOffice.ExcelApi.Enums;
+using System.Drawing;
+using System.Xml;
 
 namespace BH.UI.Excel
 {
@@ -59,11 +61,24 @@ namespace BH.UI.Excel
             Instance = this;
 
             ExcelDna.IntelliSense.IntelliSenseServer.Install();
+
             m_application = Application.GetActiveInstance();
             using (Engine.Excel.Profiling.Timer timer = new Engine.Excel.Profiling.Timer("open"))
             {
                 m_menus = new List<CommandBar>();
                 m_menus.Add(m_application.CommandBars["Cell"]);
+
+                Type callform = typeof(CallerFormula);
+
+                Type[] constrtypes = new Type[] { };
+                object[] args = new object[] { };
+
+                m_formulea = ExcelIntegration.GetExportedAssemblies()
+                    .SelectMany(a => a.GetTypes())
+                    .Where(t => t.Namespace == "BH.UI.Excel.Components"
+                                && callform.IsAssignableFrom(t))
+                    .Select(t => t.GetConstructor(constrtypes).Invoke(args) as CallerFormula)
+                    .ToDictionary(o => o.Caller.GetType().Name);
 
                 m_application.WorkbookOpenEvent += App_WorkbookOpen;
             }
@@ -216,18 +231,6 @@ namespace BH.UI.Excel
             {
                 Compute.LoadAllAssemblies(Environment.GetEnvironmentVariable("APPDATA") + @"\BHoM\Assemblies");
 
-                Type callform = typeof(CallerFormula);
-
-                Type[] constrtypes = new Type[] { };
-                object[] args = new object[] { };
-
-                m_formulea = ExcelIntegration.GetExportedAssemblies()
-                    .SelectMany(a => a.GetTypes())
-                    .Where(t => t.Namespace == "BH.UI.Excel.Components"
-                                && callform.IsAssignableFrom(t))
-                    .Select(t => t.GetConstructor(constrtypes).Invoke(args) as CallerFormula)
-                    .ToDictionary(o => o.Caller.GetType().Name);
-
                 var searcher = new FormulaSearchMenu(m_formulea);
                 searcher.SetParent(null);
 
@@ -301,9 +304,19 @@ namespace BH.UI.Excel
             initialised = true;
             return true;
         }
+
+        
         private bool initialised = false;
         public static bool Enabled { get { return Instance.initialised; } }
 
+        public static CallerFormula GetCaller(string caller)
+        {
+            if (Instance.m_formulea.ContainsKey(caller))
+            {
+                return Instance.m_formulea[caller];
+            }
+            return null;
+        }
 
         /*****************************************************************/
 
@@ -336,6 +349,37 @@ namespace BH.UI.Excel
                 return true;
 
             return false;
+        }
+
+        public static string GetRibbonXml()
+        {
+            Dictionary<string, XmlElement> groups = new Dictionary<string, XmlElement>();
+            XmlDocument doc = new XmlDocument();
+            XmlElement root = doc.CreateElement("root");
+            doc.AppendChild(root);
+            foreach(CallerFormula caller in Instance.m_formulea.Values)
+            {
+                try
+                {
+                    XmlElement group;
+                    groups.TryGetValue(caller.Category, out group);
+                    if (group == null)
+                    {
+                        group = (XmlElement)root.AppendChild(doc.CreateElement("group"));
+                        group.SetAttribute("id", caller.Category);
+                        group.SetAttribute("label", caller.Category);
+                        group.SetAttribute("getVisible", "GetVisible");
+                        groups.Add(caller.Category, group);
+                    }
+                    XmlDocument tmp = new XmlDocument();
+                    tmp.LoadXml(caller.GetRibbonXml());
+                    group.AppendChild(doc.ImportNode(tmp.DocumentElement, true));
+                } catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+            return root.InnerXml;
         }
 
         private static AddIn Instance { get; set; }

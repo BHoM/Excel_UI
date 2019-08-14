@@ -29,11 +29,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
 using NetOffice.ExcelApi;
+using System.Xml;
 
 namespace BH.UI.Excel.Templates
 {
     public abstract class CallerFormula
     {
+        private IExcelSelectorMenu m_menu;
 
         /*******************************************/
         /**** Properties                        ****/
@@ -93,6 +95,7 @@ namespace BH.UI.Excel.Templates
         public CallerFormula()
         {
             Caller.SetDataAccessor(new FormulaDataAccessor());
+            Caller.ItemSelected += (e,s) => FillFormula();
         }
 
         /*******************************************/
@@ -132,6 +135,33 @@ namespace BH.UI.Excel.Templates
         public virtual bool Run()
         {
             return Caller.Run();
+        }
+        
+
+        /*******************************************/
+
+        public virtual string GetRibbonXml()
+        {
+            Caller.SetItem(null);
+            m_menu = SelectorMenuUtil.ISetExcelSelectorMenu(Caller.Selector);
+            m_menu.RootName = Caller.GetType().Name;
+            XmlDocument doc = new XmlDocument();
+            XmlElement root = doc.CreateElement("root");
+            Caller.AddToMenu(root);
+            XmlElement menu = root.FirstChild as XmlElement;
+            if (menu == null) return "";
+            menu.RemoveAllAttributes();
+            menu.SetAttribute("id", Caller.GetType().Name);
+            menu.SetAttribute("getImage", "GetImage");
+            menu.SetAttribute("label", MenuRoot);
+            menu.SetAttribute("description", Caller.Description);
+            menu.SetAttribute("supertip", Caller.Description);
+            return root.InnerXml;
+        }
+
+        public virtual void Select(string id)
+        {
+            m_menu.Select(id);
         }
     }
 }

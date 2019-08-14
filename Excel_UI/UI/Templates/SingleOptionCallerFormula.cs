@@ -31,6 +31,7 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
 
 namespace BH.UI.Excel.Templates
 {
@@ -42,6 +43,26 @@ namespace BH.UI.Excel.Templates
 
         public SingleOptionCallerFormula() : base()
         {
+        }
+
+        public override string GetRibbonXml()
+        {
+            XmlDocument doc = new XmlDocument();
+            XmlElement btn = doc.CreateElement("button");
+            btn.SetAttribute("id", Caller.GetType().Name);
+            btn.SetAttribute("tag", Caller.GetType().Name);
+            btn.SetAttribute("getImage", "GetImage");
+            btn.SetAttribute("label", Caller.Name);
+            btn.SetAttribute("description", Caller.Description);
+            btn.SetAttribute("onAction","FillFormula");
+            return btn.OuterXml;
+        }
+
+        /*******************************************/
+
+        public override void Select(string id)
+        {
+            FillFormula();
         }
 
         /*******************************************/
