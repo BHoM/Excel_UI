@@ -53,7 +53,8 @@ namespace BH.UI.Excel.Templates
             btn.SetAttribute("tag", Caller.GetType().Name);
             btn.SetAttribute("getImage", "GetImage");
             btn.SetAttribute("label", Caller.Name);
-            btn.SetAttribute("description", Caller.Description);
+            btn.SetAttribute("screentip", Caller.Name);
+            btn.SetAttribute("supertip", Caller.Description);
             btn.SetAttribute("onAction","FillFormula");
             return btn.OuterXml;
         }
