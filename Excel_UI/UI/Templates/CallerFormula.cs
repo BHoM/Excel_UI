@@ -154,7 +154,7 @@ namespace BH.UI.Excel.Templates
             menu.SetAttribute("id", Caller.GetType().Name);
             menu.SetAttribute("getImage", "GetImage");
             menu.SetAttribute("label", MenuRoot);
-            menu.SetAttribute("description", Caller.Description);
+            menu.SetAttribute("screentip", MenuRoot);
             menu.SetAttribute("supertip", Caller.Description);
             return root.InnerXml;
         }

@@ -396,7 +396,11 @@ namespace BH.UI.Excel
                 foreach(int i in ordered)
                 {
                     groups[kvp.Key].AppendChild(kvp.Value[i]);
+                    var sep = doc.CreateElement("separator");
+                    sep.SetAttribute("id", $"sep-{kvp.Key}-{i}");
+                    groups[kvp.Key].AppendChild(sep);
                 }
+                groups[kvp.Key].RemoveChild(groups[kvp.Key].LastChild);
             }
             return root.InnerXml;
         }
