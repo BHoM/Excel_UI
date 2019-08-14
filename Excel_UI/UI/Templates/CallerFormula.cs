@@ -142,7 +142,7 @@ namespace BH.UI.Excel.Templates
 
         public virtual string GetRibbonXml()
         {
-            Caller.SetItem(null);
+            Caller.SelectedItem = null;
             m_menu = SelectorMenuUtil.ISetExcelSelectorMenu(Caller.Selector);
             m_menu.RootName = Caller.GetType().Name;
             XmlDocument doc = new XmlDocument();
