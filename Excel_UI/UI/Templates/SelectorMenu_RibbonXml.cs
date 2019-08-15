@@ -88,6 +88,7 @@ namespace BH.UI.Excel.Templates
                 T method = tree.Value;
                 element = document.CreateElement("button");
                 element.SetAttribute("onAction", "FillFormula");
+                element.SetAttribute("supertip", method.IDescription());
                 m_ItemLinks[id] = method;
             }
             element.SetAttribute("label", tree.Name);

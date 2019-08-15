@@ -22,7 +22,8 @@ namespace BH.UI.Excel.Addin
         <tabs>
           <tab id='bhomTab' label='BHoM'>
             <group id='uninitialised' label='BHoM' getVisible='GetVisible'>
-              <button id='enableBtn' label='Enable BHoM' onAction='EnableBHom' getImage='GetImage' size='large'/>
+              <button id='enableBtn' label='Enable BHoM' onAction='EnableBHom' getImage='GetImage' size='large'
+                   supertip='Turn on the Buildings and Habitats Object Model for this session.'/>
             </group>
             {AddIn.GetRibbonXml()}
           </tab>
