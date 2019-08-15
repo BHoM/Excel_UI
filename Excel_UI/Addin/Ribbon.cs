@@ -51,6 +51,13 @@ namespace BH.UI.Excel.Addin
             return null;
         }
 
+        public string GetContent(IRibbonControl control)
+        {
+            Templates.CallerFormula caller = AddIn.GetCaller(control.Id);
+            if (caller != null) return caller.GetInnerRibbonXml();
+            return null;
+        }
+
         public bool GetVisible(IRibbonControl control)
         {
             if(control.Id == "uninitialised") return !AddIn.Enabled;
