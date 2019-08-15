@@ -137,10 +137,24 @@ namespace BH.UI.Excel.Templates
             return Caller.Run();
         }
         
-
         /*******************************************/
 
         public virtual string GetRibbonXml()
+        {
+            XmlDocument doc = new XmlDocument();
+            XmlElement menu = doc.CreateElement("dynamicMenu");
+            menu.SetAttribute("id", Caller.GetType().Name);
+            menu.SetAttribute("getImage", "GetImage");
+            menu.SetAttribute("label", MenuRoot);
+            menu.SetAttribute("screentip", MenuRoot);
+            menu.SetAttribute("supertip", Caller.Description);
+            menu.SetAttribute("getContent", "GetContent");
+            return menu.OuterXml;
+        }
+
+        /*******************************************/
+
+        public virtual string GetInnerRibbonXml()
         {
             Caller.SelectedItem = null;
             m_menu = SelectorMenuUtil.ISetExcelSelectorMenu(Caller.Selector);
@@ -151,11 +165,7 @@ namespace BH.UI.Excel.Templates
             XmlElement menu = root.FirstChild as XmlElement;
             if (menu == null) return "";
             menu.RemoveAllAttributes();
-            menu.SetAttribute("id", Caller.GetType().Name);
-            menu.SetAttribute("getImage", "GetImage");
-            menu.SetAttribute("label", MenuRoot);
-            menu.SetAttribute("screentip", MenuRoot);
-            menu.SetAttribute("supertip", Caller.Description);
+            menu.SetAttribute("xmlns", "http://schemas.microsoft.com/office/2006/01/customui");
             return root.InnerXml;
         }
 

@@ -68,18 +68,6 @@ namespace BH.UI.Excel
                 m_menus = new List<CommandBar>();
                 m_menus.Add(m_application.CommandBars["Cell"]);
 
-                Type callform = typeof(CallerFormula);
-
-                Type[] constrtypes = new Type[] { };
-                object[] args = new object[] { };
-
-                m_formulea = ExcelIntegration.GetExportedAssemblies()
-                    .SelectMany(a => a.GetTypes())
-                    .Where(t => t.Namespace == "BH.UI.Excel.Components"
-                                && callform.IsAssignableFrom(t))
-                    .Select(t => t.GetConstructor(constrtypes).Invoke(args) as CallerFormula)
-                    .ToDictionary(o => o.Caller.GetType().Name);
-
                 m_application.WorkbookOpenEvent += App_WorkbookOpen;
             }
             
@@ -224,18 +212,32 @@ namespace BH.UI.Excel
         /******* Private methods                            **************/
         /*****************************************************************/
 
+        private void InitCallers()
+        {
+            Type callform = typeof(CallerFormula);
+
+            Type[] constrtypes = new Type[] { };
+            object[] args = new object[] { };
+
+            m_formulea = ExcelIntegration.GetExportedAssemblies()
+                .SelectMany(a => a.GetTypes())
+                .Where(t => t.Namespace == "BH.UI.Excel.Components"
+                            && callform.IsAssignableFrom(t))
+                .Select(t => t.GetConstructor(constrtypes).Invoke(args) as CallerFormula)
+                .ToDictionary(o => o.Caller.GetType().Name);
+        }
 
         private void RegisterBHoMMethods()
         {
             try
             {
-                Compute.LoadAllAssemblies(Environment.GetEnvironmentVariable("APPDATA") + @"\BHoM\Assemblies");
-
-                var searcher = new FormulaSearchMenu(m_formulea);
+                var searcher = new FormulaSearchMenu(Formulea);
                 searcher.SetParent(null);
 
                 searcher.ItemSelected += Formula_ItemSelected;
                 globalSearch.ItemSelected += GlobalSearch_ItemSelected;
+
+
             }
             catch (Exception e)
             {
@@ -245,9 +247,9 @@ namespace BH.UI.Excel
 
         private void Formula_ItemSelected(object sender, oM.UI.ComponentRequest e)
         {
-            if (m_formulea.ContainsKey(e.CallerType.Name))
+            if (Formulea.ContainsKey(e.CallerType.Name))
             {
-                CallerFormula formula = m_formulea[e.CallerType.Name];
+                CallerFormula formula = Formulea[e.CallerType.Name];
                 formula.Caller.SetItem(e.SelectedItem);
                 formula.Run();
                 FlagUsed();
@@ -284,10 +286,11 @@ namespace BH.UI.Excel
         [ExcelCommand(ShortCut = "^B")]
         public static void InitGlobalSearch()
         {
+            if(globalSearch == null) globalSearch = new SearchMenu_WinForm();
             var control = new System.Windows.Forms.ContainerControl();
             globalSearch.SetParent(control);
         }
-        private static SearchMenu globalSearch = new SearchMenu_WinForm();
+        private static SearchMenu globalSearch = null;
         
         public static void EnableBHoM(Action<bool> callback)
         {
@@ -311,9 +314,9 @@ namespace BH.UI.Excel
 
         public static CallerFormula GetCaller(string caller)
         {
-            if (Instance.m_formulea.ContainsKey(caller))
+            if (Instance.Formulea.ContainsKey(caller))
             {
-                return Instance.m_formulea[caller];
+                return Instance.Formulea[caller];
             }
             return null;
         }
@@ -323,9 +326,9 @@ namespace BH.UI.Excel
         private void GlobalSearch_ItemSelected(object sender, oM.UI.ComponentRequest e)
         {
 
-            if (m_formulea.ContainsKey(e.CallerType.Name))
+            if (Formulea.ContainsKey(e.CallerType.Name))
             {
-                CallerFormula formula = m_formulea[e.CallerType.Name];
+                CallerFormula formula = Formulea[e.CallerType.Name];
                 formula.Caller.SetItem(e.SelectedItem);
                 formula.FillFormula();
             }
@@ -358,7 +361,7 @@ namespace BH.UI.Excel
             XmlDocument doc = new XmlDocument();
             XmlElement root = doc.CreateElement("root");
             doc.AppendChild(root);
-            foreach(CallerFormula caller in Instance.m_formulea.Values)
+            foreach(CallerFormula caller in Instance.Formulea.Values)
             {
                 try
                 {
@@ -406,5 +409,13 @@ namespace BH.UI.Excel
         }
 
         private static AddIn Instance { get; set; }
+
+        private Dictionary<string, CallerFormula> Formulea {
+            get
+            {
+                if(m_formulea == null) InitCallers();
+                return m_formulea;
+            }
+        }
     }
 }
