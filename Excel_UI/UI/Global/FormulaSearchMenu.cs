@@ -103,10 +103,14 @@ namespace BH.UI.Excel.Global
             var items = base.GetAllPossibleItems();
 
             // All Types
-            items.AddRange(Engine.Reflection.Query.BHoMTypeList()
-                                    .Select(x => new SearchItem {
-                                        Item = x, CallerType = typeof(CreateCustomCaller), Text = x.ToText(true)
-                                    }));
+            items.AddRange(Engine.Reflection.Query.BHoMTypeList().Select(x => new SearchItem
+            {
+                Item = x, CallerType = typeof(CreateCustomCaller), Text = x.ToText(true)
+            }));
+
+            items.AddRange(Engine.UI.Query.CreateRequestItems().Select(x => new SearchItem {
+                Item = x, CallerType = typeof(UI.Components.CreateRequestCaller), Text = x.ToText(true)
+            }));
 
             return items;
         }

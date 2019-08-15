@@ -40,7 +40,7 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new CreateRequestCaller();
 
-        public override string MenuRoot { get; } = "Create Query";
+        public override string MenuRoot { get; } = "Create Request";
 
         /*******************************************/
         /**** Constructors                      ****/
