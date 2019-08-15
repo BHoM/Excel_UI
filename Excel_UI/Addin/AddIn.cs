@@ -236,8 +236,6 @@ namespace BH.UI.Excel
 
                 searcher.ItemSelected += Formula_ItemSelected;
                 globalSearch.ItemSelected += GlobalSearch_ItemSelected;
-
-
             }
             catch (Exception e)
             {
@@ -286,11 +284,11 @@ namespace BH.UI.Excel
         [ExcelCommand(ShortCut = "^B")]
         public static void InitGlobalSearch()
         {
-            if(globalSearch == null) globalSearch = new SearchMenu_WinForm();
+
             var control = new System.Windows.Forms.ContainerControl();
             globalSearch.SetParent(control);
         }
-        private static SearchMenu globalSearch = null;
+        private static SearchMenu globalSearch = new SearchMenu_WinForm();
         
         public static void EnableBHoM(Action<bool> callback)
         {
@@ -325,7 +323,6 @@ namespace BH.UI.Excel
 
         private void GlobalSearch_ItemSelected(object sender, oM.UI.ComponentRequest e)
         {
-
             if (Formulea.ContainsKey(e.CallerType.Name))
             {
                 CallerFormula formula = Formulea[e.CallerType.Name];
