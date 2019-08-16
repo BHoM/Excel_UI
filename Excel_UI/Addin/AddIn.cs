@@ -235,6 +235,7 @@ namespace BH.UI.Excel
                 searcher.SetParent(null);
 
                 searcher.ItemSelected += Formula_ItemSelected;
+                globalSearch = new SearchMenu_WinForm();
                 globalSearch.ItemSelected += GlobalSearch_ItemSelected;
             }
             catch (Exception e)
@@ -288,7 +289,7 @@ namespace BH.UI.Excel
             var control = new System.Windows.Forms.ContainerControl();
             globalSearch.SetParent(control);
         }
-        private static SearchMenu globalSearch = new SearchMenu_WinForm();
+        private static SearchMenu globalSearch;
         
         public static void EnableBHoM(Action<bool> callback)
         {
