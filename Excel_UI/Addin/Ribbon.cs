@@ -26,6 +26,11 @@ namespace BH.UI.Excel.Addin
                    supertip='Turn on the Buildings and Habitats Object Model for this session.'/>
             </group>
             {AddIn.GetRibbonXml()}
+            <group id='help' label='Help'>
+                <button id='xlwiki' onAction='OpenLink' size='large' label='BHoM Excel Wiki' imageMso='Help' tag='https://github.com/BHoM/Excel_Toolkit/wiki' supertip='Go to the BHoM Excel plugin wiki to view help documentation relating to this plugin' />
+                <button id='mainwiki' onAction='OpenLink' label='BHoM Wiki' imageMso='Help' tag='https://github.com/BHoM/documentation/wiki' supertip='Go to the core BHoM wiki to view documentation relating the BHoM' />
+                <button id='bhomxyz' onAction='OpenLink' imageMso='GetExternalDataFromWeb' label='bhom.xyz' tag='https://bhom.xyz' supertip='Visit the BHoM website' />
+            </group>
           </tab>
         </tabs>
       </ribbon>
@@ -75,6 +80,11 @@ namespace BH.UI.Excel.Addin
             Templates.CallerFormula caller = AddIn.GetCaller(control.Tag);
             if (caller == null) return;
             caller.Select(control.Id);
+        }
+
+        public void OpenLink(IRibbonControl control)
+        {
+            System.Diagnostics.Process.Start(control.Tag);
         }
     }
 }
