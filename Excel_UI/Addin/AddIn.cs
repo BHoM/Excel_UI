@@ -66,7 +66,11 @@ namespace BH.UI.Excel
             using (Engine.Excel.Profiling.Timer timer = new Engine.Excel.Profiling.Timer("open"))
             {
                 m_menus = new List<CommandBar>();
-                m_menus.Add(m_application.CommandBars["Cell"]);
+                foreach (CommandBar commandBar in m_application.CommandBars)
+                {
+                    if (commandBar.Name == "Cell" || commandBar.Name.Contains("List Range"))
+                        m_menus.Add(commandBar);
+                }
 
                 m_application.WorkbookOpenEvent += App_WorkbookOpen;
             }
