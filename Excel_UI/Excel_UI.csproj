@@ -199,9 +199,11 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetPath)"  "$(APPDATA)\BHoM\Assemblies" /C /Y
+
 
 xcopy "$(TargetDir)*.xll"  "$(APPDATA)\BHoM\Assemblies" /C /Y
+
 
 xcopy "$(TargetDir)*.dna"  "$(APPDATA)\BHoM\Assemblies" /C /Y</PostBuildEvent>
   </PropertyGroup>
