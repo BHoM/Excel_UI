@@ -34,17 +34,20 @@
     <Reference Include="BHoM">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\BHoM\Build\BHoM.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="BHoM_Adapter">
       <HintPath>..\..\BHoM_Adapter\Build\BHoM_Adapter.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="BHoM_UI">
       <HintPath>..\..\BHoM_UI\Build\BHoM_UI.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Data_oM, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\BHoM\Build\Data_oM.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="ExcelApi, Version=1.7.3.0, Culture=neutral, PublicKeyToken=26cf6d85ba68fa54, processorArchitecture=MSIL">
       <HintPath>..\packages\NetOffice.Excel.1.7.4.4\lib\net45\ExcelApi.dll</HintPath>
@@ -72,10 +75,11 @@
     <Reference Include="Reflection_Engine">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\BHoM_Engine\Build\Reflection_Engine.dll</HintPath>
-      <Private>True</Private>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Reflection_oM">
       <HintPath>..\..\BHoM\Build\Reflection_oM.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="Serialiser_Engine">
       <SpecificVersion>False</SpecificVersion>
@@ -99,9 +103,11 @@
     <Reference Include="UI_oM">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\BHoM_UI\Build\UI_oM.dll</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="UI_PostBuild">
       <HintPath>..\..\BHoM_UI\Build\UI_PostBuild.exe</HintPath>
+      <Private>False</Private>
     </Reference>
     <Reference Include="VBIDEApi, Version=1.7.3.0, Culture=neutral, PublicKeyToken=a3637beacf571e8a, processorArchitecture=MSIL">
       <HintPath>..\packages\NetOffice.Core.1.7.4.4\lib\net45\VBIDEApi.dll</HintPath>
