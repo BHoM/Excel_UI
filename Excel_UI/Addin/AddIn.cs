@@ -79,14 +79,14 @@ namespace BH.UI.Excel
 
         private void AddInternalise()
         {
-            foreach (var cmb in m_menus)
+            m_btns = m_menus.Select((menu, i) =>
             {
-                var btn = cmb.Controls.Add(MsoControlType.msoControlButton,null,null,null, true) as CommandBarButton; 
-                btn.Tag = "Internalise_Data";
+                var btn = menu.Controls.Add(MsoControlType.msoControlButton, null, null, null, true) as CommandBarButton;
+                btn.Tag = "Internalise_Data" + i;
                 btn.Caption = "Internalise Data";
                 btn.ClickEvent += Internalise_Click;
-                btn.Dispose(false);
-            }
+                return btn;
+            }).ToList();
         }
 
         private void Internalise_Click(CommandBarButton Ctrl, ref bool CancelDefault)
@@ -313,6 +313,8 @@ namespace BH.UI.Excel
 
         
         private bool initialised = false;
+        private IEnumerable<CommandBarButton> m_btns;
+
         public static bool Enabled { get { return Instance.initialised; } }
 
         public static CallerFormula GetCaller(string caller)
