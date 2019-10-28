@@ -223,7 +223,7 @@ namespace BH.UI.Excel
                     if (kvp.Value is BHoMAdapter)
                     {
                         // Don't serialise adapters, they don't deserialise
-                        Compute.RecordWarning("BHoMAdapter types canned be serialised");
+                        Engine.Reflection.Compute.RecordWarning("BHoMAdapter types canned be serialised");
                         continue;
                     }
                     else
@@ -268,7 +268,7 @@ namespace BH.UI.Excel
                 }
                 catch (Exception e)
                 {
-                    Compute.RecordError(e.Message);
+                    Engine.Reflection.Compute.RecordError(e.Message);
                 }
             }
         }
