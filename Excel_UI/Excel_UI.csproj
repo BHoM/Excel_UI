@@ -137,7 +137,6 @@
     <Compile Include="UI\Components\Adapter\Move.cs" />
     <Compile Include="UI\Components\Adapter\Pull.cs" />
     <Compile Include="UI\Components\Adapter\Push.cs" />
-    <Compile Include="UI\Components\Adapter\UpdateProperty.cs" />
     <Compile Include="UI\Components\Engine\Compute.cs" />
     <Compile Include="UI\Components\Engine\Convert.cs" />
     <Compile Include="UI\Components\Engine\Explode.cs" />
