@@ -39,14 +39,14 @@ namespace BH.UI.Excel.Templates
         /**** Public Methods                    ****/
         /*******************************************/
 
-        public static IExcelSelectorMenu ISetExcelSelectorMenu(ISelector selector)
+        public static IExcelSelectorMenu ISetExcelSelectorMenu(IItemSelector selector)
         {
             return SetExcelSelectorMenu(selector as dynamic);
         }
 
         /*******************************************/
 
-        public static IExcelSelectorMenu SetExcelSelectorMenu<T>(Selector<T> selector)
+        public static IExcelSelectorMenu SetExcelSelectorMenu<T>(ItemSelector<T> selector)
         {
             var menu = new SelectorMenu_RibbonXml<T>();
             selector.SetSelectorMenu(menu);

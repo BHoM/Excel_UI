@@ -36,7 +36,7 @@ using System.Xml;
 
 namespace BH.UI.Excel.Templates
 {
-    public class SelectorMenu_RibbonXml<T> : SelectorMenu<T, XmlElement>, IExcelSelectorMenu
+    public class SelectorMenu_RibbonXml<T> : ItemSelectorMenu<T, XmlElement>, IExcelSelectorMenu
     {
         /*******************************************/
         /**** Properties                        ****/
