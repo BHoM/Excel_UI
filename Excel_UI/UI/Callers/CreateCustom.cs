@@ -26,18 +26,14 @@ namespace BH.UI.Excel.Callers
 
         public override object Run(object[] inputs)
         {
-            IObject obj = new CustomObject();
-            if (ForcedType != null)
-                obj = Activator.CreateInstance(ForcedType) as IObject;
-            if (obj == null)
-                obj = new CustomObject();
+            CustomObject obj = new CustomObject();
 
             List<string> props = inputs[0] as List<string>;
             List<object> values = inputs[1] as List<object>;
             if (props.Count == values.Count)
             {
                 for (int i = 0; i < props.Count; i++)
-                    Engine.Reflection.Modify.SetPropertyValue(obj, props[i], values[i]);
+                    obj.CustomData[InputParams[i].Name] = inputs[i];
             }
 
             return obj;

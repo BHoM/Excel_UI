@@ -38,21 +38,6 @@ namespace BH.UI.Excel.Components
         /**** Properties                        ****/
         /*******************************************/
 
-        public override string Name
-        {
-            get
-            {
-                Type t = Caller.SelectedItem as Type;
-                if (t != null)
-                {
-                    string ns = t.Namespace;
-                    if (ns.StartsWith("BH")) ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
-                    return "CreateCustom." + ns + "." + t.ToText(genericStart: "?",genericSeparator:"_",genericEnd:"");
-                }
-                return base.Name;
-            }
-        }
-
         public override Caller Caller { get; } = new CreateCustomCaller();
 
         public override string MenuRoot { get; } = "Create Custom";
