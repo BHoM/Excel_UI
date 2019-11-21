@@ -32,7 +32,7 @@ using System.Collections.Generic;
 
 namespace BH.UI.Excel.Components
 {
-    public class CreateCustomFormula : CallerFormula
+    public class CreateCustomFormula : SingleOptionCallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/
@@ -42,6 +42,7 @@ namespace BH.UI.Excel.Components
 
         public override string MenuRoot { get; } = "Create Custom";
 
+        public override string Name { get; } = "Create.CustomObject";
         public override string Function => Name;
 
         /*******************************************/

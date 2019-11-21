@@ -1,4 +1,5 @@
-﻿using BH.oM.Base;
+﻿using BH.Engine.Reflection;
+using BH.oM.Base;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -33,7 +34,7 @@ namespace BH.UI.Excel.Callers
             if (props.Count == values.Count)
             {
                 for (int i = 0; i < props.Count; i++)
-                    obj.CustomData[InputParams[i].Name] = inputs[i];
+                    obj.SetPropertyValue(props[i], values[i]);
             }
 
             return obj;
