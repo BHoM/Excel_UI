@@ -30,7 +30,7 @@ using System.Collections.Generic;
 
 namespace BH.UI.Excel.Components
 {
-    public class DeleteFormula : SingleOptionCallerFormula
+    public class RemoveFormula : SingleOptionCallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/
@@ -38,13 +38,13 @@ namespace BH.UI.Excel.Components
 
         public override string Name => "Adapter." + Caller.Name;
 
-        public override Caller Caller { get; } = new DeleteCaller();
+        public override Caller Caller { get; } = new RemoveCaller();
 
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/
 
-        public DeleteFormula() : base()
+        public RemoveFormula() : base()
         { 
             Caller.SetDataAccessor(new CacheingDataAccessor());
         }
