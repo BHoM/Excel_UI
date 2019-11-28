@@ -132,7 +132,7 @@
     <Compile Include="UI\Callers\CreateCustom.cs" />
     <Compile Include="UI\Components\Adapter\CreateAdapter.cs" />
     <Compile Include="UI\Components\Adapter\CreateRequest.cs" />
-    <Compile Include="UI\Components\Adapter\Delete.cs" />
+    <Compile Include="UI\Components\Adapter\Remove.cs" />
     <Compile Include="UI\Components\Adapter\Execute.cs" />
     <Compile Include="UI\Components\Adapter\Move.cs" />
     <Compile Include="UI\Components\Adapter\Pull.cs" />
