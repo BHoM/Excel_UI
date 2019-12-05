@@ -63,6 +63,15 @@ namespace BH.UI.Excel.Components
             }
         }
 
+        public override string Function
+        {
+            get
+            {
+                if (Caller.SelectedItem is Type) return $"{Name}?by_Properties";
+                return base.Function;
+            }
+        }
+
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/
