@@ -74,6 +74,10 @@ namespace BH.UI.Excel.Templates
             {
                 DateTime date = DateTime.FromOADate((double)item);
             }
+            if (type == typeof(Guid) && item is string)
+            {
+                return (T)(Guid.Parse(item as string) as dynamic);
+            }
 
             // Can't always cast directly to T from object storage type even
             // when the actual type as castable to T. So have to use `as
