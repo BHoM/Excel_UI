@@ -73,6 +73,7 @@ namespace BH.UI.Excel.Templates
             if (type == typeof(DateTime) && item is double)
             {
                 DateTime date = DateTime.FromOADate((double)item);
+                return (T)(date as dynamic);
             }
             if (type == typeof(Guid) && item is string)
             {
