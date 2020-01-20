@@ -181,43 +181,59 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
-        public override bool SetDataItem<T>(int index, T data)
+        public object ToExcel(object data)
         {
             try
             {
+                if(data == null)
+                {
+                    return ExcelError.ExcelErrorNull;
+                }
                 if (data.GetType().IsPrimitive || data is string || data is object[,])
                 {
-                    output = data;
-                    return true;
+                    return data;
                 }
                 if (data is Guid)
                 {
-                    return SetDataItem(index, data.ToString());
+                    return data.ToString();
                 }
                 if (data is IEnumerable && !(data is ICollection))
                 {
-                    return SetDataItem(index, (data as IEnumerable).Cast<object>().ToList());
+                    return ToExcel((data as IEnumerable).Cast<object>().ToList());
                 }
                 if (data.GetType().IsEnum)
                 {
-                    return SetDataItem(index, Enum.GetName(data.GetType(), data));
+                    return Enum.GetName(data.GetType(), data);
                 }
                 if (data is DateTime)
                 {
                     DateTime? date = data as DateTime?;
                     if (date.HasValue)
                     {
-                        return SetDataItem(index, date.Value.ToOADate());
+                        return date.Value.ToOADate();
                     }
                 }
-                return SetDataItem(index,
-                    data.GetType().ToText() + " [" + Project.ActiveProject.IAdd(data) + "]"
-                );
-            } catch
-            {
-                output = ExcelError.ExcelErrorNA;
-                return false;
+                return data.GetType().ToText() + " [" + Project.ActiveProject.IAdd(data) + "]";
+
             }
+            catch
+            {
+                return ExcelError.ExcelErrorValue;
+            }
+        }
+        
+        /*******************************************/
+
+        public override bool SetDataItem<T>(int index, T data)
+        {
+            if (output.Length <= index)
+            {
+                var resized = new object[index + 1];
+                output.CopyTo(resized, 0);
+                output = resized;
+            }
+            output[index] = data;
+            return true;
         }
 
         /*******************************************/
@@ -284,11 +300,11 @@ namespace BH.UI.Excel.Templates
                 Engine.Excel.Query.Caller().SetNote("");
             }
 
-            if (output == null)
+            if (output.Length == 1)
             {
-                return ExcelError.ExcelErrorNull;
+                return output[0];
             }
-            return output;
+            return output.ToList();
         }
 
         /*******************************************/
@@ -296,7 +312,7 @@ namespace BH.UI.Excel.Templates
         public virtual void ResetOutput()
         {
             Engine.Excel.Query.Caller().SetNote("");
-            output = null;
+            output = new object[] { null };
         }
 
         /*******************************************/
@@ -311,7 +327,7 @@ namespace BH.UI.Excel.Templates
             //     accessor.StoreDefaults(defaults);
             //     accessor.Store( new [] {a, b, c, ...} );
             //     action();
-            //     return accessor.GetOutput();
+            //     return ToExcel(accessor.GetOutput());
             // }
 
 
@@ -358,6 +374,13 @@ namespace BH.UI.Excel.Templates
                 returnMethod      // object GetOutput()
             );
 
+            MethodInfo convertMethod = accessorType.GetMethod("ToExcel");
+            Expression convertCall = Expression.Call(
+                accessorInstance,
+                convertMethod,    // object ToExcel(object)
+                returnCall
+            );
+
             // Chain them together
             Expression tree = Expression.Block(
                 storeDefCall,
@@ -366,7 +389,7 @@ namespace BH.UI.Excel.Templates
                     actionCall,
                     Expression.Empty()
                 ),
-                returnCall
+                convertCall
             );
             LambdaExpression lambda = Expression.Lambda(tree, lambdaParams);
 
@@ -493,7 +516,7 @@ namespace BH.UI.Excel.Templates
 
         private object[] inputs;
         private object[] defaults;
-        private object output;
+        private object[] output = new object[] { null };
     }
 }
 
