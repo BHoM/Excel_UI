@@ -60,6 +60,7 @@
     <Compile Include="Compute\Contents.cs" />
     <Compile Include="Compute\Note.cs" />
     <Compile Include="Query\GetFilename.cs" />
+    <Compile Include="Query\Formula.cs" />
     <Compile Include="Timer.cs" />
     <Compile Include="Compute\NumberFormat.cs" />
     <Compile Include="Create\Reference.cs" />

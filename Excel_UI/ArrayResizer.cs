@@ -22,6 +22,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using ExcelDna.Integration;
 
 namespace BH.UI.Excel
@@ -91,53 +92,15 @@ namespace BH.UI.Excel
 
             var t = target = new ExcelReference(caller.RowFirst, rowLast, caller.ColumnFirst, columnLast, caller.SheetId);
 
+            ExcelReference firstCell = new ExcelReference(target.RowFirst, target.RowFirst, target.ColumnFirst, target.ColumnFirst, target.SheetId);
+
             // TODO: Add some kind of guard for ever-changing result?
             ExcelAsyncUtil.QueueAsMacro(() =>
             {
                 // Create a reference of the right size
                 DoResize(t); // Will trigger a recalc by writing formula
             });
-            // Return what we have - to prevent flashing #N/A
-            return array;
-        }
 
-        public static double[,] ResizeDoubles(double[,] array)
-        {
-            var caller = Excel(xlfCaller) as ExcelReference;
-            if (caller == null)
-                return array;
-
-            int rows = array.GetLength(0);
-            int columns = array.GetLength(1);
-
-            if (rows == 0 || columns == 0)
-                return array;
-
-            if ((caller.RowLast - caller.RowFirst + 1 == rows) &&
-                (caller.ColumnLast - caller.ColumnFirst + 1 == columns))
-            {
-                // Size is already OK - just return result
-                return array;
-            }
-
-            var rowLast = caller.RowFirst + rows - 1;
-            var columnLast = caller.ColumnFirst + columns - 1;
-
-            if (rowLast > ExcelDnaUtil.ExcelLimits.MaxRows - 1 ||
-                columnLast > ExcelDnaUtil.ExcelLimits.MaxColumns - 1)
-            {
-                // Can't resize - goes beyond the end of the sheet - just return null (for #NUM!)
-                // (Can't give message here, or change cells)
-                return null;
-            }
-
-            // TODO: Add guard for ever-changing result?
-            ExcelAsyncUtil.QueueAsMacro(() =>
-            {
-                // Create a reference of the right size
-                var target = new ExcelReference(caller.RowFirst, rowLast, caller.ColumnFirst, columnLast, caller.SheetId);
-                DoResize(target); // Will trigger a recalc by writing formula
-            });
             // Return what we have - to prevent flashing #N/A
             return array;
         }

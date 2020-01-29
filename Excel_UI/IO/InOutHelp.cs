@@ -44,8 +44,7 @@ namespace BH.UI.Excel
 
         public static object ReturnTypeHelper(this object obj)
         {
-            var acc = new Templates.FormulaDataAccessor();
-            return acc.ToExcel(obj);
+            return Templates.FormulaDataAccessor.ToExcel(obj);
         }
 
         /*****************************************************************/
