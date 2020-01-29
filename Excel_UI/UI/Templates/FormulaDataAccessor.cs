@@ -34,6 +34,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using BH.Engine.Reflection;
 using BH.Engine.Excel;
+using System.Text.RegularExpressions;
 
 namespace BH.UI.Excel.Templates
 {
@@ -181,7 +182,7 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
-        public object ToExcel(object data)
+        public static object ToExcel(object data)
         {
             try
             {
@@ -226,13 +227,21 @@ namespace BH.UI.Excel.Templates
 
         public override bool SetDataItem<T>(int index, T data)
         {
-            if (output.Length <= index)
+            if (data is object[,])
             {
-                var resized = new object[index + 1];
-                output.CopyTo(resized, 0);
+                output = data as object[,];
+                return true;
+            }
+            if (output.GetLength(1) <= index)
+            {
+                var resized = new object[1,index + 1];
+                for (int i = 0; i < output.GetLength(1); i++)
+                {
+                    resized[0, i] = output[0,i];
+                }
                 output = resized;
             }
-            output[index] = data;
+            output[0,index] = ToExcel(data);
             return true;
         }
 
@@ -290,21 +299,23 @@ namespace BH.UI.Excel.Templates
             // Retrieve the output from this DataAccessor
             var errors = Engine.Reflection.Query.CurrentEvents()
                 .Where(e => e.Type == oM.Reflection.Debugging.EventType.Error);
-            if (errors.Count() > 0) {
+            if (errors.Count() > 0)
+            {
                 string msg = errors
                     .Select(e => e.Message)
                     .Aggregate((a, b) => a + "\n" + b);
                 Engine.Excel.Query.Caller().SetNote(msg);
-            } else
+            }
+            else
             {
                 Engine.Excel.Query.Caller().SetNote("");
             }
 
-            if (output.Length == 1)
+            if (output.GetLength(0) == 1 && output.GetLength(1) == 1)
             {
-                return output[0];
+                return output[0, 0];
             }
-            return output.ToList();
+            return ArrayResizer.Resize(output);
         }
 
         /*******************************************/
@@ -312,7 +323,7 @@ namespace BH.UI.Excel.Templates
         public virtual void ResetOutput()
         {
             Engine.Excel.Query.Caller().SetNote("");
-            output = new object[] { null };
+            output = new object[,] { { ExcelError.ExcelErrorNull } };
         }
 
         /*******************************************/
@@ -374,13 +385,6 @@ namespace BH.UI.Excel.Templates
                 returnMethod      // object GetOutput()
             );
 
-            MethodInfo convertMethod = accessorType.GetMethod("ToExcel");
-            Expression convertCall = Expression.Call(
-                accessorInstance,
-                convertMethod,    // object ToExcel(object)
-                returnCall
-            );
-
             // Chain them together
             Expression tree = Expression.Block(
                 storeDefCall,
@@ -389,7 +393,7 @@ namespace BH.UI.Excel.Templates
                     actionCall,
                     Expression.Empty()
                 ),
-                convertCall
+                returnCall
             );
             LambdaExpression lambda = Expression.Lambda(tree, lambdaParams);
 
@@ -516,6 +520,6 @@ namespace BH.UI.Excel.Templates
 
         private object[] inputs;
         private object[] defaults;
-        private object[] output = new object[] { null };
+        private object[,] output = new object[,] { { null } };
     }
 }

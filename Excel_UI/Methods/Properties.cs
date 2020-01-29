@@ -85,7 +85,7 @@ namespace BH.UI.Excel.Methods
                 }
 
                 //Output the values as an array
-                return ArrayResizer.Resize(outArr);
+                return outArr;
                 //return ArrayResizer.Resize( outArr);
             }
             else
@@ -104,8 +104,7 @@ namespace BH.UI.Excel.Methods
                     }
                 }
 
-                return ArrayResizer.Resize(outArr);
-                //return ArrayResizer.Resize( outArr);
+                return outArr;
             }
         }
 
@@ -119,7 +118,7 @@ namespace BH.UI.Excel.Methods
             List<Dictionary<string, object>> props = new List<Dictionary<string, object>>();
             foreach (object obj in objs)
             {
-                if (obj is IEnumerable)
+                if (obj is IEnumerable && ! (obj is string) )
                 {
                     props.AddRange(GetPropertyDictionaries((obj as IEnumerable).Cast<object>().ToList(), goDeep));
                 } else
@@ -139,6 +138,11 @@ namespace BH.UI.Excel.Methods
 
         private static void GetPropertyDictionary(ref Dictionary<string,object> dict, object obj, bool goDeep = false, string parentType = "")
         {
+            if (obj.GetType().IsPrimitive || obj is string)
+            {
+                dict = new Dictionary<string, object> { { "Value", obj } };
+                return;
+            }
             if (!goDeep)
             {
                 dict = obj.PropertyDictionary();
