@@ -329,7 +329,7 @@ namespace BH.UI.Excel
 
         private void GlobalSearch_ItemSelected(object sender, oM.UI.ComponentRequest e)
         {
-            if (Formulea.ContainsKey(e.CallerType.Name))
+            if (e != null && e.CallerType != null && Formulea.ContainsKey(e.CallerType.Name))
             {
                 CallerFormula formula = Formulea[e.CallerType.Name];
                 formula.Caller.SetItem(e.SelectedItem);
