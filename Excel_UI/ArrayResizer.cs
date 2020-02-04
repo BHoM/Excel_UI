@@ -33,12 +33,6 @@ namespace BH.UI.Excel
 
         public static object Resize(object[] array)
         {
-            ExcelReference target;
-            return Resize(array, out target);
-        }
-
-        public static object Resize(object[] array, out ExcelReference target)
-        {
             object[,] largeArr = new object[1, array.Length];
 
             for (int i = 0; i < array.Length; i++)
@@ -46,22 +40,16 @@ namespace BH.UI.Excel
                 largeArr[0, i] = array[i];
             }
 
-            return Resize(largeArr, out target);
+            return Resize(largeArr);
 
-        }
-
-        public static object Resize(object[,] array)
-        {
-            ExcelReference target;
-            return Resize(array, out target);
         }
 
         // This function will run in the UDF context.
         // Needs extra protection to allow multithreaded use.
-        public static object Resize(object[,] array, out ExcelReference target)
+        public static object Resize(object[,] array)
         {
             var caller = Excel(xlfCaller) as ExcelReference;
-            target = caller;
+            var target = caller;
             if (caller == null)
                 return array;
 
