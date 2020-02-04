@@ -83,8 +83,17 @@ namespace BH.UI.Excel.Templates
                         worksheet = cell.Worksheet;
                         if (worksheet.Name == "BHoM_ValidationHidden")
                         {
-                            ExcelReference target;
-                            Caller.DataAccessor.SetDataItem(0, ArrayResizer.Resize(options, out target));
+                            ExcelReference target = xlref;
+                            if((xlref.ColumnLast - xlref.ColumnFirst) + 1 != options.Length)
+                            {
+                                target = new ExcelReference(xlref.RowFirst, xlref.RowFirst, xlref.ColumnFirst, options.Length - 1, xlref.SheetId);
+                            }
+                            var opt_array = new object[1, options.Length];
+                            for (int i = 0; i < options.Length; i++)
+                            {
+                                opt_array[0, i] = options[i];
+                            }
+                            Caller.DataAccessor.SetDataItem(0, opt_array);
                             ExcelAsyncUtil.QueueAsMacro(() =>
                             {
                                 try
