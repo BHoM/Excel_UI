@@ -43,9 +43,10 @@ namespace BH.UI.Excel.Methods
 
         [ExcelFunction(Description = "Get all properties from an object. WARNING This is an array formula and will take up more than one cell!", Category = "BHoM")]
         public static object Explode(
-                [ExcelArgument(Name = "object ids")] List<object> objects,
+                [ExcelArgument(Name = "Objects")] List<object> objects,
                 [ExcelArgument(Name = "Include the name of the properties")] bool includePropertyNames = false,
-                [ExcelArgument(Name = "Explode inner objects")] bool goDeep = false)
+                [ExcelArgument(Name = "Explode inner objects")] bool goDeep = false,
+                [ExcelArgument(Name = "Transpose")] bool transpose = false)
         {
             Engine.Reflection.Compute.ClearCurrentEvents();
 
@@ -60,11 +61,11 @@ namespace BH.UI.Excel.Methods
 
             if (props.Count < 1)
                 return "Failed to get properties";
-
+            object[,] outArr;
             if (includePropertyNames)
             {
                 //Create an 2d array to contain property names and values
-                object[,] outArr = new object[props.Count +1 , props[0].Count];
+                outArr = new object[props.Count +1 , props[0].Count];
                 int counter = 0;
 
                 foreach (KeyValuePair<string, object> kvp in props[0])
@@ -84,14 +85,11 @@ namespace BH.UI.Excel.Methods
                     }
                 }
 
-                //Output the values as an array
-                return outArr;
-                //return ArrayResizer.Resize( outArr);
             }
             else
             {
                 //Create an object array to contain the property values
-                object[,] outArr = new object[props.Count, props[0].Count];
+                outArr = new object[props.Count, props[0].Count];
 
 
                 for (int i = 0; i < props.Count; i++)
@@ -104,8 +102,27 @@ namespace BH.UI.Excel.Methods
                     }
                 }
 
-                return outArr;
             }
+            
+            if(transpose)
+            {
+                outArr = Transpose(outArr);
+            }
+            //Output the values as an array
+            return ArrayResizer.Resize(outArr);
+        }
+        private static object[,] Transpose(object[,] arr) 
+        {
+            int width = arr.GetLength(0);
+            int height = arr.GetLength(1);
+            object[,] transposed = new object[height, width];
+            for(int i = 0; i < width*height; i++)
+            {
+                int x = i % width;
+                int y = i / width;
+                transposed[y, x] = arr[x, y];
+            }
+            return transposed;
         }
 
         /*****************************************************************/

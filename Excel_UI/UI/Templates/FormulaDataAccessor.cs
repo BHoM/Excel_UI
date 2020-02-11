@@ -227,21 +227,11 @@ namespace BH.UI.Excel.Templates
 
         public override bool SetDataItem<T>(int index, T data)
         {
-            if (data is object[,])
+            if (output.Length <= index)
             {
-                output = data as object[,];
-                return true;
+                Array.Resize(ref output, index + 1);
             }
-            if (output.GetLength(1) <= index)
-            {
-                var resized = new object[1,index + 1];
-                for (int i = 0; i < output.GetLength(1); i++)
-                {
-                    resized[0, i] = output[0,i];
-                }
-                output = resized;
-            }
-            output[0,index] = ToExcel(data);
+            output[index] = ToExcel(data);
             return true;
         }
 
@@ -311,11 +301,15 @@ namespace BH.UI.Excel.Templates
                 Engine.Excel.Query.Caller().SetNote("");
             }
 
-            if (output.GetLength(0) == 1 && output.GetLength(1) == 1)
+            if(output.Length == 0)
             {
-                return output[0, 0];
+                return ExcelError.ExcelErrorNull;
             }
-            return ArrayResizer.Resize(output);
+            if (output.Length == 1)
+            {
+                return output[0];
+            }
+            return ToExcel(output.ToList());
         }
 
         /*******************************************/
@@ -323,7 +317,7 @@ namespace BH.UI.Excel.Templates
         public virtual void ResetOutput()
         {
             Engine.Excel.Query.Caller().SetNote("");
-            output = new object[,] { { ExcelError.ExcelErrorNull } };
+            output = new object[] { ExcelError.ExcelErrorNull };
         }
 
         /*******************************************/
@@ -520,7 +514,7 @@ namespace BH.UI.Excel.Templates
 
         private object[] inputs;
         private object[] defaults;
-        private object[,] output = new object[,] { { null } };
+        private object[] output = new object[] { ExcelError.ExcelErrorNull };
     }
 }
 
