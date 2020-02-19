@@ -36,6 +36,10 @@ namespace BH.UI.Excel.Templates
 {
     public abstract class CallerValueListFormula : CallerFormula
     {
+        /*******************************************/
+        /**** Properties                        ****/
+        /*******************************************/
+
         public MultiChoiceCaller MultiChoiceCaller
         {
             get
@@ -44,10 +48,18 @@ namespace BH.UI.Excel.Templates
             }
         }
 
+        /*******************************************/
+        /**** Constructors                      ****/
+        /*******************************************/
+
         public CallerValueListFormula() : base()
         {
 
         }
+
+        /*******************************************/
+        /**** Public Methods                    ****/
+        /*******************************************/
 
         public override bool Run()
         {
@@ -188,7 +200,7 @@ namespace BH.UI.Excel.Templates
             return success;
         }
 
-        protected abstract List<string> GetChoices();
+        /*******************************************/
 
         public override void FillFormula()
         {
@@ -208,5 +220,13 @@ namespace BH.UI.Excel.Templates
                     cell.Dispose();
             }
         }
+
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
+
+        protected abstract List<string> GetChoices();
+
+        /*******************************************/
     }
 }

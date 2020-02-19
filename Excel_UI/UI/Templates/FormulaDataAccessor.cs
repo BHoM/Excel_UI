@@ -55,10 +55,10 @@ namespace BH.UI.Excel.Templates
         public override T GetDataItem<T>(int index)
         {
             Type type = typeof(T);
-            object item = inputs[index];
+            object item = m_inputs[index];
 
             if (item is ExcelEmpty || item is ExcelMissing) {
-                object def = defaults[index];
+                object def = m_defaults[index];
                 return def == null ? default(T) : (T)(def as dynamic);
             }
             if (item is object[,])
@@ -91,10 +91,10 @@ namespace BH.UI.Excel.Templates
 
         public override List<T> GetDataList<T>(int index)
         {
-            object item = inputs[index];
+            object item = m_inputs[index];
             if (IsBlankOrError<T>(item))
             {
-                return defaults[index] as List<T>;
+                return m_defaults[index] as List<T>;
             }
             if (item is List<T>)
             {
@@ -124,10 +124,10 @@ namespace BH.UI.Excel.Templates
 
         public override List<List<T>> GetDataTree<T>(int index)
         {
-            object item = inputs[index];
+            object item = m_inputs[index];
             if (IsBlankOrError<T>(item))
             {
-                return defaults[index] as List<List<T>>;
+                return m_defaults[index] as List<List<T>>;
             }
             if (item is List<List<T>>)
             {
@@ -227,11 +227,11 @@ namespace BH.UI.Excel.Templates
 
         public override bool SetDataItem<T>(int index, T data)
         {
-            if (output.Length <= index)
+            if (m_output.Length <= index)
             {
-                Array.Resize(ref output, index + 1);
+                Array.Resize(ref m_output, index + 1);
             }
-            output[index] = ToExcel(data);
+            m_output[index] = ToExcel(data);
             return true;
         }
 
@@ -264,7 +264,7 @@ namespace BH.UI.Excel.Templates
         {
             // Collect default values from ParamInfo so defaultable
             // arguments can be ommited in excel
-            defaults = params_;
+            m_defaults = params_;
         }
 
         /*******************************************/
@@ -273,10 +273,10 @@ namespace BH.UI.Excel.Templates
         {
             // Store some inputs in this DataAccessor
             // convert Guid strings to objects
-            inputs = new object[in_.Length];
+            m_inputs = new object[in_.Length];
             for (int i = 0; i < in_.Length; i++)
             {
-                inputs[i] = Evaluate(in_[i]);
+                m_inputs[i] = Evaluate(in_[i]);
             }
             ResetOutput();
             return true;
@@ -301,15 +301,15 @@ namespace BH.UI.Excel.Templates
                 Engine.Excel.Query.Caller().SetNote("");
             }
 
-            if(output.Length == 0)
+            if(m_output.Length == 0)
             {
                 return ExcelError.ExcelErrorNull;
             }
-            if (output.Length == 1)
+            if (m_output.Length == 1)
             {
-                return output[0];
+                return m_output[0];
             }
-            return ToExcel(output.ToList());
+            return ToExcel(m_output.ToList());
         }
 
         /*******************************************/
@@ -317,7 +317,7 @@ namespace BH.UI.Excel.Templates
         public virtual void ResetOutput()
         {
             Engine.Excel.Query.Caller().SetNote("");
-            output = new object[] { ExcelError.ExcelErrorNull };
+            m_output = new object[] { ExcelError.ExcelErrorNull };
         }
 
         /*******************************************/
@@ -514,9 +514,11 @@ namespace BH.UI.Excel.Templates
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private object[] inputs;
-        private object[] defaults;
-        private object[] output = new object[] { ExcelError.ExcelErrorNull };
+        private object[] m_output = new object[] { ExcelError.ExcelErrorNull };
+        private object[] m_inputs;
+        private object[] m_defaults;
+
+        /*******************************************/
     }
 }
 

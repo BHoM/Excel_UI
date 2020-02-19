@@ -53,7 +53,17 @@ namespace BH.UI.Excel.Templates
         }
 
         /*******************************************/
-        /**** Protected Methods                 ****/
+        /**** Public Methods                    ****/
+        /*******************************************/
+
+        public void Select(string id)
+        {
+            if(m_ItemLinks.ContainsKey(id))
+                ReturnSelectedItem(m_ItemLinks[id]);
+        }
+
+        /*******************************************/
+        /**** Private Methods                   ****/
         /*******************************************/
 
         protected override void AddSearchBox(XmlElement menu, List<SearchItem> itemList)
@@ -68,8 +78,6 @@ namespace BH.UI.Excel.Templates
             AppendMenuTree(itemTree, menu);
         }
 
-        /*******************************************/
-        /**** Private Methods                   ****/
         /*******************************************/
 
         private void AppendMenuTree(Tree<T> tree, XmlElement menu)
@@ -99,17 +107,13 @@ namespace BH.UI.Excel.Templates
             menu.AppendChild(element);
         }
 
-        public void Select(string id)
-        {
-            if(m_ItemLinks.ContainsKey(id))
-                ReturnSelectedItem(m_ItemLinks[id]);
-        }
-
         /*******************************************/
         /**** Private Fields                    ****/
         /*******************************************/
 
         private Dictionary<string, T> m_ItemLinks = new Dictionary<string, T>();
+
+        /*******************************************/
     }
 }
 

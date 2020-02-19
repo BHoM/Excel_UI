@@ -100,7 +100,7 @@ namespace BH.UI.Excel.Templates
         }
 
         /*******************************************/
-        /**** Private Methods                   ****/
+        /**** Public Methods                    ****/
         /*******************************************/
 
         public virtual void FillFormula()
@@ -133,7 +133,6 @@ namespace BH.UI.Excel.Templates
                     cell.Dispose();
             }
         }
-
 
         /*******************************************/
 
@@ -175,10 +174,14 @@ namespace BH.UI.Excel.Templates
             return root.InnerXml;
         }
 
+        /*******************************************/
+
         public virtual void Select(string id)
         {
             m_menu.Select(id);
         }
+
+        /*******************************************/
     }
 }
 

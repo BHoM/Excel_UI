@@ -45,6 +45,10 @@ namespace BH.UI.Excel.Templates
         {
         }
 
+        /*******************************************/
+        /**** Public Methods                    ****/
+        /*******************************************/
+
         public override string GetRibbonXml()
         {
             XmlDocument doc = new XmlDocument();
@@ -71,6 +75,8 @@ namespace BH.UI.Excel.Templates
         /*******************************************/
 
         public override string MenuRoot => "";
+
+        /*******************************************/
     }
 }
 

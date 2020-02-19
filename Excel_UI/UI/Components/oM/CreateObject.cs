@@ -79,6 +79,8 @@ namespace BH.UI.Excel.Components
         /*******************************************/
 
         public CreateObjectFormula() : base() { }
+
+        /*******************************************/
     }
 }
 

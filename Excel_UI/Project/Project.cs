@@ -40,29 +40,7 @@ namespace BH.UI.Excel
     public class Project
     {
         /*****************************************/
-        /**** Data fields               **********/
-        /*****************************************/
-
-        private Dictionary<string, object> m_objects;
-
-
-        /*****************************************/
-        /**** Static singleton instance **********/
-        /*****************************************/
-
-        private static Project m_instance = null;
-
-        /*****************************************/
-        /**** Constructor               **********/
-        /*****************************************/
-
-        private Project()
-        {
-            m_objects = new Dictionary<string, object>();
-        }
-
-        /*****************************************/
-        /**** Get singleton method      **********/
+        /**** Properties                      ****/
         /*****************************************/
 
         public static Project ActiveProject
@@ -79,7 +57,16 @@ namespace BH.UI.Excel
         public bool Empty => Count() == 0;
 
         /*****************************************/
-        /**** Public get methods        **********/
+        /**** Constructors                    ****/
+        /*****************************************/
+
+        private Project()
+        {
+            m_objects = new Dictionary<string, object>();
+        }
+
+        /*****************************************/
+        /**** Public Methods                  ****/
         /*****************************************/
 
         public IBHoMObject GetBHoM(string str)
@@ -106,6 +93,8 @@ namespace BH.UI.Excel
             return null;
         }
 
+        /*****************************************/
+
         public object GetAny(string str)
         {
             string id = GetId(str);
@@ -117,8 +106,7 @@ namespace BH.UI.Excel
         }
 
         /*****************************************/
-        /****** "Interface" Add method     *******/
-        /*****************************************/
+
         public string IAdd(object obj)
         {
             return IAdd(obj, ToString(Guid.NewGuid()));
@@ -139,8 +127,6 @@ namespace BH.UI.Excel
             return Add(obj as dynamic, id);
         }
 
-        /*****************************************/
-        /***** Add methods             ***********/
         /*****************************************/
 
         public string Add(IBHoMObject obj, string id) 
@@ -167,21 +153,6 @@ namespace BH.UI.Excel
                     IAdd(kvp.Value);
                 }
             }
-            return id;
-        }
-
-        /*****************************************/
-
-        private static string ToString(Guid id)
-        {
-            return System.Convert.ToBase64String(id.ToByteArray()).Remove(8);
-        }
-
-        /*****************************************/
-
-        private string Add(object obj, string id)
-        {
-            m_objects[id] = obj;
             return id;
         }
 
@@ -329,6 +300,42 @@ namespace BH.UI.Excel
                 }
             }
         }
+
+        /*****************************************/
+        /**** Private Methods           **********/
+        /*****************************************/
+
+        private string Add(object obj)
+        {
+            string guid = ToString(Guid.NewGuid());
+            m_objects[guid] = obj;
+            return guid;
+        }
+
+        /*****************************************/
+
+        private string Add(object obj, string id)
+        {
+            m_objects[id] = obj;
+            return id;
+        }
+
+        /*****************************************/
+
+        private static string ToString(Guid id)
+        {
+            return System.Convert.ToBase64String(id.ToByteArray()).Remove(8);
+        }
+
+
+        /*****************************************/
+        /**** Private fields            **********/
+        /*****************************************/
+
+        private Dictionary<string, object> m_objects;
+        private static Project m_instance = null;
+
+        /*****************************************/
     }
 }
 

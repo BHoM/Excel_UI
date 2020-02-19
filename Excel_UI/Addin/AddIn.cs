@@ -48,11 +48,14 @@ namespace BH.UI.Excel
 {
     public class AddIn : IExcelAddIn
     {
-        private Dictionary<string, CallerFormula> m_formulea;
-        private List<CommandBar> m_menus;
-        private Application m_application;
         /*****************************************************************/
-        /******* Public methods                             **************/
+        /******* Properties                                 **************/
+        /*****************************************************************/
+                
+        public static bool Enabled { get { return Instance.m_initialised; } }
+
+        /*****************************************************************/
+        /******* Methods                                    **************/
         /*****************************************************************/
 
         public void AutoOpen()
@@ -76,6 +79,15 @@ namespace BH.UI.Excel
             
         }
 
+        /*****************************************************************/
+
+        public void AutoClose()
+        {
+            ExcelDna.IntelliSense.IntelliSenseServer.Uninstall();
+        }
+
+        /*****************************************************************/
+
         private void AddInternalise()
         {
             m_btns = m_menus.Select((menu, i) =>
@@ -87,6 +99,120 @@ namespace BH.UI.Excel
                 return btn;
             }).ToList();
         }
+
+        /*****************************************************************/
+        
+        public bool InitBHoMAddin()
+        {
+            if (m_initialised)
+                return true;
+            RegisterBHoMMethods();
+            ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
+            AddInternalise();
+            ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
+            m_initialised = true;
+            return true;
+        }
+
+        /*****************************************************************/
+
+        public static void EnableBHoM(Action<bool> callback)
+        {
+            ExcelAsyncUtil.QueueAsMacro(() => callback(Instance.InitBHoMAddin()));
+        }
+
+        /*****************************************************************/
+
+        [ExcelCommand(ShortCut = "^B")]
+        public static void InitGlobalSearch()
+        {
+
+            var control = new System.Windows.Forms.ContainerControl();
+            m_globalSearch.SetParent(control);
+        }
+
+        /*****************************************************************/
+
+        public static CallerFormula GetCaller(string caller)
+        {
+            if (Instance.Formulea.ContainsKey(caller))
+            {
+                return Instance.Formulea[caller];
+            }
+            return null;
+        }
+
+        /*****************************************************************/
+
+        public static string GetRibbonXml()
+        {
+            Dictionary<string, XmlElement> groups = new Dictionary<string, XmlElement>();
+            Dictionary<string, Dictionary<int, XmlElement>> boxes = new Dictionary<string, Dictionary<int, XmlElement>>();
+            XmlDocument doc = new XmlDocument();
+            XmlElement root = doc.CreateElement("root");
+            doc.AppendChild(root);
+            foreach(CallerFormula caller in Instance.Formulea.Values)
+            {
+                try
+                {
+                    XmlElement group;
+                    groups.TryGetValue(caller.Category, out group);
+                    if (group == null)
+                    {
+                        group = (XmlElement)root.AppendChild(doc.CreateElement("group"));
+                        group.SetAttribute("id", caller.Category);
+                        group.SetAttribute("label", caller.Category);
+                        group.SetAttribute("getVisible", "GetVisible");
+                        groups.Add(caller.Category, group);
+                        boxes.Add(caller.Category, new Dictionary<int, XmlElement>());
+                    }
+                    if (!boxes[caller.Category].ContainsKey(caller.Caller.GroupIndex))
+                        boxes[caller.Category].Add(caller.Caller.GroupIndex, doc.CreateElement("box"));
+
+                    XmlElement box = boxes[caller.Category][caller.Caller.GroupIndex];
+                    box.SetAttribute("id", caller.Category+"-group" + caller.Caller.GroupIndex);
+                    box.SetAttribute("boxStyle", "vertical");
+
+                    XmlDocument tmp = new XmlDocument();
+                    tmp.LoadXml(caller.GetRibbonXml());
+                    box.AppendChild(doc.ImportNode(tmp.DocumentElement, true));
+                } catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+
+            foreach(var kvp in boxes)
+            {
+                List<int> ordered = kvp.Value.Keys.ToList();
+                ordered.Sort();
+                foreach(int i in ordered)
+                {
+                    groups[kvp.Key].AppendChild(kvp.Value[i]);
+                    var sep = doc.CreateElement("separator");
+                    sep.SetAttribute("id", $"sep-{kvp.Key}-{i}");
+                    groups[kvp.Key].AppendChild(sep);
+                }
+                groups[kvp.Key].RemoveChild(groups[kvp.Key].LastChild);
+            }
+            return root.InnerXml;
+        }
+
+        /*****************************************************************/
+        /******* Private methods                            **************/
+        /*****************************************************************/
+
+        private void GlobalSearch_ItemSelected(object sender, oM.UI.ComponentRequest e)
+        {
+            if (e != null && e.CallerType != null && Formulea.ContainsKey(e.CallerType.Name))
+            {
+                CallerFormula formula = Formulea[e.CallerType.Name];
+                formula.Caller.SetItem(e.SelectedItem);
+                formula.FillFormula();
+            }
+        }
+
+        /*****************************************************************/
 
         private void Internalise_Click(CommandBarButton Ctrl, ref bool CancelDefault)
         {
@@ -124,7 +250,6 @@ namespace BH.UI.Excel
                     selected.Dispose();
             }
         }
-
 
         /*****************************************************************/
 
@@ -211,15 +336,6 @@ namespace BH.UI.Excel
             }
         }
         
-        /***************************************************/
-
-        public void AutoClose()
-        {
-            ExcelDna.IntelliSense.IntelliSenseServer.Uninstall();
-        }
-
-        /*****************************************************************/
-        /******* Private methods                            **************/
         /*****************************************************************/
 
         private void InitCallers()
@@ -237,6 +353,8 @@ namespace BH.UI.Excel
                 .ToDictionary(o => o.Caller.GetType().Name);
         }
 
+        /*****************************************************************/
+
         private void RegisterBHoMMethods()
         {
             try
@@ -245,14 +363,16 @@ namespace BH.UI.Excel
                 searcher.SetParent(null);
 
                 searcher.ItemSelected += Formula_ItemSelected;
-                globalSearch = new SearchMenu_WinForm();
-                globalSearch.ItemSelected += GlobalSearch_ItemSelected;
+                m_globalSearch = new SearchMenu_WinForm();
+                m_globalSearch.ItemSelected += GlobalSearch_ItemSelected;
             }
             catch (Exception e)
             {
                 Compute.RecordError(e.Message);
             }
         }
+
+        /*****************************************************************/
 
         private void Formula_ItemSelected(object sender, oM.UI.ComponentRequest e)
         {
@@ -295,62 +415,6 @@ namespace BH.UI.Excel
 
         /*****************************************************************/
       
-        [ExcelCommand(ShortCut = "^B")]
-        public static void InitGlobalSearch()
-        {
-
-            var control = new System.Windows.Forms.ContainerControl();
-            globalSearch.SetParent(control);
-        }
-        private static SearchMenu globalSearch;
-        
-        public static void EnableBHoM(Action<bool> callback)
-        {
-            ExcelAsyncUtil.QueueAsMacro(() => callback(Instance.InitBHoMAddin()));
-        }
-
-        public bool InitBHoMAddin()
-        {
-            if (initialised)
-                return true;
-            RegisterBHoMMethods();
-            ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
-            AddInternalise();
-            ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
-            initialised = true;
-            return true;
-        }
-
-        
-        private bool initialised = false;
-        private IEnumerable<CommandBarButton> m_btns;
-
-        public static bool Enabled { get { return Instance.initialised; } }
-
-        public static CallerFormula GetCaller(string caller)
-        {
-            if (Instance.Formulea.ContainsKey(caller))
-            {
-                return Instance.Formulea[caller];
-            }
-            return null;
-        }
-
-        /*****************************************************************/
-
-        private void GlobalSearch_ItemSelected(object sender, oM.UI.ComponentRequest e)
-        {
-            if (e != null && e.CallerType != null && Formulea.ContainsKey(e.CallerType.Name))
-            {
-                CallerFormula formula = Formulea[e.CallerType.Name];
-                formula.Caller.SetItem(e.SelectedItem);
-                formula.FillFormula();
-            }
-        }
-
-
-        /*****************************************************************/
-
         private static bool IsNullMissingOrEmpty(object obj)
         {
             if (obj == null)
@@ -367,62 +431,14 @@ namespace BH.UI.Excel
 
             return false;
         }
-
-        public static string GetRibbonXml()
-        {
-            Dictionary<string, XmlElement> groups = new Dictionary<string, XmlElement>();
-            Dictionary<string, Dictionary<int, XmlElement>> boxes = new Dictionary<string, Dictionary<int, XmlElement>>();
-            XmlDocument doc = new XmlDocument();
-            XmlElement root = doc.CreateElement("root");
-            doc.AppendChild(root);
-            foreach(CallerFormula caller in Instance.Formulea.Values)
-            {
-                try
-                {
-                    XmlElement group;
-                    groups.TryGetValue(caller.Category, out group);
-                    if (group == null)
-                    {
-                        group = (XmlElement)root.AppendChild(doc.CreateElement("group"));
-                        group.SetAttribute("id", caller.Category);
-                        group.SetAttribute("label", caller.Category);
-                        group.SetAttribute("getVisible", "GetVisible");
-                        groups.Add(caller.Category, group);
-                        boxes.Add(caller.Category, new Dictionary<int, XmlElement>());
-                    }
-                    if (!boxes[caller.Category].ContainsKey(caller.Caller.GroupIndex))
-                        boxes[caller.Category].Add(caller.Caller.GroupIndex, doc.CreateElement("box"));
-
-                    XmlElement box = boxes[caller.Category][caller.Caller.GroupIndex];
-                    box.SetAttribute("id", caller.Category+"-group" + caller.Caller.GroupIndex);
-                    box.SetAttribute("boxStyle", "vertical");
-
-                    XmlDocument tmp = new XmlDocument();
-                    tmp.LoadXml(caller.GetRibbonXml());
-                    box.AppendChild(doc.ImportNode(tmp.DocumentElement, true));
-                } catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                }
-            }
-
-            foreach(var kvp in boxes)
-            {
-                List<int> ordered = kvp.Value.Keys.ToList();
-                ordered.Sort();
-                foreach(int i in ordered)
-                {
-                    groups[kvp.Key].AppendChild(kvp.Value[i]);
-                    var sep = doc.CreateElement("separator");
-                    sep.SetAttribute("id", $"sep-{kvp.Key}-{i}");
-                    groups[kvp.Key].AppendChild(sep);
-                }
-                groups[kvp.Key].RemoveChild(groups[kvp.Key].LastChild);
-            }
-            return root.InnerXml;
-        }
-
+            
+        /*****************************************************************/
+        /******* Private properties                         **************/
+        /*****************************************************************/
+       
         private static AddIn Instance { get; set; }
+
+        /*****************************************************************/
 
         private Dictionary<string, CallerFormula> Formulea {
             get
@@ -432,6 +448,19 @@ namespace BH.UI.Excel
                 return m_formulea;
             }
         }
+
+        /*****************************************************************/
+        /******* Private fields                             **************/
+        /*****************************************************************/
+
+        private Dictionary<string, CallerFormula> m_formulea;
+        private List<CommandBar> m_menus;
+        private Application m_application;
+        private static SearchMenu m_globalSearch;
+        private bool m_initialised = false;
+        private IEnumerable<CommandBarButton> m_btns;
+
+        /*****************************************************************/
     }
 }
 

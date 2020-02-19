@@ -32,12 +32,8 @@ namespace BH.UI.Excel.Callers
     class ExplodeCaller : UI.Templates.MethodCaller
     {
         /*******************************************/
-        /**** Constructors                      ****/
+        /**** Properties                        ****/
         /*******************************************/
-
-        public ExplodeCaller() : base(typeof(Methods.Properties).GetMethod("Explode"))
-        {
-        }
 
         public override System.Drawing.Bitmap Icon_24x24 => m_native.Icon_24x24;
 
@@ -50,5 +46,15 @@ namespace BH.UI.Excel.Callers
         public override int GroupIndex => m_native.GroupIndex;
 
         private UI.Components.ExplodeCaller m_native = new UI.Components.ExplodeCaller();
+
+        /*******************************************/
+        /**** Constructors                      ****/
+        /*******************************************/
+
+        public ExplodeCaller() : base(typeof(Methods.Properties).GetMethod("Explode"))
+        {
+        }
+
+        /*******************************************/
     }
 }

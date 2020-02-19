@@ -34,7 +34,9 @@ namespace BH.UI.Excel.Addin
     [ComVisible(true)]
     public class Ribbon : ExcelRibbon
     {
-        private IRibbonUI m_ribbon = null;
+        /*****************************************************************/
+        /******* Methods                                    **************/
+        /*****************************************************************/
 
         public override string GetCustomUI(string RibbonID)
         {
@@ -60,6 +62,8 @@ namespace BH.UI.Excel.Addin
             return ribbonxml;
         }
 
+        /*****************************************************************/
+
         public void EnableBHoM(IRibbonControl control)
         {
             AddIn.EnableBHoM((success) => {
@@ -70,6 +74,8 @@ namespace BH.UI.Excel.Addin
             });
         }
         
+        /*****************************************************************/
+
         public Bitmap GetImage(IRibbonControl control)
         {
             if (control.Id == "enableBtn")
@@ -81,6 +87,8 @@ namespace BH.UI.Excel.Addin
             return null;
         }
 
+        /*****************************************************************/
+
         public string GetContent(IRibbonControl control)
         {
             Templates.CallerFormula caller = AddIn.GetCaller(control.Id);
@@ -88,6 +96,8 @@ namespace BH.UI.Excel.Addin
                 return caller.GetInnerRibbonXml();
             return null;
         }
+        
+        /*****************************************************************/
 
         public bool GetVisible(IRibbonControl control)
         {
@@ -96,10 +106,14 @@ namespace BH.UI.Excel.Addin
             return AddIn.Enabled;
         }
 
+        /*****************************************************************/
+
         public void OnLoadRibbon(IRibbonUI ribbon)
         {
             m_ribbon = ribbon;
         }
+
+        /*****************************************************************/
 
         public void FillFormula(IRibbonControl control)
         {
@@ -109,9 +123,19 @@ namespace BH.UI.Excel.Addin
             caller.Select(control.Id);
         }
 
+        /*****************************************************************/
+
         public void OpenLink(IRibbonControl control)
         {
             System.Diagnostics.Process.Start(control.Tag);
         }
+
+        /*****************************************************************/
+        /******* Private fields                             **************/
+        /*****************************************************************/
+
+        private IRibbonUI m_ribbon = null;
+
+        /*****************************************************************/
     }
 }
