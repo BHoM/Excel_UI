@@ -65,7 +65,8 @@ namespace BH.UI.Excel.Global
                     try
                     {
                         var proxy = CreateDelegate(item);
-                        if (proxy == null) continue;
+                        if (proxy == null)
+                            continue;
                         var name = proxy.Item2.Name;
                         if (!dups.ContainsKey(name))
                         {
@@ -122,7 +123,8 @@ namespace BH.UI.Excel.Global
                 CallerFormula caller = m_callers[item.CallerType.Name];
                 caller.Caller.SetItem(item.Item);
                 FormulaDataAccessor accessor = caller.Caller.DataAccessor as FormulaDataAccessor;
-                if(accessor != null) return accessor.Wrap(caller, () => NotifySelection(item));
+                if(accessor != null)
+                    return accessor.Wrap(caller, () => NotifySelection(item));
             }
             return null;
         }

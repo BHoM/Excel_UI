@@ -49,7 +49,8 @@ namespace BH.UI.Excel.Templates
                 {
                     Type decltype = (Caller as MethodCaller).Method.DeclaringType;
                     string ns = decltype.Namespace;
-                    if (ns.StartsWith("BH")) ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
+                    if (ns.StartsWith("BH"))
+                        ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
                     return decltype.Name + "." + ns + "." + Caller.Name;
                 }
                 return Category + "." + Caller.Name;
@@ -115,17 +116,21 @@ namespace BH.UI.Excel.Templates
                 if (Caller.InputParams.Count == 0)
                 {
                     cellcontents += "()";
-                    if (cell != null) cell.Formula = cellcontents;
+                    if (cell != null)
+                        cell.Formula = cellcontents;
                 }
                 else
                 {
-                    if (cell != null) cell.Formula = cellcontents;
+                    if (cell != null)
+                        cell.Formula = cellcontents;
                     app.SendKeys("{F2}{(}", true);
                 }
             } finally
             {
-                if (app != null) app.Dispose();
-                if (cell != null) cell.Dispose();
+                if (app != null)
+                    app.Dispose();
+                if (cell != null)
+                    cell.Dispose();
             }
         }
 
@@ -163,7 +168,8 @@ namespace BH.UI.Excel.Templates
             XmlElement root = doc.CreateElement("root");
             Caller.AddToMenu(root);
             XmlElement menu = root.FirstChild as XmlElement;
-            if (menu == null) return "";
+            if (menu == null)
+                return "";
             menu.RemoveAllAttributes();
             menu.SetAttribute("xmlns", "http://schemas.microsoft.com/office/2006/01/customui");
             return root.InnerXml;

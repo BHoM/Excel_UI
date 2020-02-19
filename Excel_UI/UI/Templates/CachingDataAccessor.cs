@@ -64,7 +64,8 @@ namespace BH.UI.Excel.Templates
 
         public override bool Store(string function, params object[] in_)
         {
-            if (function == null) function = "";
+            if (function == null)
+                function = "";
             try
             {
                 string reference = Engine.Excel.Query.Caller().RefText();
@@ -97,7 +98,8 @@ namespace BH.UI.Excel.Templates
                                 break;
                             }
                         }
-                        if (same) return false;
+                        if (same)
+                            return false;
                     }
                 }
                 input_cache[key] = in_;
@@ -110,7 +112,8 @@ namespace BH.UI.Excel.Templates
 
         public override object GetOutput()
         {
-            if (current_op == null) return base.GetOutput();
+            if (current_op == null)
+                return base.GetOutput();
 
             object output = null;
             output_cache.TryGetValue(current_op, out output);

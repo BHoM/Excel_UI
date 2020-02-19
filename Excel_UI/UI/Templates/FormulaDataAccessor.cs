@@ -411,7 +411,8 @@ namespace BH.UI.Excel.Templates
                             int limit = 253 - name.Length;
                             string desc = p.Description + postfix;
 
-                            if (desc.Length >= limit) desc = p.Description.Substring(limit - postfix.Length) + postfix;
+                            if (desc.Length >= limit)
+                                desc = p.Description.Substring(limit - postfix.Length) + postfix;
 
                             return new ExcelArgumentAttribute()
                             {
@@ -498,7 +499,8 @@ namespace BH.UI.Excel.Templates
         {
             int limit = 254;
             string description = caller.Caller.Description;
-            if (description.Length >= limit) description = description.Substring(0, limit-1);
+            if (description.Length >= limit)
+                description = description.Substring(0, limit-1);
             return new ExcelFunctionAttribute()
             {
                 Name = caller.Function,

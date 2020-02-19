@@ -72,23 +72,27 @@ namespace BH.UI.Excel.Addin
         
         public Bitmap GetImage(IRibbonControl control)
         {
-            if (control.Id == "enableBtn") return BH.UI.Excel.Properties.Resources.BHoM_Logo;
+            if (control.Id == "enableBtn")
+                return BH.UI.Excel.Properties.Resources.BHoM_Logo;
 
             Templates.CallerFormula caller = AddIn.GetCaller(control.Id);
-            if (caller != null) return caller.Caller.Icon_24x24;
+            if (caller != null)
+                return caller.Caller.Icon_24x24;
             return null;
         }
 
         public string GetContent(IRibbonControl control)
         {
             Templates.CallerFormula caller = AddIn.GetCaller(control.Id);
-            if (caller != null) return caller.GetInnerRibbonXml();
+            if (caller != null)
+                return caller.GetInnerRibbonXml();
             return null;
         }
 
         public bool GetVisible(IRibbonControl control)
         {
-            if(control.Id == "uninitialised") return !AddIn.Enabled;
+            if(control.Id == "uninitialised")
+                return !AddIn.Enabled;
             return AddIn.Enabled;
         }
 
@@ -100,7 +104,8 @@ namespace BH.UI.Excel.Addin
         public void FillFormula(IRibbonControl control)
         {
             Templates.CallerFormula caller = AddIn.GetCaller(control.Tag);
-            if (caller == null) return;
+            if (caller == null)
+                return;
             caller.Select(control.Id);
         }
 

@@ -53,7 +53,8 @@ namespace BH.UI.Excel.Components
                     if (typeof(IObject).IsAssignableFrom(decltype))
                     {
                         string ns = decltype.Namespace;
-                        if (ns.StartsWith("BH")) ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
+                        if (ns.StartsWith("BH"))
+                            ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
                         return "Create." + ns + "." + Caller.Name;
                     }
                     return base.Name;
@@ -67,7 +68,8 @@ namespace BH.UI.Excel.Components
         {
             get
             {
-                if (Caller.SelectedItem is Type) return $"{Name}?by_Properties";
+                if (Caller.SelectedItem is Type)
+                    return $"{Name}?by_Properties";
                 return base.Function;
             }
         }

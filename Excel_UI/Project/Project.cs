@@ -247,7 +247,8 @@ namespace BH.UI.Excel
                     }
                 }
                 catch { }
-                if (json != null) yield return json;
+                if (json != null)
+                    yield return json;
             }
             yield break;
         }
@@ -261,7 +262,8 @@ namespace BH.UI.Excel
                 try
                 {
                     var obj = Engine.Serialiser.Convert.FromJson(str);
-                    if (obj == null) continue;
+                    if (obj == null)
+                        continue;
                     if (obj is KeyValuePair<string, object>)
                     {
                         var kvp = (KeyValuePair<string, object>)obj;
