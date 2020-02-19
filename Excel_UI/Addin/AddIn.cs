@@ -103,13 +103,15 @@ namespace BH.UI.Excel
                         try
                         {
                             value = (string)objcell.Value;
-                            if (value == null || value.Length == 0) continue;
+                            if (value == null || value.Length == 0)
+                                continue;
                         }
                         catch { continue; }
 
                         Project proj = Project.ForIDs(new string[] { value });
 
-                        if (proj.Count((o) => !(o is Adapter.BHoMAdapter)) == 0) continue;
+                        if (proj.Count((o) => !(o is Adapter.BHoMAdapter)) == 0)
+                            continue;
                         proj.SaveData(m_application.ActiveWorkbook);
 
                         objcell.Value = value;
@@ -118,7 +120,8 @@ namespace BH.UI.Excel
             }
             finally
             {
-                if (selected != null) selected.Dispose();
+                if (selected != null)
+                    selected.Dispose();
             }
         }
 
@@ -197,10 +200,14 @@ namespace BH.UI.Excel
             }
             finally
             {
-                if (newsheet != null) newsheet.Dispose();
-                if (cell != null) cell.Dispose();
-                if (used != null) used.Dispose();
-                if (next != null) next.Dispose();
+                if (newsheet != null)
+                    newsheet.Dispose();
+                if (cell != null)
+                    cell.Dispose();
+                if (used != null)
+                    used.Dispose();
+                if (next != null)
+                    next.Dispose();
             }
         }
         
@@ -277,9 +284,12 @@ namespace BH.UI.Excel
                 }
             } finally
             {
-                if (Wb != null) Wb.Dispose();
-                if (sheet != null) sheet.Dispose();
-                if (sheets != null) sheets.Dispose();
+                if (Wb != null)
+                    Wb.Dispose();
+                if (sheet != null)
+                    sheet.Dispose();
+                if (sheets != null)
+                    sheets.Dispose();
             }
         }
 
@@ -301,7 +311,8 @@ namespace BH.UI.Excel
 
         public bool InitBHoMAddin()
         {
-            if (initialised) return true;
+            if (initialised)
+                return true;
             RegisterBHoMMethods();
             ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
             AddInternalise();
@@ -416,7 +427,8 @@ namespace BH.UI.Excel
         private Dictionary<string, CallerFormula> Formulea {
             get
             {
-                if(m_formulea == null) InitCallers();
+                if(m_formulea == null)
+                    InitCallers();
                 return m_formulea;
             }
         }

@@ -146,9 +146,12 @@ namespace BH.UI.Excel.Templates
                                 }
                                 finally
                                 {
-                                    if (app != null) app.Dispose();
-                                    if (cell != null) cell.Dispose();
-                                    if (validation != null) validation.Dispose();
+                                    if (app != null)
+                                        app.Dispose();
+                                    if (cell != null)
+                                        cell.Dispose();
+                                    if (validation != null)
+                                        validation.Dispose();
                                 }
                             });
 
@@ -165,14 +168,22 @@ namespace BH.UI.Excel.Templates
             }
             finally
             {
-                if (app != null) app.Dispose();
-                if (validation_ws != null) validation_ws.Dispose();
-                if (workbook != null) workbook.Dispose();
-                if (worksheet != null) worksheet.Dispose();
-                if (sheets != null) sheets.Dispose();
-                if (names != null) names.Dispose();
-                if (cell != null) cell.Dispose();
-                if (n != null) n.Dispose();
+                if (app != null)
+                    app.Dispose();
+                if (validation_ws != null)
+                    validation_ws.Dispose();
+                if (workbook != null)
+                    workbook.Dispose();
+                if (worksheet != null)
+                    worksheet.Dispose();
+                if (sheets != null)
+                    sheets.Dispose();
+                if (names != null)
+                    names.Dispose();
+                if (cell != null)
+                    cell.Dispose();
+                if (n != null)
+                    n.Dispose();
             }
             return success;
         }
@@ -191,8 +202,10 @@ namespace BH.UI.Excel.Templates
             }
             finally
             {
-                if (app != null) app.Dispose();
-                if (cell != null) cell.Dispose();
+                if (app != null)
+                    app.Dispose();
+                if (cell != null)
+                    cell.Dispose();
             }
         }
     }
