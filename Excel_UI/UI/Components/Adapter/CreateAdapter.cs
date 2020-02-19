@@ -49,6 +49,8 @@ namespace BH.UI.Excel.Components
         /*******************************************/
 
         public CreateAdapterFormula() : base() { }
+
+        /*******************************************/
     }
 }
 

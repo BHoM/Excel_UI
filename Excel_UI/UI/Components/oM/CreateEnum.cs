@@ -62,10 +62,16 @@ namespace BH.UI.Excel.Components
 
         public CreateEnumFormula() : base() { }
 
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
         protected override List<string> GetChoices()
         {
             return MultiChoiceCaller.GetChoiceNames();
         }
+
+        /*******************************************/
     }
 }
 

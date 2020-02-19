@@ -49,7 +49,7 @@ namespace BH.UI.Excel.Global
         }
 
         /*******************************************/
-        /**** Public Methods                    ****/
+        /**** Methods                           ****/
         /*******************************************/
 
         public override bool SetParent(object parent)
@@ -115,6 +115,8 @@ namespace BH.UI.Excel.Global
 
             return items;
         }
+        
+        /*******************************************/
 
         private Tuple<Delegate, ExcelFunctionAttribute, List<object>> CreateDelegate(SearchItem item)
         {
@@ -134,6 +136,8 @@ namespace BH.UI.Excel.Global
         /*******************************************/
 
         private Dictionary<string, CallerFormula> m_callers;
+
+        /*******************************************/
     }
 }
 

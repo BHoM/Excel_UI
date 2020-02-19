@@ -58,6 +58,10 @@ namespace BH.UI.Excel.Components
 
         public CreateDataFormula() : base() { }
 
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
         protected override List<string> GetChoices()
         {
             var names = MultiChoiceCaller.GetChoiceNames();
@@ -75,7 +79,15 @@ namespace BH.UI.Excel.Components
                 return $"{names[i]} [{id}]";
             }).ToList();
         }
-        private static System.Text.RegularExpressions.Regex valid = new System.Text.RegularExpressions.Regex("[^a-z0-9?_]", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        /*******************************************/
+        /**** Private fields                    ****/
+        /*******************************************/
+
+        private static System.Text.RegularExpressions.Regex valid =
+            new System.Text.RegularExpressions.Regex("[^a-z0-9?_]", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        /*******************************************/
     }
 }
 

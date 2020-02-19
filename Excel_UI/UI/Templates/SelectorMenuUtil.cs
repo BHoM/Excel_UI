@@ -52,6 +52,8 @@ namespace BH.UI.Excel.Templates
             selector.SetSelectorMenu(menu);
             return menu;
         }
+
+        /*******************************************/
     }
 }
 
