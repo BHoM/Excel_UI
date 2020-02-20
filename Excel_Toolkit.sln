@@ -9,6 +9,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Excel_Engine", "Excel_Engin
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Excel_oM", "Excel_oM\Excel_oM.csproj", "{79FAC4B0-77EC-4257-BCBE-CFF37FFF537C}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Excel_Adapter", "Excel_Adapter\Excel_Adapter.csproj", "{962ADB76-7DCE-42DA-A966-502E44656F2D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -27,6 +29,10 @@ Global
 		{79FAC4B0-77EC-4257-BCBE-CFF37FFF537C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79FAC4B0-77EC-4257-BCBE-CFF37FFF537C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79FAC4B0-77EC-4257-BCBE-CFF37FFF537C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{962ADB76-7DCE-42DA-A966-502E44656F2D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{962ADB76-7DCE-42DA-A966-502E44656F2D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{962ADB76-7DCE-42DA-A966-502E44656F2D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{962ADB76-7DCE-42DA-A966-502E44656F2D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
