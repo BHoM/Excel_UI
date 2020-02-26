@@ -21,6 +21,7 @@
  */
 
 using BH.Engine.Reflection;
+using BH.oM.Base;
 using BH.UI.Components;
 using BH.UI.Excel.Templates;
 using BH.UI.Templates;
@@ -62,7 +63,15 @@ namespace BH.UI.Excel.Components
             var names = MultiChoiceCaller.GetChoiceNames();
             return MultiChoiceCaller.Choices.Select((o, i) =>
             {
-                string id = Project.ActiveProject.IAdd(o);
+                string id;
+                if (o is IBHoMObject)
+                {
+                    id = Project.ActiveProject.IAdd(o, ((IBHoMObject)o).BHoM_Guid);
+                }
+                else
+                {
+                    id = Project.ActiveProject.IAdd(o);
+                }
                 return $"{names[i]} [{id}]";
             }).ToList();
         }
