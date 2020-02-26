@@ -116,33 +116,46 @@ namespace BH.UI.Excel
             return null;
         }
 
-
         /*****************************************/
         /****** "Interface" Add method     *******/
         /*****************************************/
         public string IAdd(object obj)
         {
-            return Add(obj as dynamic);
+            return IAdd(obj, ToString(Guid.NewGuid()));
+            
+        }
+
+        /*****************************************/
+
+        public string IAdd(object obj, Guid id)
+        {
+            return IAdd(obj, ToString(id));
+        }
+
+        /*****************************************/
+
+        public string IAdd(object obj, string id)
+        {
+            return Add(obj as dynamic, id);
         }
 
         /*****************************************/
         /***** Add methods             ***********/
         /*****************************************/
 
-        public string Add(IBHoMObject obj)
+        public string Add(IBHoMObject obj, string id) 
         {
-            string guid = ToString(Guid.NewGuid());
-            if (m_objects.ContainsKey(guid))
-                return guid;
+            if (m_objects.ContainsKey(id))
+                return id;
 
-            m_objects.Add(guid, obj);
+            m_objects.Add(id, obj);
 
             //Recurively add the objects dependecies
             foreach (object o in obj.PropertyObjects())
             {
                 if (o is IBHoMObject)
                 {
-                    Add(o as IBHoMObject);
+                    IAdd(o);
                 } 
             }
 
@@ -151,10 +164,10 @@ namespace BH.UI.Excel
             {
                 if (kvp.Value is IBHoMObject)
                 {
-                    Add(kvp.Value as IBHoMObject);
+                    IAdd(kvp.Value);
                 }
             }
-            return guid;
+            return id;
         }
 
         /*****************************************/
@@ -166,11 +179,10 @@ namespace BH.UI.Excel
 
         /*****************************************/
 
-        private string Add(object obj)
+        private string Add(object obj, string id)
         {
-            string guid = ToString(Guid.NewGuid());
-            m_objects[guid] = obj;
-            return guid;
+            m_objects[id] = obj;
+            return id;
         }
 
         /*****************************************/
@@ -254,16 +266,9 @@ namespace BH.UI.Excel
                     {
                         var kvp = (KeyValuePair<string, object>)obj;
                         m_objects.Add(kvp.Key, kvp.Value);
-                    } else if (obj is CustomObject)
-                    {
-                        var co = obj as CustomObject;
-                        foreach (var kvp in co.CustomData)
-                        {
-                            m_objects.Add(kvp.Key, kvp.Value);
-                        }
                     } else if (obj is IBHoMObject)
                     {
-                        Add(obj as IBHoMObject);
+                        IAdd(obj, (obj as IBHoMObject).BHoM_Guid);
                     }
                 }
                 catch (Exception e)
