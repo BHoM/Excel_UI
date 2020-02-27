@@ -39,22 +39,17 @@ namespace BH.UI.Excel.Components
         /**** Properties                        ****/
         /*******************************************/
 
-        public override string Name {
-            get {
-                Type t = Caller.SelectedItem as Type;
-                if (t != null)
-                {
-                    return "CreateEnum." + t.Namespace.Split('.').Last() + "." + t.ToText();
-                }
-                return base.Name;
-            }
-        }
-
         public override Caller Caller { get; } = new CreateEnumCaller();
 
         public override string MenuRoot { get; } = "Create Enum";
 
-        public override string Function => Name;
+        public override string Function
+        {
+            get
+            {
+                return GetName();
+            }
+        }
 
         /*******************************************/
         /**** Constructors                      ****/
@@ -64,6 +59,18 @@ namespace BH.UI.Excel.Components
 
         /*******************************************/
         /**** Methods                           ****/
+        /*******************************************/
+
+        public override string GetName()
+        {
+            Type t = Caller.SelectedItem as Type;
+            if (t != null)
+            {
+                return "CreateEnum." + t.Namespace.Split('.').Last() + "." + t.ToText();
+            }
+            return base.GetName();
+        }
+
         /*******************************************/
 
         protected override List<string> GetChoices()

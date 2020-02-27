@@ -48,15 +48,15 @@ namespace BH.UI.Excel
 {
     public class AddIn : IExcelAddIn
     {
-        /*****************************************************************/
-        /******* Properties                                 **************/
-        /*****************************************************************/
+        /*******************************************/
+        /**** Properties                        ****/
+        /*******************************************/
                 
         public static bool Enabled { get { return Instance.m_initialised; } }
 
-        /*****************************************************************/
-        /******* Methods                                    **************/
-        /*****************************************************************/
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
 
         public void AutoOpen()
         {
@@ -79,14 +79,14 @@ namespace BH.UI.Excel
             
         }
 
-        /*****************************************************************/
+        /*******************************************/
 
         public void AutoClose()
         {
             ExcelDna.IntelliSense.IntelliSenseServer.Uninstall();
         }
 
-        /*****************************************************************/
+        /*******************************************/
 
         private void AddInternalise()
         {
@@ -100,7 +100,7 @@ namespace BH.UI.Excel
             }).ToList();
         }
 
-        /*****************************************************************/
+        /*******************************************/
         
         public bool InitBHoMAddin()
         {
@@ -114,14 +114,14 @@ namespace BH.UI.Excel
             return true;
         }
 
-        /*****************************************************************/
+        /*******************************************/
 
         public static void EnableBHoM(Action<bool> callback)
         {
             ExcelAsyncUtil.QueueAsMacro(() => callback(Instance.InitBHoMAddin()));
         }
 
-        /*****************************************************************/
+        /*******************************************/
 
         [ExcelCommand(ShortCut = "^B")]
         public static void InitGlobalSearch()
@@ -131,7 +131,7 @@ namespace BH.UI.Excel
             m_globalSearch.SetParent(control);
         }
 
-        /*****************************************************************/
+        /*******************************************/
 
         public static CallerFormula GetCaller(string caller)
         {
@@ -142,7 +142,7 @@ namespace BH.UI.Excel
             return null;
         }
 
-        /*****************************************************************/
+        /*******************************************/
 
         public static string GetRibbonXml()
         {
@@ -198,9 +198,9 @@ namespace BH.UI.Excel
             return root.InnerXml;
         }
 
-        /*****************************************************************/
-        /******* Private methods                            **************/
-        /*****************************************************************/
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
 
         private void GlobalSearch_ItemSelected(object sender, oM.UI.ComponentRequest e)
         {
@@ -212,7 +212,7 @@ namespace BH.UI.Excel
             }
         }
 
-        /*****************************************************************/
+        /*******************************************/
 
         private void Internalise_Click(CommandBarButton Ctrl, ref bool CancelDefault)
         {
@@ -251,7 +251,7 @@ namespace BH.UI.Excel
             }
         }
 
-        /*****************************************************************/
+        /*******************************************/
 
         private void App_WorkbookOpen(Workbook Wb)
         {
@@ -336,7 +336,7 @@ namespace BH.UI.Excel
             }
         }
         
-        /*****************************************************************/
+        /*******************************************/
 
         private void InitCallers()
         {
@@ -353,7 +353,7 @@ namespace BH.UI.Excel
                 .ToDictionary(o => o.Caller.GetType().Name);
         }
 
-        /*****************************************************************/
+        /*******************************************/
 
         private void RegisterBHoMMethods()
         {
@@ -372,7 +372,7 @@ namespace BH.UI.Excel
             }
         }
 
-        /*****************************************************************/
+        /*******************************************/
 
         private void Formula_ItemSelected(object sender, oM.UI.ComponentRequest e)
         {
@@ -385,7 +385,7 @@ namespace BH.UI.Excel
             }
         }
         
-        /*****************************************************************/
+        /*******************************************/
         private void FlagUsed()
         {
             Workbook Wb = null;
@@ -413,7 +413,7 @@ namespace BH.UI.Excel
             }
         }
 
-        /*****************************************************************/
+        /*******************************************/
       
         private static bool IsNullMissingOrEmpty(object obj)
         {
@@ -432,13 +432,13 @@ namespace BH.UI.Excel
             return false;
         }
             
-        /*****************************************************************/
-        /******* Private properties                         **************/
-        /*****************************************************************/
+        /*******************************************/
+        /**** Private properties                ****/
+        /*******************************************/
        
         private static AddIn Instance { get; set; }
 
-        /*****************************************************************/
+        /*******************************************/
 
         private Dictionary<string, CallerFormula> Formulea {
             get
@@ -449,9 +449,9 @@ namespace BH.UI.Excel
             }
         }
 
-        /*****************************************************************/
-        /******* Private fields                             **************/
-        /*****************************************************************/
+        /*******************************************/
+        /**** Private Fields                    ****/
+        /*******************************************/
 
         private Dictionary<string, CallerFormula> m_formulea;
         private List<CommandBar> m_menus;
@@ -460,7 +460,7 @@ namespace BH.UI.Excel
         private bool m_initialised = false;
         private IEnumerable<CommandBarButton> m_btns;
 
-        /*****************************************************************/
+        /*******************************************/
     }
 }
 

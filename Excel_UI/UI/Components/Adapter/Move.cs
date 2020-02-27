@@ -38,8 +38,6 @@ namespace BH.UI.Excel.Components
         /**** Properties                        ****/
         /*******************************************/
 
-        public override string Name => "Adapter." + Caller.Name;
-
         public override Caller Caller { get; } = new MoveCaller();
 
         /*******************************************/
@@ -49,6 +47,15 @@ namespace BH.UI.Excel.Components
         public MoveFormula() : base()
         {
             Caller.SetDataAccessor(new CacheingDataAccessor());
+        }
+
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
+        public override string GetName()
+        {
+            return "Adapter." + Caller.Name;
         }
 
         /*******************************************/

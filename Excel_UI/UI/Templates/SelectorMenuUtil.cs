@@ -36,7 +36,7 @@ namespace BH.UI.Excel.Templates
     internal static class SelectorMenuUtil
     {
         /*******************************************/
-        /**** Public Methods                    ****/
+        /**** Methods                           ****/
         /*******************************************/
 
         public static IExcelSelectorMenu ISetExcelSelectorMenu(IItemSelector selector)

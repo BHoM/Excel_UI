@@ -38,21 +38,6 @@ namespace BH.UI.Excel.Components
         /**** Properties                        ****/
         /*******************************************/
 
-        public override string Name {
-            get {
-                Type t = Caller.SelectedItem as Type;
-                if (t != null)
-                {
-
-                    string ns = t.Namespace;
-                    if (ns.StartsWith("BH"))
-                        ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
-                    return "CreateType." + ns + "." + t.ToText(genericStart: "?",genericSeparator:"_",genericEnd:"");
-                }
-                return base.Name;
-            }
-        }
-
         public override Caller Caller { get; } = new CreateTypeCaller();
 
         public override string MenuRoot { get; } = "Create Type";
@@ -62,6 +47,24 @@ namespace BH.UI.Excel.Components
         /*******************************************/
 
         public CreateTypeFormula() : base() { }
+
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
+        public override string GetName()
+        {
+            Type t = Caller.SelectedItem as Type;
+            if (t != null)
+            {
+
+                string ns = t.Namespace;
+                if (ns.StartsWith("BH"))
+                    ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
+                return "CreateType." + ns + "." + t.ToText(genericStart: "?", genericSeparator: "_", genericEnd: "");
+            }
+            return base.GetName();
+        }
 
         /*******************************************/
     }

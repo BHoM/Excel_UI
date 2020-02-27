@@ -40,17 +40,17 @@ namespace BH.UI.Excel.Components
         /**** Properties                        ****/
         /*******************************************/
 
-        public override string Name {
-            get {
-                
-                return "CreateData." + valid.Replace(Caller.Name, "_");
-            }
-        }
         public override Caller Caller { get; } = new CreateDataCaller();
 
         public override string MenuRoot { get; } = "Create Data";
 
-        public override string Function => Name;
+        public override string Function
+        {
+            get
+            {
+                return GetName();
+            }
+        }
 
         /*******************************************/
         /**** Constructors                      ****/
@@ -81,7 +81,14 @@ namespace BH.UI.Excel.Components
         }
 
         /*******************************************/
-        /**** Private fields                    ****/
+
+        public override string GetName()
+        {
+            return "CreateData." + valid.Replace(Caller.Name, "_");
+        }
+
+        /*******************************************/
+        /**** Private Fields                    ****/
         /*******************************************/
 
         private static System.Text.RegularExpressions.Regex valid =

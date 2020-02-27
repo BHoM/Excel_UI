@@ -31,7 +31,7 @@ namespace BH.UI.Excel.Templates
         string RootName { get; set; }
 
         /*******************************************/
-        /**** Public Methods                    ****/
+        /**** Methods                           ****/
         /*******************************************/
         
         void Select(string id);

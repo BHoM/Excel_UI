@@ -46,7 +46,7 @@ namespace BH.UI.Excel.Templates
         }
 
         /*******************************************/
-        /**** Public Methods                    ****/
+        /**** Methods                           ****/
         /*******************************************/
 
         public override string GetRibbonXml()

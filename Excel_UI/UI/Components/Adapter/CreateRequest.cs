@@ -36,8 +36,6 @@ namespace BH.UI.Excel.Components
         /**** Properties                        ****/
         /*******************************************/
 
-        public override string Name => "Adapter.Request." + Caller.Name;
-
         public override Caller Caller { get; } = new CreateRequestCaller();
 
         public override string MenuRoot { get; } = "Create Request";
@@ -47,6 +45,15 @@ namespace BH.UI.Excel.Components
         /*******************************************/
 
         public CreateRequestFormula() : base() { }
+
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
+        public override string GetName()
+        {
+            return "Adapter.Request." + Caller.Name;
+        }
 
         /*******************************************/
     }
