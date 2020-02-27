@@ -40,16 +40,10 @@ namespace BH.UI.Excel
         /**** Methods                           ****/
         /*******************************************/
 
-
-
         public static object ReturnTypeHelper(this object obj)
         {
             return Templates.FormulaDataAccessor.ToExcel(obj);
         }
-
-        /*******************************************/
-
-        private static Type iTupleType = Type.GetType("System.ITuple, mscorlib"); //the ITuple interface is "internal" for some reason. getting it out once via reflection to be used for checking in the method above...
 
         /*******************************************/
 
