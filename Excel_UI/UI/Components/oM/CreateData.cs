@@ -84,14 +84,14 @@ namespace BH.UI.Excel.Components
 
         public override string GetName()
         {
-            return "CreateData." + valid.Replace(Caller.Name, "_");
+            return "CreateData." + m_Valid.Replace(Caller.Name, "_");
         }
 
         /*******************************************/
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private static System.Text.RegularExpressions.Regex valid =
+        private static System.Text.RegularExpressions.Regex m_Valid =
             new System.Text.RegularExpressions.Regex("[^a-z0-9?_]", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
 
         /*******************************************/
