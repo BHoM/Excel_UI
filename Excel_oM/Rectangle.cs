@@ -31,9 +31,15 @@ namespace BH.oM.Excel
 {
     public class Rectangle : BHoMObject
     {
+        /*******************************************/
+        /**** Properties                        ****/
+        /*******************************************/
+
         public int RowFirst { get; set; }
         public int ColumnFirst { get; set; }
         public int RowLast { get; set; }
         public int ColumnLast { get; set; }
+
+        /*******************************************/
     }
 }

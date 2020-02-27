@@ -30,9 +30,15 @@ namespace BH.Engine.Excel
 {
     public static partial class Query
     {
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
         public static List<T> CleanList<T>(this List<T> list)
         {
             return list.FindAll(item => item != null);
         }
+
+        /*******************************************/
     }
 }

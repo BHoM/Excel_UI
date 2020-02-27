@@ -31,7 +31,13 @@ namespace BH.oM.Excel
 {
     public class Reference : BHoMObject
     {
+        /*******************************************/
+        /**** Properties                        ****/
+        /*******************************************/
+
         public List<Rectangle> Rectangles { get; set; }
         public IntPtr Sheet { get; set; }
+
+        /*******************************************/
     }
 }

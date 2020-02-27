@@ -29,10 +29,16 @@ namespace BH.Engine.Excel
 {
     public static partial class Query
     {
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
         public static oM.Excel.Reference Caller()
         {
             ExcelReference xlref = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
             return xlref.ToBHoM();
         }
+
+        /*******************************************/
     }
 }

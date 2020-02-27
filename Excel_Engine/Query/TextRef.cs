@@ -28,9 +28,15 @@ namespace BH.Engine.Excel
 {
     public static partial class Query
     {
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
         public static string RefText(this oM.Excel.Reference reference)
         {
             return XlCall.Excel(XlCall.xlfReftext, reference.ToExcel(), true).ToString();
         }
+
+        /*******************************************/
     }
 }

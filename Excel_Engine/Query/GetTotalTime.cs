@@ -26,13 +26,18 @@ using BH.oM.Excel;
 using ExcelDna.Integration;
 
 namespace BH.Engine.Excel.Profiling
-
 {
     public static partial class Query
     {
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
         public static double GetTotalTime(string name)
         {
             return Timer.GetTotal(name);
         }
+
+        /*******************************************/
     }
 }

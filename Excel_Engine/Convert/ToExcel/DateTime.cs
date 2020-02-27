@@ -31,9 +31,15 @@ namespace BH.Engine.Excel
 {
     public static partial class Convert
     {
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
         public static double ToExcel(this DateTime dateTime)
         {
             return dateTime.ToOADate();
         }
+
+        /*******************************************/
     }
 }

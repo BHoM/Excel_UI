@@ -31,6 +31,10 @@ namespace BH.Engine.Excel
 {
     public static partial class Compute
     {
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
         public static bool Contents(this oM.Excel.Reference reference, string value)
         {
             ExcelAsyncUtil.QueueAsMacro(() =>
@@ -46,5 +50,7 @@ namespace BH.Engine.Excel
             });
             return true;
         }
+
+        /*******************************************/
     }
 }
