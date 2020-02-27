@@ -35,17 +35,17 @@ namespace BH.UI.Excel.Callers
         /**** Properties                        ****/
         /*******************************************/
 
-        public override System.Drawing.Bitmap Icon_24x24 => m_native.Icon_24x24;
+        public override System.Drawing.Bitmap Icon_24x24 => m_Native.Icon_24x24;
 
-        public override string Name => m_native.Name;
+        public override string Name => m_Native.Name;
 
-        public override string Category => m_native.Category;
+        public override string Category => m_Native.Category;
 
-        public override string Description => m_native.Description;
+        public override string Description => m_Native.Description;
 
-        public override int GroupIndex => m_native.GroupIndex;
+        public override int GroupIndex => m_Native.GroupIndex;
 
-        private UI.Components.ExplodeCaller m_native = new UI.Components.ExplodeCaller();
+        private UI.Components.ExplodeCaller m_Native = new UI.Components.ExplodeCaller();
 
         /*******************************************/
         /**** Constructors                      ****/

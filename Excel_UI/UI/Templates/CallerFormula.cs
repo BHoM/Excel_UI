@@ -35,7 +35,7 @@ namespace BH.UI.Excel.Templates
 {
     public abstract class CallerFormula
     {
-        private IExcelSelectorMenu m_menu;
+        private IExcelSelectorMenu m_Menu;
 
         /*******************************************/
         /**** Properties                        ****/
@@ -158,8 +158,8 @@ namespace BH.UI.Excel.Templates
         public virtual string GetInnerRibbonXml()
         {
             Caller.SelectedItem = null;
-            m_menu = SelectorMenuUtil.ISetExcelSelectorMenu(Caller.Selector);
-            m_menu.RootName = Caller.GetType().Name;
+            m_Menu = SelectorMenuUtil.ISetExcelSelectorMenu(Caller.Selector);
+            m_Menu.RootName = Caller.GetType().Name;
             XmlDocument doc = new XmlDocument();
             XmlElement root = doc.CreateElement("root");
             Caller.AddToMenu(root);
@@ -175,7 +175,7 @@ namespace BH.UI.Excel.Templates
 
         public virtual void Select(string id)
         {
-            m_menu.Select(id);
+            m_Menu.Select(id);
         }
 
         /*******************************************/

@@ -52,7 +52,7 @@ namespace BH.UI.Excel
         /**** Properties                        ****/
         /*******************************************/
                 
-        public static bool Enabled { get { return Instance.m_initialised; } }
+        public static bool Enabled { get { return Instance.m_Initialised; } }
 
         /*******************************************/
         /**** Methods                           ****/
@@ -64,17 +64,17 @@ namespace BH.UI.Excel
 
             ExcelDna.IntelliSense.IntelliSenseServer.Install();
 
-            m_application = Application.GetActiveInstance();
+            m_Application = Application.GetActiveInstance();
             using (Engine.Excel.Profiling.Timer timer = new Engine.Excel.Profiling.Timer("open"))
             {
-                m_menus = new List<CommandBar>();
-                foreach (CommandBar commandBar in m_application.CommandBars)
+                m_Menus = new List<CommandBar>();
+                foreach (CommandBar commandBar in m_Application.CommandBars)
                 {
                     if (commandBar.Name == "Cell" || commandBar.Name.Contains("List Range"))
-                        m_menus.Add(commandBar);
+                        m_Menus.Add(commandBar);
                 }
 
-                m_application.WorkbookOpenEvent += App_WorkbookOpen;
+                m_Application.WorkbookOpenEvent += App_WorkbookOpen;
             }
             
         }
@@ -90,7 +90,7 @@ namespace BH.UI.Excel
 
         private void AddInternalise()
         {
-            m_btns = m_menus.Select((menu, i) =>
+            m_Btns = m_Menus.Select((menu, i) =>
             {
                 var btn = menu.Controls.Add(MsoControlType.msoControlButton, null, null, null, true) as CommandBarButton;
                 btn.Tag = "Internalise_Data" + i;
@@ -104,13 +104,13 @@ namespace BH.UI.Excel
         
         public bool InitBHoMAddin()
         {
-            if (m_initialised)
+            if (m_Initialised)
                 return true;
             RegisterBHoMMethods();
             ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
             AddInternalise();
             ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
-            m_initialised = true;
+            m_Initialised = true;
             return true;
         }
 
@@ -128,7 +128,7 @@ namespace BH.UI.Excel
         {
 
             var control = new System.Windows.Forms.ContainerControl();
-            m_globalSearch.SetParent(control);
+            m_GlobalSearch.SetParent(control);
         }
 
         /*******************************************/
@@ -221,7 +221,7 @@ namespace BH.UI.Excel
 
             try
             {
-                    selected = m_application.Selection as Range;
+                    selected = m_Application.Selection as Range;
 
                     foreach (Range objcell in selected)
                     {
@@ -238,7 +238,7 @@ namespace BH.UI.Excel
 
                         if (proj.Count((o) => !(o is Adapter.BHoMAdapter)) == 0)
                             continue;
-                        proj.SaveData(m_application.ActiveWorkbook);
+                        proj.SaveData(m_Application.ActiveWorkbook);
 
                         objcell.Value = value;
                         objcell.Dispose();
@@ -345,7 +345,7 @@ namespace BH.UI.Excel
             Type[] constrtypes = new Type[] { };
             object[] args = new object[] { };
 
-            m_formulea = ExcelIntegration.GetExportedAssemblies()
+            m_Formulea = ExcelIntegration.GetExportedAssemblies()
                 .SelectMany(a => a.GetTypes())
                 .Where(t => t.Namespace == "BH.UI.Excel.Components"
                             && callform.IsAssignableFrom(t))
@@ -363,8 +363,8 @@ namespace BH.UI.Excel
                 searcher.SetParent(null);
 
                 searcher.ItemSelected += Formula_ItemSelected;
-                m_globalSearch = new SearchMenu_WinForm();
-                m_globalSearch.ItemSelected += GlobalSearch_ItemSelected;
+                m_GlobalSearch = new SearchMenu_WinForm();
+                m_GlobalSearch.ItemSelected += GlobalSearch_ItemSelected;
             }
             catch (Exception e)
             {
@@ -393,7 +393,7 @@ namespace BH.UI.Excel
             Worksheet sheet = null;
             try
             {
-                Wb = m_application.ActiveWorkbook;
+                Wb = m_Application.ActiveWorkbook;
                 sheets = Wb.Worksheets;
                 if (sheets.OfType<Worksheet>()
                     .FirstOrDefault(s => s.Name == "BHoM_Used") == null)
@@ -443,9 +443,9 @@ namespace BH.UI.Excel
         private Dictionary<string, CallerFormula> Formulea {
             get
             {
-                if(m_formulea == null)
+                if(m_Formulea == null)
                     InitCallers();
-                return m_formulea;
+                return m_Formulea;
             }
         }
 
@@ -453,12 +453,12 @@ namespace BH.UI.Excel
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private Dictionary<string, CallerFormula> m_formulea;
-        private List<CommandBar> m_menus;
-        private Application m_application;
-        private static SearchMenu m_globalSearch;
-        private bool m_initialised = false;
-        private IEnumerable<CommandBarButton> m_btns;
+        private Dictionary<string, CallerFormula> m_Formulea;
+        private List<CommandBar> m_Menus;
+        private Application m_Application;
+        private static SearchMenu m_GlobalSearch;
+        private bool m_Initialised = false;
+        private IEnumerable<CommandBarButton> m_Btns;
 
         /*******************************************/
     }

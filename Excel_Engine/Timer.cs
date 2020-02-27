@@ -31,49 +31,70 @@ namespace BH.Engine.Excel.Profiling
 {
     public class Timer : IDisposable
     {
+        /*******************************************/
+        /**** Constructors                      ****/
+        /*******************************************/
+
         public Timer(string name)
         {
-            m_name = name;
-            m_start = DateTime.Now;
+            m_Name = name;
+            m_Start = DateTime.Now;
         }
 
-        private string m_name;
-        private DateTime m_start;
-        
-        private static Dictionary<string, List<double>> records = new Dictionary<string, List<double>>();
-
-        private static void RecordTime(string name, double time)
-        {
-            if (records.ContainsKey(name))
-            {
-                records[name].Add(time);
-            } else
-            {
-                records.Add(name, new List<double> { time });
-            }
-        }
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
 
         public static double GetTotal(string name)
         {
-            if(records.ContainsKey(name))
+            if(m_Records.ContainsKey(name))
             {
-                return records[name].Sum();
+                return m_Records[name].Sum();
             }
             return 0;
         }
+
+        /*******************************************/
 
         public static double GetMean(string name)
         {
-            if(records.ContainsKey(name) && records[name].Count > 0)
+            if(m_Records.ContainsKey(name) && m_Records[name].Count > 0)
             {
-                return records[name].Sum() / records[name].Count;
+                return m_Records[name].Sum() / m_Records[name].Count;
             }
             return 0;
         }
 
+        /*******************************************/
+
         public void Dispose()
         {
-            RecordTime(m_name, (DateTime.Now - m_start).TotalMilliseconds);
+            RecordTime(m_Name, (DateTime.Now - m_Start).TotalMilliseconds);
         }
+
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
+
+        private static void RecordTime(string name, double time)
+        {
+            if (m_Records.ContainsKey(name))
+            {
+                m_Records[name].Add(time);
+            } else
+            {
+                m_Records.Add(name, new List<double> { time });
+            }
+        }
+
+        /*******************************************/
+        /**** Private Fields                    ****/
+        /*******************************************/
+
+        private string m_Name;
+        private DateTime m_Start;
+        private static Dictionary<string, List<double>> m_Records = new Dictionary<string, List<double>>();
+
+        /*******************************************/
     }
 }

@@ -54,10 +54,10 @@ namespace BH.UI.Excel.Templates
         public override bool SetDataItem<T>(int index, T data)
         {
             bool success = base.SetDataItem(index, data);
-            if(m_currentOp != null)
+            if(m_CurrentOp != null)
             {
-                m_outputCache[m_currentOp] = base.GetOutput();
-                m_cacheAge[m_currentOp] = DateTime.Now;
+                m_OutputCache[m_CurrentOp] = base.GetOutput();
+                m_CacheAge[m_CurrentOp] = DateTime.Now;
             }
             return success;
         }
@@ -73,22 +73,22 @@ namespace BH.UI.Excel.Templates
                 string reference = Engine.Excel.Query.Caller().RefText();
                 string key = $"{reference}:::{function}";
 
-                m_currentOp = key;
+                m_CurrentOp = key;
 
-                if (m_cacheAge.ContainsKey(m_currentOp))
+                if (m_CacheAge.ContainsKey(m_CurrentOp))
                 {
-                    var age = DateTime.Now.Subtract(m_cacheAge[m_currentOp]);
+                    var age = DateTime.Now.Subtract(m_CacheAge[m_CurrentOp]);
                     if (age.TotalSeconds > 60)
                     {
-                        m_cacheAge.Remove(m_currentOp);
-                        m_outputCache.Remove(m_currentOp);
-                        m_inputCache.Remove(m_currentOp);
+                        m_CacheAge.Remove(m_CurrentOp);
+                        m_OutputCache.Remove(m_CurrentOp);
+                        m_InputCache.Remove(m_CurrentOp);
                     }
                 }
 
-                if (function.Length > 0 && m_inputCache.ContainsKey(key))
+                if (function.Length > 0 && m_InputCache.ContainsKey(key))
                 {
-                    var cached = m_inputCache[key];
+                    var cached = m_InputCache[key];
                     if (in_.Length == cached.Length)
                     {
                         bool same = true;
@@ -104,7 +104,7 @@ namespace BH.UI.Excel.Templates
                             return false;
                     }
                 }
-                m_inputCache[key] = in_;
+                m_InputCache[key] = in_;
             } catch { }
 
             return base.Store(function, in_);
@@ -114,11 +114,11 @@ namespace BH.UI.Excel.Templates
 
         public override object GetOutput()
         {
-            if (m_currentOp == null)
+            if (m_CurrentOp == null)
                 return base.GetOutput();
 
             object output = null;
-            m_outputCache.TryGetValue(m_currentOp, out output);
+            m_OutputCache.TryGetValue(m_CurrentOp, out output);
 
             base.SetDataItem(0, output);
 
@@ -130,10 +130,10 @@ namespace BH.UI.Excel.Templates
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private string m_currentOp;
-        private Dictionary<string, object[]> m_inputCache = new Dictionary<string, object[]>();
-        private Dictionary<string, object> m_outputCache = new Dictionary<string, object>();
-        private Dictionary<string, DateTime> m_cacheAge = new Dictionary<string, DateTime>();
+        private string m_CurrentOp;
+        private Dictionary<string, object[]> m_InputCache = new Dictionary<string, object[]>();
+        private Dictionary<string, object> m_OutputCache = new Dictionary<string, object>();
+        private Dictionary<string, DateTime> m_CacheAge = new Dictionary<string, DateTime>();
 
         /*******************************************/
     }

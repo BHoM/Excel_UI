@@ -47,10 +47,10 @@ namespace BH.UI.Excel
         {
             get
             {
-                if (m_instance == null)
-                    m_instance = new Project();
+                if (m_Instance == null)
+                    m_Instance = new Project();
 
-                return m_instance;
+                return m_Instance;
             }
         }
 
@@ -62,7 +62,7 @@ namespace BH.UI.Excel
 
         private Project()
         {
-            m_objects = new Dictionary<string, object>();
+            m_Objects = new Dictionary<string, object>();
         }
 
         /*******************************************/
@@ -78,7 +78,7 @@ namespace BH.UI.Excel
 
         public string GetId(string str)
         {
-            if(m_objects.ContainsKey(str))
+            if(m_Objects.ContainsKey(str))
             {
                 return str; 
             } else
@@ -100,7 +100,7 @@ namespace BH.UI.Excel
             string id = GetId(str);
             if (id != null)
             {
-                return m_objects[id];
+                return m_Objects[id];
             }
             return null;
         }
@@ -131,10 +131,10 @@ namespace BH.UI.Excel
 
         public string Add(IBHoMObject obj, string id) 
         {
-            if (m_objects.ContainsKey(id))
+            if (m_Objects.ContainsKey(id))
                 return id;
 
-            m_objects.Add(id, obj);
+            m_Objects.Add(id, obj);
 
             //Recurively add the objects dependecies
             foreach (object o in obj.PropertyObjects())
@@ -168,7 +168,7 @@ namespace BH.UI.Excel
                     object obj = ActiveProject.GetAny(id);
                     if (obj != null)
                     {
-                        proj.m_objects.Add(ActiveProject.GetId(id), obj);
+                        proj.m_Objects.Add(ActiveProject.GetId(id), obj);
                     }
                 }
                 catch { }
@@ -180,21 +180,21 @@ namespace BH.UI.Excel
 
         public int Count()
         {
-            return m_objects.Count;
+            return m_Objects.Count;
         }
 
         /*******************************************/
 
         public int Count(Func<object, bool> predicate)
         {
-            return m_objects.Count((kvp) => predicate(kvp.Value));
+            return m_Objects.Count((kvp) => predicate(kvp.Value));
         }
 
         /*******************************************/
 
         public IEnumerable<string> Serialize()
         {
-            foreach(var kvp in m_objects)
+            foreach(var kvp in m_Objects)
             {
                 string json = null;
                 try
@@ -238,7 +238,7 @@ namespace BH.UI.Excel
                     if (obj is KeyValuePair<string, object>)
                     {
                         var kvp = (KeyValuePair<string, object>)obj;
-                        m_objects.Add(kvp.Key, kvp.Value);
+                        m_Objects.Add(kvp.Key, kvp.Value);
                     } else if (obj is IBHoMObject)
                     {
                         IAdd(obj, (obj as IBHoMObject).BHoM_Guid);
@@ -308,7 +308,7 @@ namespace BH.UI.Excel
         private string Add(object obj)
         {
             string guid = ToString(Guid.NewGuid());
-            m_objects[guid] = obj;
+            m_Objects[guid] = obj;
             return guid;
         }
 
@@ -316,7 +316,7 @@ namespace BH.UI.Excel
 
         private string Add(object obj, string id)
         {
-            m_objects[id] = obj;
+            m_Objects[id] = obj;
             return id;
         }
 
@@ -332,8 +332,8 @@ namespace BH.UI.Excel
         /**** Private Fields            **********/
         /*****************************************/
 
-        private Dictionary<string, object> m_objects;
-        private static Project m_instance = null;
+        private Dictionary<string, object> m_Objects;
+        private static Project m_Instance = null;
 
         /*******************************************/
     }

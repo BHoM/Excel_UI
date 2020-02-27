@@ -45,7 +45,7 @@ namespace BH.UI.Excel.Global
 
         public FormulaSearchMenu(Dictionary<string, CallerFormula> callers) : base()
         {
-            m_callers = callers;
+            m_Callers = callers;
         }
 
         /*******************************************/
@@ -120,9 +120,9 @@ namespace BH.UI.Excel.Global
 
         private Tuple<Delegate, ExcelFunctionAttribute, List<object>> CreateDelegate(SearchItem item)
         {
-            if (m_callers.ContainsKey(item.CallerType.Name))
+            if (m_Callers.ContainsKey(item.CallerType.Name))
             {
-                CallerFormula caller = m_callers[item.CallerType.Name];
+                CallerFormula caller = m_Callers[item.CallerType.Name];
                 caller.Caller.SetItem(item.Item);
                 FormulaDataAccessor accessor = caller.Caller.DataAccessor as FormulaDataAccessor;
                 if(accessor != null)
@@ -135,7 +135,7 @@ namespace BH.UI.Excel.Global
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private Dictionary<string, CallerFormula> m_callers;
+        private Dictionary<string, CallerFormula> m_Callers;
 
         /*******************************************/
     }
