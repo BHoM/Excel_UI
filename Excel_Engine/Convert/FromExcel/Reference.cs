@@ -35,7 +35,7 @@ namespace BH.Engine.Excel
         /**** Methods                           ****/
         /*******************************************/
 
-        public static Reference ToBHoM(this ExcelDna.Integration.ExcelReference xlRef)
+        public static Reference ToReference(this ExcelDna.Integration.ExcelReference xlRef)
         {
             return Create.Reference(xlRef.RowFirst, xlRef.RowLast, xlRef.ColumnFirst, xlRef.ColumnLast, xlRef.SheetId);
         }
