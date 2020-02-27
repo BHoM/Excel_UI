@@ -93,7 +93,7 @@ namespace BH.UI.Excel.Templates
                             {
                                 opt_array[0, i] = options[i];
                             }
-                            Caller.DataAccessor.SetDataItem(0, opt_array);
+                            Caller.DataAccessor.SetDataItem(0, ArrayResizer.Resize(opt_array));
                             ExcelAsyncUtil.QueueAsMacro(() =>
                             {
                                 try
