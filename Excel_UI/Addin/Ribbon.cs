@@ -67,9 +67,9 @@ namespace BH.UI.Excel.Addin
         public void EnableBHoM(IRibbonControl control)
         {
             AddIn.EnableBHoM((success) => {
-                if(m_ribbon != null)
+                if(m_Ribbon != null)
                 {
-                    m_ribbon.Invalidate();
+                    m_Ribbon.Invalidate();
                 }
             });
         }
@@ -110,7 +110,7 @@ namespace BH.UI.Excel.Addin
 
         public void OnLoadRibbon(IRibbonUI ribbon)
         {
-            m_ribbon = ribbon;
+            m_Ribbon = ribbon;
         }
 
         /*******************************************/
@@ -134,7 +134,7 @@ namespace BH.UI.Excel.Addin
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private IRibbonUI m_ribbon = null;
+        private IRibbonUI m_Ribbon = null;
 
         /*******************************************/
     }
