@@ -31,9 +31,15 @@ namespace BH.Engine.Excel
 {
     public static partial class Convert
     {
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
         public static Reference ToBHoM(this ExcelDna.Integration.ExcelReference xlRef)
         {
             return Create.Reference(xlRef.RowFirst, xlRef.RowLast, xlRef.ColumnFirst, xlRef.ColumnLast, xlRef.SheetId);
         }
+
+        /*******************************************/
     }
 }
