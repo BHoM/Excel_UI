@@ -41,20 +41,17 @@ namespace BH.UI.Excel.Templates
         /**** Properties                        ****/
         /*******************************************/
 
-        public virtual string Name
+        public virtual string GetName()
         {
-            get
+            if (Caller is MethodCaller && Caller.SelectedItem != null)
             {
-                if (Caller is MethodCaller && Caller.SelectedItem != null)
-                {
-                    Type decltype = (Caller as MethodCaller).Method.DeclaringType;
-                    string ns = decltype.Namespace;
-                    if (ns.StartsWith("BH"))
-                        ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
-                    return decltype.Name + "." + ns + "." + Caller.Name;
-                }
-                return Category + "." + Caller.Name;
+                Type decltype = (Caller as MethodCaller).Method.DeclaringType;
+                string ns = decltype.Namespace;
+                if (ns.StartsWith("BH"))
+                    ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
+                return decltype.Name + "." + ns + "." + Caller.Name;
             }
+            return Category + "." + Caller.Name;
         }
 
         public virtual string Category { get { return Caller.Category; } }
@@ -83,7 +80,7 @@ namespace BH.UI.Excel.Templates
                         .Aggregate((a, b) => $"{a}_{b}");
                 }
 
-                return Name + params_;
+                return GetName() + params_;
             }
         }
 
@@ -100,7 +97,7 @@ namespace BH.UI.Excel.Templates
         }
 
         /*******************************************/
-        /**** Public Methods                    ****/
+        /**** Methods                           ****/
         /*******************************************/
 
         public virtual void FillFormula()

@@ -48,7 +48,7 @@ namespace BH.UI.Excel.Templates
         }
 
         /*******************************************/
-        /**** Public Methods                    ****/
+        /**** Methods                           ****/
         /*******************************************/
 
         public override bool SetDataItem<T>(int index, T data)

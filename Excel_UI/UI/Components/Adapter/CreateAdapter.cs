@@ -38,8 +38,6 @@ namespace BH.UI.Excel.Components
         /**** Properties                        ****/
         /*******************************************/
 
-        public override string Name => "Adapter.Create." + Caller.Name;
-
         public override Caller Caller { get; } = new CreateAdapterCaller();
 
         public override string MenuRoot { get; } = "Create Adapter";
@@ -49,6 +47,15 @@ namespace BH.UI.Excel.Components
         /*******************************************/
 
         public CreateAdapterFormula() : base() { }
+
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
+        public override string GetName()
+        {
+            return "Adapter.Create." + Caller.Name;
+        }
 
         /*******************************************/
     }

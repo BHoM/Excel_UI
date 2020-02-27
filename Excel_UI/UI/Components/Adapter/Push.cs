@@ -34,8 +34,6 @@ namespace BH.UI.Excel.Components
         /**** Properties                        ****/
         /*******************************************/
 
-        public override string Name => "Adapter." + Caller.Name;
-
         public override Caller Caller { get; } = new PushCaller();
 
         /*******************************************/
@@ -45,6 +43,15 @@ namespace BH.UI.Excel.Components
         public PushFormula() : base()
         {
             Caller.SetDataAccessor(new CacheingDataAccessor());
+        }
+
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
+        public override string GetName()
+        {
+            return "Adapter." + Caller.Name;
         }
 
         /*******************************************/

@@ -49,7 +49,7 @@ namespace BH.UI.Excel.Templates
         }
 
         /*******************************************/
-        /**** Public Methods                    ****/
+        /**** Methods                           ****/
         /*******************************************/
 
         public override T GetDataItem<T>(int index)

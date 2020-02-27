@@ -53,7 +53,7 @@ namespace BH.UI.Excel.Templates
         }
 
         /*******************************************/
-        /**** Public Methods                    ****/
+        /**** Methods                           ****/
         /*******************************************/
 
         public void Select(string id)

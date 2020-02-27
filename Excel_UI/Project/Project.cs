@@ -39,9 +39,9 @@ namespace BH.UI.Excel
 
     public class Project
     {
-        /*****************************************/
-        /**** Properties                      ****/
-        /*****************************************/
+        /*******************************************/
+        /**** Properties                        ****/
+        /*******************************************/
 
         public static Project ActiveProject
         {
@@ -56,25 +56,25 @@ namespace BH.UI.Excel
 
         public bool Empty => Count() == 0;
 
-        /*****************************************/
-        /**** Constructors                    ****/
-        /*****************************************/
+        /*******************************************/
+        /**** Constructors                      ****/
+        /*******************************************/
 
         private Project()
         {
             m_objects = new Dictionary<string, object>();
         }
 
-        /*****************************************/
-        /**** Public Methods                  ****/
-        /*****************************************/
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
 
         public IBHoMObject GetBHoM(string str)
         {
             return GetAny(str) as IBHoMObject;
         }
 
-        /*****************************************/
+        /*******************************************/
 
         public string GetId(string str)
         {
@@ -93,7 +93,7 @@ namespace BH.UI.Excel
             return null;
         }
 
-        /*****************************************/
+        /*******************************************/
 
         public object GetAny(string str)
         {
@@ -105,7 +105,7 @@ namespace BH.UI.Excel
             return null;
         }
 
-        /*****************************************/
+        /*******************************************/
 
         public string IAdd(object obj)
         {
@@ -113,7 +113,7 @@ namespace BH.UI.Excel
             
         }
 
-        /*****************************************/
+        /*******************************************/
 
         public string IAdd(object obj, Guid id)
         {
@@ -156,7 +156,7 @@ namespace BH.UI.Excel
             return id;
         }
 
-        /*****************************************/
+        /*******************************************/
 
         public static Project ForIDs(IEnumerable<string> ids)
         {
@@ -176,21 +176,21 @@ namespace BH.UI.Excel
             return proj;
         }
 
-        /*****************************************/
+        /*******************************************/
 
         public int Count()
         {
             return m_objects.Count;
         }
 
-        /*****************************************/
+        /*******************************************/
 
         public int Count(Func<object, bool> predicate)
         {
             return m_objects.Count((kvp) => predicate(kvp.Value));
         }
 
-        /*****************************************/
+        /*******************************************/
 
         public IEnumerable<string> Serialize()
         {
@@ -224,7 +224,7 @@ namespace BH.UI.Excel
             yield break;
         }
 
-        /*****************************************/
+        /*******************************************/
 
         public void Deserialize(IEnumerable<string> objs)
         {
@@ -251,7 +251,7 @@ namespace BH.UI.Excel
             }
         }
 
-        /*****************************************/
+        /*******************************************/
 
         public void SaveData(Workbook Wb)
         {
@@ -301,9 +301,9 @@ namespace BH.UI.Excel
             }
         }
 
-        /*****************************************/
-        /**** Private Methods           **********/
-        /*****************************************/
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
 
         private string Add(object obj)
         {
@@ -329,13 +329,13 @@ namespace BH.UI.Excel
 
 
         /*****************************************/
-        /**** Private fields            **********/
+        /**** Private Fields            **********/
         /*****************************************/
 
         private Dictionary<string, object> m_objects;
         private static Project m_instance = null;
 
-        /*****************************************/
+        /*******************************************/
     }
 }
 

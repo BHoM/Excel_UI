@@ -42,14 +42,22 @@ namespace BH.UI.Excel.Components
 
         public override string MenuRoot { get; } = "Create Custom";
 
-        public override string Name { get; } = "Create.CustomObject";
-        public override string Function => Name;
+        public override string Function => GetName();
 
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/
 
         public CreateCustomFormula() : base() { }
+
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
+        public override string GetName()
+        {
+            return  "Create.CustomObject";
+        }
 
         /*******************************************/
     }

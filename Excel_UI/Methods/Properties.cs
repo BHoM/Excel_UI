@@ -37,9 +37,9 @@ namespace BH.UI.Excel.Methods
 {
     public static class Properties
     {
-        /*****************************************************************/
-        /******* Public methods                             **************/
-        /*****************************************************************/
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
 
         [ExcelFunction(Description = "Get all properties from an object. WARNING This is an array formula and will take up more than one cell!", Category = "BHoM")]
         public static object Explode(
@@ -125,9 +125,9 @@ namespace BH.UI.Excel.Methods
             return transposed;
         }
 
-        /*****************************************************************/
-        /******* Private methods                            **************/
-        /*****************************************************************/
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
 
         private static List<Dictionary<string, object>> GetPropertyDictionaries(List<object> objs, bool goDeep = false)
         {
@@ -151,7 +151,7 @@ namespace BH.UI.Excel.Methods
         }
 
 
-        /*****************************************************************/
+        /*******************************************/
 
         private static void GetPropertyDictionary(ref Dictionary<string,object> dict, object obj, bool goDeep = false, string parentType = "")
         {
@@ -186,7 +186,7 @@ namespace BH.UI.Excel.Methods
             }
         }
 
-        /*****************************************************************/
+        /*******************************************/
 
     }
 }

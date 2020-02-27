@@ -36,9 +36,9 @@ namespace BH.UI.Excel
 {
     public static class InOutHelp
     {
-        /*****************************************************************/
-        /******* Public methods                             **************/
-        /*****************************************************************/
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
 
 
 
@@ -47,11 +47,11 @@ namespace BH.UI.Excel
             return Templates.FormulaDataAccessor.ToExcel(obj);
         }
 
-        /*****************************************************************/
+        /*******************************************/
 
         private static Type iTupleType = Type.GetType("System.ITuple, mscorlib"); //the ITuple interface is "internal" for some reason. getting it out once via reflection to be used for checking in the method above...
 
-        /*****************************************************************/
+        /*******************************************/
 
         public static bool IsNumeric(this object obj)
         {
@@ -69,7 +69,7 @@ namespace BH.UI.Excel
             return false;
         }
 
-        /*****************************************************************/
+        /*******************************************/
 
         public static bool IsValidArray(object[] arr)
         {
@@ -85,14 +85,14 @@ namespace BH.UI.Excel
             return true;
         }
 
-        /*****************************************************************/
+        /*******************************************/
 
         public static object[] CleanArray(this object[] arr)
         {
             return arr.Where(x => x != null && x != ExcelMissing.Value && x != ExcelEmpty.Value).ToArray();
         }
 
-        /*****************************************************************/
+        /*******************************************/
     }
 }
 
