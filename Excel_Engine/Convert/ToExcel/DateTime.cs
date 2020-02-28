@@ -22,9 +22,11 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BH.oM.Reflection.Attributes;
 using ExcelDna.Integration;
 
 namespace BH.Engine.Excel
@@ -35,6 +37,9 @@ namespace BH.Engine.Excel
         /**** Methods                           ****/
         /*******************************************/
 
+        [Description("A DateTime object to an OADate number for MS Office.")]
+        [Input("dateTime", "The Date and Time to convert.")]
+        [Output("An OADate number.")]
         public static double ToExcel(this DateTime dateTime)
         {
             return dateTime.ToOADate();

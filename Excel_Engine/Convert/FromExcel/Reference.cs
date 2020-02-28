@@ -21,8 +21,10 @@
  */
 
 using BH.oM.Excel;
+using BH.oM.Reflection.Attributes;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +37,9 @@ namespace BH.Engine.Excel
         /**** Methods                           ****/
         /*******************************************/
 
+        [Description("Converts an Excel Reference to a BHoM object (Excel_oM Reference).")]
+        [Input("xlRef", "The reference to convert.")]
+        [Output("A BHoM Excel Reference.")]
         public static Reference ToReference(this ExcelDna.Integration.ExcelReference xlRef)
         {
             return Create.Reference(xlRef.RowFirst, xlRef.RowLast, xlRef.ColumnFirst, xlRef.ColumnLast, xlRef.SheetId);

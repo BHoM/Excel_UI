@@ -22,6 +22,8 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
+using BH.oM.Reflection.Attributes;
 using ExcelDna.Integration;
 
 namespace BH.Engine.Excel
@@ -32,6 +34,9 @@ namespace BH.Engine.Excel
         /**** Methods                           ****/
         /*******************************************/
 
+        [Description("Gets the Excel textual reference of the Reference object.")]
+        [Input("reference", "A reference to a cell or range.")]
+        [Output("The string value of the reference in the given cell or range.")]
         public static string RefText(this oM.Excel.Reference reference)
         {
             return XlCall.Excel(XlCall.xlfReftext, reference.ToExcel(), true).ToString();

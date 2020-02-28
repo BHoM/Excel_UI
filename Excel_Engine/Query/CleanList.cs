@@ -23,7 +23,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.ComponentModel;
 using BH.oM.Excel;
+using BH.oM.Reflection.Attributes;
 using ExcelDna.Integration;
 
 namespace BH.Engine.Excel
@@ -34,6 +36,10 @@ namespace BH.Engine.Excel
         /**** Methods                           ****/
         /*******************************************/
 
+
+        [Description("Removes nulls from a list.")]
+        [Input("list", "The list to clean.")]
+        [Output("A list without nulls in it.")]
         public static List<T> CleanList<T>(this List<T> list)
         {
             return list.FindAll(item => item != null);

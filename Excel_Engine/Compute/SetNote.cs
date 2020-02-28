@@ -20,9 +20,11 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
+using BH.oM.Reflection.Attributes;
 using ExcelDna.Integration;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +37,10 @@ namespace BH.Engine.Excel
         /**** Methods                           ****/
         /*******************************************/
 
+        [Description("Sets the note of a cell.")]
+        [Input("reference", "The reference of the cell to set the note of.")]
+        [Input("message", "The value to set the note to.")]
+        [Output("Whether the note was set successfully.")]
         public static bool SetNote(this oM.Excel.Reference reference, string message)
         {
             ExcelAsyncUtil.QueueAsMacro(() =>
