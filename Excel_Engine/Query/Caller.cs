@@ -22,7 +22,9 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using BH.oM.Excel;
+using BH.oM.Reflection.Attributes;
 using ExcelDna.Integration;
 
 namespace BH.Engine.Excel
@@ -33,6 +35,8 @@ namespace BH.Engine.Excel
         /**** Methods                           ****/
         /*******************************************/
 
+        [Description("Gets a reference to this cell (the one frim which this method is being called).")]
+        [Output("The reference to the calling cell.")]
         public static oM.Excel.Reference Caller()
         {
             ExcelReference xlref = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;

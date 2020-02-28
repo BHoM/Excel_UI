@@ -20,9 +20,11 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
+using BH.oM.Reflection.Attributes;
 using ExcelDna.Integration;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -35,6 +37,10 @@ namespace BH.Engine.Excel
         /**** Methods                           ****/
         /*******************************************/
 
+        [Description("Sets the number format of a cell.")]
+        [Input("reference", "The reference of the cell to set the number format of.")]
+        [Input("fmt", "The number format string to use.")]
+        [Output("Whether the number format was set successfully.")]
         public static bool NumberFormat(this oM.Excel.Reference reference, string fmt = null)
         {
             ExcelAsyncUtil.QueueAsMacro(() =>
