@@ -4,20 +4,20 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
 using System;
@@ -51,7 +51,7 @@ namespace BH.UI.Excel
         /*******************************************/
         /**** Properties                        ****/
         /*******************************************/
-                
+
         public static bool Enabled { get { return Instance.m_Initialised; } }
 
         /*******************************************/
@@ -76,7 +76,7 @@ namespace BH.UI.Excel
 
                 m_Application.WorkbookOpenEvent += App_WorkbookOpen;
             }
-            
+
         }
 
         /*******************************************/
@@ -101,7 +101,7 @@ namespace BH.UI.Excel
         }
 
         /*******************************************/
-        
+
         public bool InitBHoMAddin()
         {
             if (m_Initialised)
@@ -335,7 +335,7 @@ namespace BH.UI.Excel
                     next.Dispose();
             }
         }
-        
+
         /*******************************************/
 
         private void InitCallers()
@@ -384,7 +384,7 @@ namespace BH.UI.Excel
                 FlagUsed();
             }
         }
-        
+
         /*******************************************/
         private void FlagUsed()
         {
@@ -414,7 +414,7 @@ namespace BH.UI.Excel
         }
 
         /*******************************************/
-      
+
         private static bool IsNullMissingOrEmpty(object obj)
         {
             if (obj == null)
@@ -431,11 +431,11 @@ namespace BH.UI.Excel
 
             return false;
         }
-            
+
         /*******************************************/
         /**** Private properties                ****/
         /*******************************************/
-       
+
         private static AddIn Instance { get; set; }
 
         /*******************************************/
