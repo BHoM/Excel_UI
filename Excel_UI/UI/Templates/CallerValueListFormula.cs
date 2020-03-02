@@ -61,7 +61,10 @@ namespace BH.UI.Excel.Templates
         /**** Methods                           ****/
         /*******************************************/
 
-        public override bool Run()
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
+        protected override bool Excecute()
         {
             var options = GetChoices().ToArray();
 
@@ -200,9 +203,8 @@ namespace BH.UI.Excel.Templates
             return success;
         }
 
-        /*******************************************/
 
-        public override void FillFormula()
+        protected override void Fill()
         {
             Application app = null;
             Range cell = null;
@@ -221,8 +223,6 @@ namespace BH.UI.Excel.Templates
             }
         }
 
-        /*******************************************/
-        /**** Private Methods                   ****/
         /*******************************************/
 
         protected abstract List<string> GetChoices();

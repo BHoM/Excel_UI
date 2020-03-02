@@ -147,6 +147,7 @@
     <Compile Include="UI\Components\Engine\SetProperty.cs" />
     <Compile Include="UI\Components\Engine\ToJson.cs" />
     <Compile Include="UI\Components\oM\CreateData.cs" />
+    <Compile Include="UI\Global\ComponentManager.cs" />
     <Compile Include="UI\Templates\CallerValueListFormula.cs" />
     <Compile Include="UI\Components\oM\CreateCustom.cs" />
     <Compile Include="UI\Components\oM\CreateDictionary.cs" />

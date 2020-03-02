@@ -30,6 +30,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using NetOffice.ExcelApi;
 using System.Xml;
+using BH.Engine.Serialiser;
 
 namespace BH.UI.Excel.Templates
 {
@@ -100,42 +101,17 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
-        public virtual void FillFormula()
+        public void FillFormula()
         {
-            Application app = null;
-            Range cell = null;
-
-            try
-            {
-                app = Application.GetActiveInstance();
-                cell = app.Selection as Range;
-                var cellcontents = "=" + Function;
-                if (Caller.InputParams.Count == 0)
-                {
-                    cellcontents += "()";
-                    if (cell != null)
-                        cell.Formula = cellcontents;
-                }
-                else
-                {
-                    if (cell != null)
-                        cell.Formula = cellcontents;
-                    app.SendKeys("{F2}{(}", true);
-                }
-            } finally
-            {
-                if (app != null)
-                    app.Dispose();
-                if (cell != null)
-                    cell.Dispose();
-            }
+            Register(Fill);
         }
 
         /*******************************************/
 
-        public virtual bool Run()
+        public bool Run()
         {
-            return Caller.Run();
+            OnRun?.Invoke(this, null);
+            return Excecute();
         }
 
         /*******************************************/
@@ -179,10 +155,93 @@ namespace BH.UI.Excel.Templates
         }
 
         /*******************************************/
+
+        public void Register()
+        {
+            Register(() => { });
+        }
+
+        /*******************************************/
+
+        public void Register(System.Action callback)
+        {
+            if (m_Registered.Contains(Function))
+            {
+                callback();
+                return;
+            }
+            var accessor = Caller.DataAccessor as FormulaDataAccessor;
+            object item = Caller.SelectedItem;
+            var formula = accessor.Wrap(this, () => RunItem(item));
+            ExcelAsyncUtil.QueueAsMacro(() =>
+            {
+                ExcelIntegration.RegisterDelegates(
+                    new List<Delegate>() { formula.Item1 },
+                    new List<object> { formula.Item2 },
+                    new List<List<object>> { formula.Item3 }
+                );
+                m_Registered.Add(Function);
+                callback();
+            });
+        }
+
+        public event EventHandler OnRun;
+
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
+
+        protected virtual bool Excecute()
+        {
+            return Caller.Run();
+        }
+
+        protected virtual void Fill()
+        {
+            Application app = null;
+            Range cell = null;
+
+            try
+            {
+                app = Application.GetActiveInstance();
+                cell = app.Selection as Range;
+                var cellcontents = "=" + Function;
+                if (Caller.InputParams.Count == 0)
+                {
+                    cellcontents += "()";
+                    if (cell != null)
+                        cell.Formula = cellcontents;
+                }
+                else
+                {
+                    if (cell != null)
+                        cell.Formula = cellcontents;
+                    app.SendKeys("{F2}{(}", true);
+                }
+            }
+            finally
+            {
+                if (app != null)
+                    app.Dispose();
+                if (cell != null)
+                    cell.Dispose();
+            }
+        }
+
+        /*******************************************/
+
+        private void RunItem(object item)
+        {
+            Caller.SetItem(item);
+            Run();
+        }
+
+        /*******************************************/
         /**** Private Fields                    ****/
         /*******************************************/
 
         private IExcelSelectorMenu m_Menu;
+        private HashSet<string> m_Registered = new HashSet<string>();
 
         /*******************************************/
     }
