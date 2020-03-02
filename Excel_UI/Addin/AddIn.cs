@@ -43,6 +43,7 @@ using NetOffice.OfficeApi.Enums;
 using NetOffice.ExcelApi.Enums;
 using System.Drawing;
 using System.Xml;
+using BH.oM.UI;
 
 namespace BH.UI.Excel
 {
@@ -65,6 +66,8 @@ namespace BH.UI.Excel
             ExcelDna.IntelliSense.IntelliSenseServer.Install();
 
             m_Application = Application.GetActiveInstance();
+
+            ComponentManager.ComponentRestored += ComponentManager_ComponentRestored;
             using (Engine.Excel.Profiling.Timer timer = new Engine.Excel.Profiling.Timer("open"))
             {
                 m_Menus = new List<CommandBar>();
@@ -76,7 +79,6 @@ namespace BH.UI.Excel
 
                 m_Application.WorkbookOpenEvent += App_WorkbookOpen;
             }
-
         }
 
         /*******************************************/
@@ -214,6 +216,19 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
+        private void ComponentManager_ComponentRestored(object sender, oM.UI.ComponentRequest e)
+        {
+            if (e != null && e.CallerType != null && Formulea.ContainsKey(e.CallerType.Name))
+            {
+                CallerFormula formula = Formulea[e.CallerType.Name];
+                formula.Caller.SetItem(e.SelectedItem);
+                formula.Register();
+            }
+        }
+
+
+        /*******************************************/
+
         private void Internalise_Click(CommandBarButton Ctrl, ref bool CancelDefault)
         {
             Range selected = null;
@@ -271,6 +286,7 @@ namespace BH.UI.Excel
                     ExcelAsyncUtil.QueueAsMacro(() =>
                     {
                         InitBHoMAddin();
+                        ComponentManager.Restore();
                         foreach (Worksheet sheet in sheets.OfType<Worksheet>())
                         {
                             try
@@ -351,6 +367,16 @@ namespace BH.UI.Excel
                             && callform.IsAssignableFrom(t))
                 .Select(t => t.GetConstructor(constrtypes).Invoke(args) as CallerFormula)
                 .ToDictionary(o => o.Caller.GetType().Name);
+            foreach (var formula in m_Formulea.Values)
+            {
+                formula.OnRun += (s, e) =>
+                {
+                    FlagUsed();
+                    var caller = (s as CallerFormula).Caller;
+                    var request = new ComponentRequest { CallerType = caller.GetType(), SelectedItem = caller.SelectedItem };
+                    ComponentManager.Store(request);
+                };
+            }
         }
 
         /*******************************************/
@@ -360,7 +386,7 @@ namespace BH.UI.Excel
             try
             {
                 var searcher = new FormulaSearchMenu(Formulea);
-                searcher.SetParent(null);
+                //searcher.SetParent(null);
 
                 searcher.ItemSelected += Formula_ItemSelected;
                 m_GlobalSearch = new SearchMenu_WinForm();
@@ -381,7 +407,6 @@ namespace BH.UI.Excel
                 CallerFormula formula = Formulea[e.CallerType.Name];
                 formula.Caller.SetItem(e.SelectedItem);
                 formula.Run();
-                FlagUsed();
             }
         }
 
