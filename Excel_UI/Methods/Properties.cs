@@ -111,6 +111,11 @@ namespace BH.UI.Excel.Methods
             //Output the values as an array
             return ArrayResizer.Resize(outArr);
         }
+
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
+
         private static object[,] Transpose(object[,] arr) 
         {
             int width = arr.GetLength(0);
@@ -124,9 +129,6 @@ namespace BH.UI.Excel.Methods
             }
             return transposed;
         }
-
-        /*******************************************/
-        /**** Private Methods                   ****/
         /*******************************************/
 
         private static List<Dictionary<string, object>> GetPropertyDictionaries(List<object> objs, bool goDeep = false)
@@ -154,6 +156,7 @@ namespace BH.UI.Excel.Methods
         /*******************************************/
 
         private static void GetPropertyDictionary(ref Dictionary<string,object> dict, object obj, bool goDeep = false, string parentType = "")
+
         {
             if (obj.GetType().IsPrimitive || obj is string)
             {

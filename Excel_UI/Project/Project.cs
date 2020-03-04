@@ -54,7 +54,12 @@ namespace BH.UI.Excel
             }
         }
 
-        public bool Empty => Count() == 0;
+        public bool Empty {
+            get
+            {
+                return Count() == 0;
+            }
+        }
 
         /*******************************************/
         /**** Constructors                      ****/
@@ -253,24 +258,24 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        public void SaveData(Workbook Wb)
+        public void SaveData(Workbook workbook)
         {
             Worksheet newsheet;
             try
             {
                 try
                 {
-                    newsheet = Wb.Sheets["BHoM_DataHidden"] as Worksheet;
+                    newsheet = workbook.Sheets["BHoM_DataHidden"] as Worksheet;
                 }
                 catch
                 {
                     // Backwards compatibility
-                    newsheet = Wb.Sheets["BHoM_Data"] as Worksheet;
+                    newsheet = workbook.Sheets["BHoM_Data"] as Worksheet;
                 }
             }
             catch
             {
-                newsheet = Wb.Sheets.Add() as Worksheet;
+                newsheet = workbook.Sheets.Add() as Worksheet;
             }
             newsheet.Name = "BHoM_DataHidden";
             newsheet.Visible = XlSheetVisibility.xlSheetHidden;

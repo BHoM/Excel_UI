@@ -20,74 +20,66 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using BH.oM.Base;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using ExcelDna.Integration;
 
-namespace BH.UI.Excel.Callers
+namespace BH.UI.Excel
 {
-    class ExplodeCaller : UI.Templates.MethodCaller
+    // Select an ExcelReference (perhaps on another sheet) allowing changes to be made there.
+    // On clean-up, resets all the selections and the active sheet.
+    // Should not be used if the work you are going to do will switch sheets, amke new sheets etc.
+    public class ExcelSelectionHelper : XlCall, IDisposable
     {
-        /*******************************************/
-        /**** Properties                        ****/
-        /*******************************************/
-
-        public override System.Drawing.Bitmap Icon_24x24
-        {
-            get
-            {
-                return m_Native.Icon_24x24;
-            }
-        }
-
-        public override string Name
-        {
-            get
-            {
-                return m_Native.Name;
-            }
-        }
-
-        public override string Category
-        {
-            get
-            {
-                return m_Native.Category;
-            }
-        }
-
-        public override string Description
-        {
-            get
-            {
-                return m_Native.Description;
-            }
-        }
-
-        public override int GroupIndex
-        {
-            get
-            {
-                return m_Native.GroupIndex;
-            }
-        }
-
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/
 
-        public ExplodeCaller() : base(typeof(Methods.Properties).GetMethod("Explode"))
+        public ExcelSelectionHelper(ExcelReference refToSelect)
         {
+            // Remember old selection state on the active sheet
+            oldSelectionOnActiveSheet = Excel(xlfSelection);
+            oldActiveCellOnActiveSheet = Excel(xlfActiveCell);
+
+            // Switch to the sheet we want to select
+            string refSheet = (string)Excel(xlSheetNm, refToSelect);
+            Excel(xlcWorkbookSelect, new object[] { refSheet });
+
+            // record selection and active cell on the sheet we want to select
+            oldSelectionOnRefSheet = Excel(xlfSelection);
+            oldActiveCellOnRefSheet = Excel(xlfActiveCell);
+
+            // make the selection
+            Excel(xlcFormulaGoto, refToSelect);
+        }
+
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
+        public void Dispose()
+        {
+            // Reset the selection on the target sheet
+            Excel(xlcSelect, oldSelectionOnRefSheet, oldActiveCellOnRefSheet);
+
+            // Reset the sheet originally selected
+            string oldActiveSheet = (string)Excel(xlSheetNm, oldSelectionOnActiveSheet);
+            Excel(xlcWorkbookSelect, new object[] { oldActiveSheet });
+
+            // Reset the selection in the active sheet (some bugs make this change sometimes too)
+            Excel(xlcSelect, oldSelectionOnActiveSheet, oldActiveCellOnActiveSheet);
         }
 
         /*******************************************/
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private UI.Components.ExplodeCaller m_Native = new UI.Components.ExplodeCaller();
+        object oldSelectionOnActiveSheet;
+        object oldActiveCellOnActiveSheet;
+
+        object oldSelectionOnRefSheet;
+        object oldActiveCellOnRefSheet;
 
         /*******************************************/
     }

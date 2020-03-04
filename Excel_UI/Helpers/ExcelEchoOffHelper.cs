@@ -22,23 +22,40 @@
 
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using ExcelDna.Integration;
 
 namespace BH.UI.Excel
 {
-    public enum ErrorMessageHandling
+    // RIIA-style helpers to deal with Excel selections    
+    // Don't use if you agree with Eric Lippert here: http://stackoverflow.com/a/1757344/44264
+    public class ExcelEchoOffHelper : XlCall, IDisposable
     {
-        ErrorMessage,   //Show the errormessages from thrown exception in the cells failing
-        ErrorValue,     //Show the default error value "#VALUE" in cells failing. Default behaviour
-        EmptyCell       //Leave cells failing empty
-    }
+        /*******************************************/
+        /**** Constructors                      ****/
+        /*******************************************/
 
-    public static class DebugConfig
-    {
-        public const ErrorMessageHandling ErrorHandling = ErrorMessageHandling.ErrorValue;  //Determains what to show in cells where calculations fail
-        public const bool ShowExcelDNALog = false;                                          //Show the excel dna dialog at startup, showing what methods have failed to initialize. Useful for debugging, but anoying for release
+        public ExcelEchoOffHelper()
+        {
+            oldEcho = Excel(xlfGetWorkspace, 40);
+            Excel(xlcEcho, false);
+        }
+
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
+        public void Dispose()
+        {
+            Excel(xlcEcho, oldEcho);
+        }
+
+        /*******************************************/
+        /**** Private Fields                    ****/
+        /*******************************************/
+
+        object oldEcho;
+
+        /*******************************************/
     }
 }
-

@@ -35,24 +35,9 @@ namespace BH.UI.Excel.Templates
 {
     public abstract class CallerFormula
     {
-        private IExcelSelectorMenu m_Menu;
-
         /*******************************************/
         /**** Properties                        ****/
         /*******************************************/
-
-        public virtual string GetName()
-        {
-            if (Caller is MethodCaller && Caller.SelectedItem != null)
-            {
-                Type decltype = (Caller as MethodCaller).Method.DeclaringType;
-                string ns = decltype.Namespace;
-                if (ns.StartsWith("BH"))
-                    ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
-                return decltype.Name + "." + ns + "." + Caller.Name;
-            }
-            return Category + "." + Caller.Name;
-        }
 
         public virtual string Category { get { return Caller.Category; } }
 
@@ -98,6 +83,21 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
         /**** Methods                           ****/
+        /*******************************************/
+
+        public virtual string GetName()
+        {
+            if (Caller is MethodCaller && Caller.SelectedItem != null)
+            {
+                Type decltype = (Caller as MethodCaller).Method.DeclaringType;
+                string ns = decltype.Namespace;
+                if (ns.StartsWith("BH"))
+                    ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
+                return decltype.Name + "." + ns + "." + Caller.Name;
+            }
+            return Category + "." + Caller.Name;
+        }
+
         /*******************************************/
 
         public virtual void FillFormula()
@@ -177,6 +177,12 @@ namespace BH.UI.Excel.Templates
         {
             m_Menu.Select(id);
         }
+
+        /*******************************************/
+        /**** Private Fields                    ****/
+        /*******************************************/
+
+        private IExcelSelectorMenu m_Menu;
 
         /*******************************************/
     }

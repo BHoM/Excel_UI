@@ -117,8 +117,10 @@
   <ItemGroup>
     <Compile Include="Addin\AddIn.cs" />
     <Compile Include="Addin\Ribbon.cs" />
-    <Compile Include="ArrayResizer.cs" />
-    <Compile Include="DebugConfig.cs" />
+    <Compile Include="Helpers\ExcelSelectionHelper.cs" />
+    <Compile Include="Helpers\ExcelCalculationManualHelper.cs" />
+    <Compile Include="Helpers\ExcelEchoOffHelper.cs" />
+    <Compile Include="Helpers\ArrayResizer.cs" />
     <Compile Include="IO\InOutHelp.cs" />
     <Compile Include="Methods\Properties.cs" />
     <Compile Include="Project\Project.cs" />
