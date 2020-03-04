@@ -38,6 +38,12 @@ namespace BH.UI.Excel.Templates
     public abstract class SingleOptionCallerFormula : CallerFormula
     {
         /*******************************************/
+        /**** Properties                        ****/
+        /*******************************************/
+
+        public override string MenuRoot { get; } = "";
+
+        /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/
 
@@ -69,12 +75,6 @@ namespace BH.UI.Excel.Templates
         {
             FillFormula();
         }
-
-        /*******************************************/
-        /**** Private Fields                    ****/
-        /*******************************************/
-
-        public override string MenuRoot => "";
 
         /*******************************************/
     }

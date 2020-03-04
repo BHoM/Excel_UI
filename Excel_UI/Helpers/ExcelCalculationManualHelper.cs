@@ -20,74 +20,39 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using BH.oM.Base;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using ExcelDna.Integration;
 
-namespace BH.UI.Excel.Callers
+namespace BH.UI.Excel
 {
-    class ExplodeCaller : UI.Templates.MethodCaller
+    public class ExcelCalculationManualHelper : XlCall, IDisposable
     {
-        /*******************************************/
-        /**** Properties                        ****/
-        /*******************************************/
-
-        public override System.Drawing.Bitmap Icon_24x24
-        {
-            get
-            {
-                return m_Native.Icon_24x24;
-            }
-        }
-
-        public override string Name
-        {
-            get
-            {
-                return m_Native.Name;
-            }
-        }
-
-        public override string Category
-        {
-            get
-            {
-                return m_Native.Category;
-            }
-        }
-
-        public override string Description
-        {
-            get
-            {
-                return m_Native.Description;
-            }
-        }
-
-        public override int GroupIndex
-        {
-            get
-            {
-                return m_Native.GroupIndex;
-            }
-        }
-
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/
 
-        public ExplodeCaller() : base(typeof(Methods.Properties).GetMethod("Explode"))
+        public ExcelCalculationManualHelper()
         {
+            oldCalculationMode = Excel(xlfGetDocument, 14);
+            Excel(xlcOptionsCalculation, 3);
+        }
+
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
+        public void Dispose()
+        {
+            Excel(xlcOptionsCalculation, oldCalculationMode);
         }
 
         /*******************************************/
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private UI.Components.ExplodeCaller m_Native = new UI.Components.ExplodeCaller();
+        object oldCalculationMode;
 
         /*******************************************/
     }

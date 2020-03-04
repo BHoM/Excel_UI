@@ -253,7 +253,7 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        private void App_WorkbookOpen(Workbook Wb)
+        private void App_WorkbookOpen(Workbook workbook)
         {
             List<string> json = new List<string>();
             Sheets sheets = null;
@@ -263,7 +263,7 @@ namespace BH.UI.Excel
             Range next = null;
             try
             {
-                sheets = Wb.Sheets;
+                sheets = workbook.Sheets;
 
                 if (sheets.OfType<Worksheet>()
                     .FirstOrDefault(s => s.Name == "BHoM_Used") != null)
@@ -388,13 +388,13 @@ namespace BH.UI.Excel
         /*******************************************/
         private void FlagUsed()
         {
-            Workbook Wb = null;
+            Workbook workbook = null;
             Sheets sheets = null;
             Worksheet sheet = null;
             try
             {
-                Wb = m_Application.ActiveWorkbook;
-                sheets = Wb.Worksheets;
+                workbook = m_Application.ActiveWorkbook;
+                sheets = workbook.Worksheets;
                 if (sheets.OfType<Worksheet>()
                     .FirstOrDefault(s => s.Name == "BHoM_Used") == null)
                 {
@@ -404,8 +404,8 @@ namespace BH.UI.Excel
                 }
             } finally
             {
-                if (Wb != null)
-                    Wb.Dispose();
+                if (workbook != null)
+                    workbook.Dispose();
                 if (sheet != null)
                     sheet.Dispose();
                 if (sheets != null)
