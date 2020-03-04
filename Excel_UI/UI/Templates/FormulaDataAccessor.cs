@@ -294,11 +294,11 @@ namespace BH.UI.Excel.Templates
                 string msg = errors
                     .Select(e => e.Message)
                     .Aggregate((a, b) => a + "\n" + b);
-                Engine.Excel.Query.Caller().SetNote(msg);
+                Engine.Excel.Query.Caller().Note(msg);
             }
             else
             {
-                Engine.Excel.Query.Caller().SetNote("");
+                Engine.Excel.Query.Caller().Note("");
             }
 
             if(m_Output.Length == 0)
@@ -316,7 +316,7 @@ namespace BH.UI.Excel.Templates
 
         public virtual void ResetOutput()
         {
-            Engine.Excel.Query.Caller().SetNote("");
+            Engine.Excel.Query.Caller().Note("");
             m_Output = new object[] { ExcelError.ExcelErrorNull };
         }
 

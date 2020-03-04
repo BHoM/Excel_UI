@@ -33,7 +33,7 @@ namespace BH.Engine.Excel.Profiling
         /**** Methods                           ****/
         /*******************************************/
 
-        public static double GetMeanTime(string name)
+        public static double MeanTime(string name)
         {
             return Timer.GetMean(name);
         }
