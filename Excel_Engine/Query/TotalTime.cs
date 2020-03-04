@@ -20,11 +20,12 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using BH.oM.Reflection.Attributes;
-using System.ComponentModel;
-using System.Text.RegularExpressions;
+using System;
+using System.Collections.Generic;
+using BH.oM.Excel;
+using ExcelDna.Integration;
 
-namespace BH.Engine.Excel
+namespace BH.Engine.Excel.Profiling
 {
     public static partial class Query
     {
@@ -32,13 +33,9 @@ namespace BH.Engine.Excel
         /**** Methods                           ****/
         /*******************************************/
 
-
-        [Description("Gets the filename of this workbook.")]
-        [Output("A filename.")]
-        public static string GetFilename()
+        public static double TotalTime(string name)
         {
-            string reftext = Caller().RefText();
-            return Regex.Match(reftext, @"\[(.*)\]").Groups[1].Value;
+            return Timer.GetTotal(name);
         }
 
         /*******************************************/

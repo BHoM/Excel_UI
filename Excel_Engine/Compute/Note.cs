@@ -41,7 +41,7 @@ namespace BH.Engine.Excel
         [Input("reference", "The reference of the cell to set the note of.")]
         [Input("message", "The value to set the note to.")]
         [Output("Whether the note was set successfully.")]
-        public static bool SetNote(this oM.Excel.Reference reference, string message)
+        public static bool Note(this oM.Excel.Reference reference, string message)
         {
             ExcelAsyncUtil.QueueAsMacro(() =>
             {
