@@ -65,7 +65,7 @@ namespace BH.UI.Excel.Methods
             if (includePropertyNames)
             {
                 //Create an 2d array to contain property names and values
-                outArr = new object[props.Count +1 , props[0].Count];
+                outArr = new object[props.Count + 1, props[0].Count];
                 int counter = 0;
 
                 foreach (KeyValuePair<string, object> kvp in props[0])
@@ -80,7 +80,7 @@ namespace BH.UI.Excel.Methods
                     counter = 0;
                     foreach (KeyValuePair<string, object> kvp in props[i])
                     {
-                        outArr[i+1, counter] = kvp.Value.ReturnTypeHelper();
+                        outArr[i + 1, counter] = kvp.Value.ReturnTypeHelper();
                         counter++;
                     }
                 }
@@ -103,8 +103,8 @@ namespace BH.UI.Excel.Methods
                 }
 
             }
-            
-            if(transpose)
+
+            if (transpose)
             {
                 outArr = Transpose(outArr);
             }
@@ -116,12 +116,12 @@ namespace BH.UI.Excel.Methods
         /**** Private Methods                   ****/
         /*******************************************/
 
-        private static object[,] Transpose(object[,] arr) 
+        private static object[,] Transpose(object[,] arr)
         {
             int width = arr.GetLength(0);
             int height = arr.GetLength(1);
             object[,] transposed = new object[height, width];
-            for(int i = 0; i < width*height; i++)
+            for (int i = 0; i < width * height; i++)
             {
                 int x = i % width;
                 int y = i / width;
@@ -137,10 +137,11 @@ namespace BH.UI.Excel.Methods
             List<Dictionary<string, object>> props = new List<Dictionary<string, object>>();
             foreach (object obj in objs)
             {
-                if (obj is IEnumerable && ! (obj is string) )
+                if (obj is IEnumerable && !(obj is string))
                 {
                     props.AddRange(GetPropertyDictionaries((obj as IEnumerable).Cast<object>().ToList(), goDeep));
-                } else
+                }
+                else
                 {
                     Dictionary<string, object> dict = new Dictionary<string, object>();
                     GetPropertyDictionary(ref dict, obj, goDeep);
@@ -155,7 +156,7 @@ namespace BH.UI.Excel.Methods
 
         /*******************************************/
 
-        private static void GetPropertyDictionary(ref Dictionary<string,object> dict, object obj, bool goDeep = false, string parentType = "")
+        private static void GetPropertyDictionary(ref Dictionary<string, object> dict, object obj, bool goDeep = false, string parentType = "")
 
         {
             if (obj.GetType().IsPrimitive || obj is string)
@@ -174,7 +175,7 @@ namespace BH.UI.Excel.Methods
 
                 baseDict = obj.PropertyDictionary();
 
-                foreach (KeyValuePair<string,object> kvp in baseDict)
+                foreach (KeyValuePair<string, object> kvp in baseDict)
                 {
                     object value = kvp.Value.ReturnTypeHelper();
                     object innerObj = Project.ActiveProject.GetAny(value.ToString());
