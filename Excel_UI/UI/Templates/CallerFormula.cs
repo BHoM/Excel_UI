@@ -185,6 +185,10 @@ namespace BH.UI.Excel.Templates
             });
         }
 
+        /*******************************************/
+        /**** Events                            ****/
+        /*******************************************/
+
         public event EventHandler OnRun;
 
         /*******************************************/
@@ -195,6 +199,8 @@ namespace BH.UI.Excel.Templates
         {
             return Caller.Run();
         }
+
+        /*******************************************/
 
         protected virtual void Fill()
         {

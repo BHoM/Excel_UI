@@ -34,7 +34,7 @@ namespace BH.UI.Excel
         /**** Methods                           ****/
         /*******************************************/
 
-        public static object Resize(object[] array)
+        public static object Resize(object[] array, Action<ExcelReference> callback)
         {
             object[,] largeArr = new object[1, array.Length];
 
@@ -43,14 +43,28 @@ namespace BH.UI.Excel
                 largeArr[0, i] = array[i];
             }
 
-            return Resize(largeArr);
+            return Resize(largeArr, callback);
+        }
+
+        /*******************************************/
+
+        public static object Resize(object[] array)
+        {
+            return Resize(array, (t) => { });
+        }
+
+        /*******************************************/
+
+        public static object Resize(object[,] array)
+        {
+            return Resize(array, (t) => { });
         }
 
         /*******************************************/
 
         // This function will run in the UDF context.
         // Needs extra protection to allow multithreaded use.
-        public static object Resize(object[,] array)
+        public static object Resize(object[,] array, Action<ExcelReference> callback)
         {
             var caller = Excel(xlfCaller) as ExcelReference;
             var target = caller;
@@ -90,7 +104,7 @@ namespace BH.UI.Excel
             ExcelAsyncUtil.QueueAsMacro(() =>
             {
                 // Create a reference of the right size
-                DoResize(t); // Will trigger a recalc by writing formula
+                DoResize(t, callback); // Will trigger a recalc by writing formula
             });
 
             // Return what we have - to prevent flashing #N/A
@@ -101,7 +115,7 @@ namespace BH.UI.Excel
         /**** Private Methods                   ****/
         /*******************************************/
 
-        static void DoResize(ExcelReference target)
+        static void DoResize(ExcelReference target, Action<ExcelReference> callback)
         {
             // Get the current state for reset later
             using (new ExcelEchoOffHelper())
@@ -151,9 +165,14 @@ namespace BH.UI.Excel
                 if (formulaArrayReturn != XlReturn.XlReturnSuccess)
                 {
                     string firstCellAddress = (string)Excel(xlfReftext, firstCell, true);
+
                     Excel(xlcAlert, "Cannot resize array formula at " + firstCellAddress + " - result might overlap another array.");
                     // Might have failed due to array in the way.
                     firstCell.SetValue("'" + formula);
+                }
+                else
+                {
+                    callback(target);
                 }
             }
         }

@@ -79,6 +79,8 @@ namespace BH.UI.Excel
 
                 m_Application.WorkbookOpenEvent += App_WorkbookOpen;
             }
+
+            InitBHoMAddin();
         }
 
         /*******************************************/

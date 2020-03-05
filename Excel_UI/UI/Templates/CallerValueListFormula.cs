@@ -98,25 +98,16 @@ namespace BH.UI.Excel.Templates
                         worksheet = cell.Worksheet;
                         if (worksheet.Name == "BHoM_ValidationHidden")
                         {
-                            ExcelReference target = xlref;
-                            if((xlref.ColumnLast - xlref.ColumnFirst) + 1 != options.Length)
-                            {
-                                target = new ExcelReference(xlref.RowFirst, xlref.RowFirst, xlref.ColumnFirst, options.Length - 1, xlref.SheetId);
-                            }
-                            var opt_array = new object[1, options.Length];
-                            for (int i = 0; i < options.Length; i++)
-                            {
-                                opt_array[0, i] = options[i];
-                            }
-                            Caller.DataAccessor.SetDataItem(0, ArrayResizer.Resize(opt_array));
-                            ExcelAsyncUtil.QueueAsMacro(() =>
-                            {
-                                try
+                            Caller.DataAccessor.SetDataItem(0,
+                                ArrayResizer.Resize(options, (target) =>
                                 {
-                                    XlCall.Excel(XlCall.xlcDefineName, name, target);
-                                }
-                                catch { }
-                            });
+                                    try
+                                    {
+                                        XlCall.Excel(XlCall.xlcDefineName, name, target);
+                                    }
+                                    catch { }
+                                })
+                            );
                             success = true;
                         }
                         else
