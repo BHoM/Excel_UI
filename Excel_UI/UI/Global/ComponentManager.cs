@@ -17,10 +17,9 @@ namespace BH.UI.Excel.Global
 
         static public void Store(this ComponentRequest req)
         {
-
             foreach (var existing in GetComponents())
             {
-                if(existing.CallerType == req.CallerType && existing.SelectedItem == req.SelectedItem)
+                if (existing.CallerType == req.CallerType && existing.SelectedItem.Equals(req.SelectedItem))
                 {
                     return;
                 }
@@ -40,7 +39,8 @@ namespace BH.UI.Excel.Global
                 try
                 {
                     sheet = sheets["BHoM_ComponetRequests"] as Worksheet;
-                } catch
+                }
+                catch
                 {
                     sheet = null;
 
@@ -177,5 +177,7 @@ namespace BH.UI.Excel.Global
         /*************************************/
 
         public static event EventHandler<ComponentRequest> ComponentRestored;
+
+        /*************************************/
     }
 }
