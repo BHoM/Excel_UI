@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using NetOffice.ExcelApi;
 using BH.Engine.Serialiser;
+using BH.UI.Templates;
 
 namespace BH.UI.Excel.Global
 {
@@ -15,17 +16,17 @@ namespace BH.UI.Excel.Global
         /**** Methods                     ****/
         /*************************************/
 
-        static public void Store(this ComponentRequest req)
+        public static void Store(this Caller req, string formula)
         {
-            foreach (var existing in GetComponents())
+            foreach (var existing in GetStored())
             {
-                if (existing.CallerType == req.CallerType && existing.SelectedItem.Equals(req.SelectedItem))
+                if (formula == existing)
                 {
                     return;
                 }
             }
 
-            string json = req.ToJson();
+            string json = req.Write();
             Application app = null;
             Workbook workbook = null;
             Sheets sheets = null;
@@ -56,7 +57,7 @@ namespace BH.UI.Excel.Global
                 do
                 {
                     row++;
-                    cell = sheet.Cells[row, 1];
+                    cell = sheet.Cells[row, 3];
                     try
                     {
                         contents = cell.Value as string;
@@ -67,6 +68,8 @@ namespace BH.UI.Excel.Global
                 int c = 0;
                 while (c < json.Length)
                 {
+                    sheet.Cells[row, 1].Value = formula;
+                    sheet.Cells[row, 2].Value = req.GetType().Name;
                     cell.Value = json.Substring(c);
                     c += (cell.Value as string).Length;
                     cell = cell.Next;
@@ -85,20 +88,9 @@ namespace BH.UI.Excel.Global
             }
         }
 
-        /*************************************/
-
-        static public void Restore()
+        private static IEnumerable<string> GetStored()
         {
-            foreach (var req in GetComponents())
-            {
-                ComponentRestored?.Invoke(null, req);
-            }
-        }
-
-        static private List<ComponentRequest> GetComponents()
-        {
-            List<string> json = new List<string>();
-
+            List<string> formulas = new List<string>();
             Application app = null;
             Workbook workbook = null;
             Sheets sheets = null;
@@ -122,6 +114,82 @@ namespace BH.UI.Excel.Global
                         try
                         {
                             cell = row.Cells[1, 1];
+                            str = cell.Value.ToString();
+                            next = cell.Next;
+                            cell.Dispose();
+                            cell = next;
+                        }
+                        catch { }
+
+                        if (str.Length > 0)
+                        {
+                            formulas.Add(str);
+                        }
+
+                        row.Dispose();
+                    }
+                }
+                catch
+                {
+                }
+            }
+            finally
+            {
+                if (app != null)
+                    app.Dispose();
+                if (sheets != null)
+                    sheets.Dispose();
+                if (sheet != null)
+                    sheet.Dispose();
+                if (cell != null)
+                    cell.Dispose();
+            }
+            return formulas;
+        }
+
+        /*************************************/
+
+        static public void Restore()
+        {
+            foreach (var req in GetComponents())
+            {
+                ComponentRestored?.Invoke(null, req);
+            }
+        }
+
+        static private Dictionary<string, Tuple<string, string>> GetComponents()
+        {
+            Dictionary<string, Tuple<string, string>> components = new Dictionary<string, Tuple<string, string>>();
+
+            Application app = null;
+            Workbook workbook = null;
+            Sheets sheets = null;
+            Worksheet sheet = null;
+            Range cell = null;
+            Range next = null;
+            Range used = null;
+            try
+            {
+                app = Application.GetActiveInstance();
+                workbook = app.ActiveWorkbook;
+                sheets = workbook.Sheets;
+                try
+                {
+                    sheet = sheets["BHoM_ComponetRequests"] as Worksheet;
+
+                    used = sheet.UsedRange;
+                    foreach (Range row in used.Rows)
+                    {
+                        string str = "";
+                        string key = "";
+                        string callerType = "";
+                        try
+                        {
+                            cell = row.Cells[1, 1];
+                            key = cell.Value.ToString();
+                            cell = row.Cells[1, 2];
+                            callerType = cell.Value.ToString();
+                            cell = row.Cells[1, 3];
                             while (cell.Value != null && cell.Value is string && (cell.Value as string).Length > 0)
                             {
                                 str += cell.Value;
@@ -134,7 +202,7 @@ namespace BH.UI.Excel.Global
 
                         if (str.Length > 0)
                         {
-                            json.Add(str);
+                            components.Add(key,new Tuple<string, string>(callerType, str));
                         }
 
                         row.Dispose();
@@ -156,27 +224,15 @@ namespace BH.UI.Excel.Global
                     cell.Dispose();
             }
 
-            List<ComponentRequest> requests = new List<ComponentRequest>();
-            foreach (string request in json)
-            {
-                try
-                {
-                    ComponentRequest req = BH.Engine.Serialiser.Convert.FromJson(request) as ComponentRequest;
-                    if (req != null)
-                    {
-                        requests.Add(req);
-                    }
-                }
-                catch { }
-            }
-            return requests;
+            return components;
         }
+
 
         /*************************************/
         /**** Events                      ****/
         /*************************************/
 
-        public static event EventHandler<ComponentRequest> ComponentRestored;
+        public static event EventHandler<KeyValuePair<string, Tuple<string, string>>> ComponentRestored;
 
         /*************************************/
     }

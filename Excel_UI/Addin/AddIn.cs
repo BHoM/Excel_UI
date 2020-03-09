@@ -218,13 +218,34 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        private void ComponentManager_ComponentRestored(object sender, oM.UI.ComponentRequest e)
+        private void ComponentManager_ComponentRestored(object sender, KeyValuePair<string, Tuple<string, string>> restored)
         {
-            if (e != null && e.CallerType != null && Formulea.ContainsKey(e.CallerType.Name))
+            string key = restored.Key;
+            string json = restored.Value.Item2;
+            string callerType = restored.Value.Item1;
+            if (Formulea.ContainsKey(callerType))
             {
-                CallerFormula formula = Formulea[e.CallerType.Name];
-                formula.Caller.SetItem(e.SelectedItem);
-                formula.Register();
+                var formula = Formulea[callerType];
+                if (formula.Caller.Read(json))
+                {
+                    if (formula.Function != key)
+                    {
+                        if (formula.Caller.WasUpgraded)
+                        {
+                            /* TODO: Handle upgraded components
+                             *      Register dummy formula with old formula
+                             *      Have this dummy formula parse into an expression tree,
+                             *      Rearrange inputs accordingly, and write new expression 
+                             *      tree back out, replacing formula in the cell.
+                             */
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                    formula.Register();
+                }
             }
         }
 
@@ -289,20 +310,23 @@ namespace BH.UI.Excel
                     {
                         InitBHoMAddin();
                         ComponentManager.Restore();
-                        foreach (Worksheet sheet in sheets.OfType<Worksheet>())
+                        ExcelAsyncUtil.QueueAsMacro(() =>
                         {
-                            try
+                            foreach (Worksheet sheet in sheets.OfType<Worksheet>())
                             {
-                                bool before = sheet.EnableCalculation;
-                                sheet.EnableCalculation = false;
-                                sheet.Calculate();
-                                sheet.EnableCalculation = before;
+                                try
+                                {
+                                    bool before = sheet.EnableCalculation;
+                                    sheet.EnableCalculation = false;
+                                    sheet.Calculate();
+                                    sheet.EnableCalculation = before;
+                                }
+                                finally
+                                {
+                                    sheet.Dispose();
+                                }
                             }
-                            finally
-                            {
-                                sheet.Dispose();
-                            }
-                        }
+                        });
                     });
                 }
 
@@ -373,10 +397,10 @@ namespace BH.UI.Excel
             {
                 formula.OnRun += (s, e) =>
                 {
+                    var f = (s as CallerFormula);
                     FlagUsed();
-                    var caller = (s as CallerFormula).Caller;
-                    var request = new ComponentRequest { CallerType = caller.GetType(), SelectedItem = caller.SelectedItem };
-                    ComponentManager.Store(request);
+                    var caller = f.Caller;
+                    caller.Store(f.Function);
                 };
             }
         }
