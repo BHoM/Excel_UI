@@ -81,6 +81,7 @@ namespace BH.UI.Excel
                 (caller.ColumnLast - caller.ColumnFirst + 1 == columns))
             {
                 // Size is already OK - just return result
+                //callback(target);
                 return array;
             }
 
@@ -156,11 +157,7 @@ namespace BH.UI.Excel
                 }
                 // Must be R1C1-style references
                 object ignoredResult;
-                //Debug.Print("Resizing START: " + target.RowLast);
                 XlReturn formulaArrayReturn = TryExcel(xlcFormulaArray, out ignoredResult, formulaR1C1, target);
-                //Debug.Print("Resizing FINISH");
-
-                // TODO: Find some dummy macro to clear the undo stack
 
                 if (formulaArrayReturn != XlReturn.XlReturnSuccess)
                 {

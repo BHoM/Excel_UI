@@ -110,8 +110,9 @@ namespace BH.UI.Excel.Templates
 
         public bool Run()
         {
+            bool success = Excecute();
             OnRun?.Invoke(this, null);
-            return Excecute();
+            return success;
         }
 
         /*******************************************/
@@ -181,6 +182,7 @@ namespace BH.UI.Excel.Templates
                     new List<List<object>> { formula.Item3 }
                 );
                 m_Registered.Add(Function);
+                ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
                 callback();
             });
         }
