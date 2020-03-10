@@ -71,14 +71,32 @@ namespace BH.Engine.Excel
 
         public static string ToFormula(this FunctionExpression expression)
         {
-            return expression.Name + "(" + expression.Arguments.Select(e=>e.IToFormula()).Aggregate((a,b)=>$"{a},{b}") + ")";
+            string inner = "";
+            bool first = true;
+            foreach (string expr in expression.Arguments.Select(e=>e.IToFormula()))
+            {
+                if (!first)
+                    inner += ",";
+                inner += expr;
+                first = false;
+            }
+            return expression.Name + "(" + inner + ")";
         }
 
         /*******************************************/
 
         public static string ToFormula(this ArrayExpression expression)
         {
-            return "{" + expression.Expressions.Select(e=>e.IToFormula()).Aggregate((a,b)=>$"{a},{b}") + "}";
+            string inner = "";
+            bool first = true;
+            foreach (string expr in expression.Expressions.Select(e=>e.IToFormula()))
+            {
+                if (!first)
+                    inner += ",";
+                inner += expr;
+                first = false;
+            }
+            return "{" + inner + "}";
         }
 
         /*******************************************/
