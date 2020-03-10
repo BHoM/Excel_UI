@@ -24,6 +24,7 @@ namespace BH.UI.Excel.UI.Global
             m_NewName = caller.Function;
             m_NewParams = caller.Caller.InputParams.ToList();
             m_OldName = oldFormula;
+            m_Upgraded = caller.Caller.WasUpgraded;
             Register();
         }
 
@@ -74,21 +75,33 @@ namespace BH.UI.Excel.UI.Global
             if (expression.Name == m_OldName)
             {
                 var newExpr = new FunctionExpression { Name = m_NewName };
-                foreach (var param in m_NewParams)
+                if (!m_Upgraded) // If just renamed
                 {
-                    IExpression newParam = new EmptyExpression();
-                    var oldIndexFgmt = param.FindFragment<ParamOldIndexFragment>();
-                    int oldIndex = -1;
-                    if(oldIndexFgmt != null)
-                    {
-                        oldIndex = oldIndexFgmt.OldIndex;
-                    }
-                    if(oldIndex != -1 && oldIndex < expression.Arguments.Count)
-                    {
-                        newParam = IRemap(expression.Arguments[oldIndex]);
-                    }
-                    newExpr.Arguments.Add(newParam);
+                    newExpr.Arguments = expression.Arguments.Select(IRemap).ToList();
                 }
+                else
+                {
+                    foreach (var param in m_NewParams)
+                    {
+                        IExpression newParam = new EmptyExpression();
+                        var oldIndexFgmt = param.FindFragment<ParamOldIndexFragment>();
+                        int oldIndex = -1;
+                        if (oldIndexFgmt != null)
+                        {
+                            oldIndex = oldIndexFgmt.OldIndex;
+                        }
+                        if (oldIndex != -1 && oldIndex < expression.Arguments.Count)
+                        {
+                            newParam = IRemap(expression.Arguments[oldIndex]);
+                        }
+                        newExpr.Arguments.Add(newParam);
+                    }
+                }
+
+                // Remove trailing empty expressions
+                int lastNonEmpty = newExpr.Arguments.FindLastIndex(e => !(e is EmptyExpression)) + 1;
+                if(lastNonEmpty < newExpr.Arguments.Count)
+                    newExpr.Arguments.RemoveRange(lastNonEmpty, newExpr.Arguments.Count - lastNonEmpty);
                 return newExpr;
             }
            return new FunctionExpression { Name = expression.Name, Arguments = expression.Arguments.Select(IRemap).ToList() };
@@ -136,6 +149,7 @@ namespace BH.UI.Excel.UI.Global
         private string m_NewName;
         private List<ParamInfo> m_NewParams;
         private string m_OldName;
+        private bool m_Upgraded;
         private static HashSet<string> m_Registered = new HashSet<string>();
         private static object m_Mutex = new object();
 
