@@ -79,7 +79,7 @@ namespace BH.UI.Excel.Templates
         public CallerFormula()
         {
             Caller.SetDataAccessor(new FormulaDataAccessor());
-            Caller.ItemSelected += (e,s) => FillFormula();
+            //Caller.ItemSelected += (e,s) => FillFormula();
         }
 
         /*******************************************/

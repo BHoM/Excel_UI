@@ -232,12 +232,7 @@ namespace BH.UI.Excel
                     {
                         if (formula.Caller.WasUpgraded)
                         {
-                            /* TODO: Handle upgraded components
-                             *      Register dummy formula with old formula
-                             *      Have this dummy formula parse into an expression tree,
-                             *      Rearrange inputs accordingly, and write new expression 
-                             *      tree back out, replacing formula in the cell.
-                             */
+                            var upgrader = new UI.Global.ComponentUpgrader(key, formula);
                         }
                         else
                         {

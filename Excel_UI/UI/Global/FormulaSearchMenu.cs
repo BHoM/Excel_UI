@@ -110,7 +110,7 @@ namespace BH.UI.Excel.Global
             }));
 
             items.AddRange(Engine.UI.Query.CreateRequestItems().Select(x => new SearchItem {
-                Item = x, CallerType = typeof(UI.Components.CreateRequestCaller), Text = x.ToText(true)
+                Item = x, CallerType = typeof(BH.UI.Components.CreateRequestCaller), Text = x.ToText(true)
             }));
 
             return items;

@@ -30,7 +30,7 @@ using System.Threading.Tasks;
 
 namespace BH.UI.Excel.Callers
 {
-    class CreateCustomCaller : UI.Components.CreateCustomCaller
+    class CreateCustomCaller : BH.UI.Components.CreateCustomCaller
     {
         /*******************************************/
         /**** Constructors                      ****/
