@@ -244,7 +244,6 @@ namespace BH.UI.Excel
             }
         }
 
-
         /*******************************************/
 
         private void Internalise_Click(CommandBarButton Ctrl, ref bool CancelDefault)

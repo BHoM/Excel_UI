@@ -88,6 +88,54 @@ namespace BH.UI.Excel.Global
             }
         }
 
+        /*************************************/
+
+        public static void Restore()
+        {
+            foreach (var req in GetComponents())
+            {
+                ComponentRestored?.Invoke(null, req);
+            }
+
+            // Clear the sheet, it will be repopulated
+            Application app = null;
+            Workbook workbook = null;
+            Sheets sheets = null;
+            Worksheet sheet = null;
+            Range used = null;
+            try
+            {
+                app = Application.GetActiveInstance();
+                workbook = app.ActiveWorkbook;
+                sheets = workbook.Sheets;
+                try
+                {
+                    sheet = sheets["BHoM_ComponetRequests"] as Worksheet;
+
+                    used = sheet.UsedRange;
+                    used.Clear();
+                }
+                catch { }
+            }
+            finally
+            {
+                if (used != null)
+                    used.Dispose();
+                if (sheet != null)
+                    sheet.Dispose();
+                if (sheets != null)
+                    sheets.Dispose();
+                if (workbook != null)
+                    workbook.Dispose();
+                if (app != null)
+                    app.Dispose();
+            }
+        }
+
+        /*************************************/
+        /**** Private Methods             ****/
+        /*************************************/
+
         private static IEnumerable<string> GetStored()
         {
             List<string> formulas = new List<string>();
@@ -155,49 +203,7 @@ namespace BH.UI.Excel.Global
 
         /*************************************/
 
-        static public void Restore()
-        {
-            foreach (var req in GetComponents())
-            {
-                ComponentRestored?.Invoke(null, req);
-            }
-
-            // Clear the sheet, it will be repopulated
-            Application app = null;
-            Workbook workbook = null;
-            Sheets sheets = null;
-            Worksheet sheet = null;
-            Range used = null;
-            try
-            {
-                app = Application.GetActiveInstance();
-                workbook = app.ActiveWorkbook;
-                sheets = workbook.Sheets;
-                try
-                {
-                    sheet = sheets["BHoM_ComponetRequests"] as Worksheet;
-
-                    used = sheet.UsedRange;
-                    used.Clear();
-                }
-                catch { }
-            }
-            finally
-            {
-                if (used != null)
-                    used.Dispose();
-                if (sheet != null)
-                    sheet.Dispose();
-                if (sheets != null)
-                    sheets.Dispose();
-                if (workbook != null)
-                    workbook.Dispose();
-                if (app != null)
-                    app.Dispose();
-            }
-        }
-
-        static private Dictionary<string, Tuple<string, string>> GetComponents()
+        private static Dictionary<string, Tuple<string, string>> GetComponents()
         {
             Dictionary<string, Tuple<string, string>> components = new Dictionary<string, Tuple<string, string>>();
 
@@ -272,7 +278,6 @@ namespace BH.UI.Excel.Global
 
             return components;
         }
-
 
         /*************************************/
         /**** Events                      ****/

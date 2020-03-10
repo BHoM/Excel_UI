@@ -15,6 +15,10 @@ namespace BH.UI.Excel.UI.Global
 {
     class ComponentUpgrader
     {
+        /*************************************/
+        /**** Constructors                ****/
+        /*************************************/
+
         public ComponentUpgrader(string oldFormula, CallerFormula caller)
         {
             m_NewName = caller.Function;
@@ -22,6 +26,48 @@ namespace BH.UI.Excel.UI.Global
             m_OldName = oldFormula;
             Register();
         }
+
+        /*************************************/
+        /**** Private Methods             ****/
+        /*************************************/
+
+        private void Register()
+        {
+            lock(m_Mutex)
+            {
+                if(m_Registered.Contains(m_OldName))
+                    return;
+                ExcelIntegration.RegisterDelegates(
+                    new List<Delegate> { new Func<object,object,object,object,object,object,object,object,object,object,object,object,object,object,object>((a,b,c,d,e,f,g,h,i,j,k,l,m,n)=>Upgrade()) },
+                    new List<object> { new ExcelFunctionAttribute { Name = m_OldName } },
+                    new List<List<object>> { new List<object> { } }
+                );
+            }
+        }
+
+        /*************************************/
+
+        private object Upgrade()
+        {
+            ExcelReference xlref = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
+            ExcelAsyncUtil.QueueAsMacro(() =>
+            {
+                string formula = XlCall.Excel(XlCall.xlfGetFormula, xlref).ToString();
+                var expr = formula.ToExpression();
+                var newExpr = IRemap(expr);
+                xlref.ToReference().Contents("=" + newExpr.IToFormula());
+            });
+            return ExcelError.ExcelErrorName;
+        }
+
+        /*************************************/
+
+        private IExpression IRemap(IExpression expression)
+        {
+            return Remap(expression as dynamic);
+        }
+
+        /*************************************/
 
         private IExpression Remap(FunctionExpression expression)
         {
@@ -48,67 +94,51 @@ namespace BH.UI.Excel.UI.Global
            return new FunctionExpression { Name = expression.Name, Arguments = expression.Arguments.Select(IRemap).ToList() };
         }
 
+        /*************************************/
+
         private IExpression Remap(ArrayExpression expression)
         {
            return new ArrayExpression { Expressions = expression.Expressions.Select(IRemap).ToList() };
         }
+
+        /*************************************/
 
         private IExpression Remap(ExpressionGroup expression)
         {
             return new ExpressionGroup { Expression = IRemap(expression.Expression) };
         }
 
+        /*************************************/
+
         private IExpression Remap(BinaryExpression expression)
         {
             return new BinaryExpression { Operator = expression.Operator, Left = IRemap(expression.Left), Right = IRemap(expression.Right) };
         }
+
+        /*************************************/
 
         private IExpression Remap(UnaryExpression expression)
         {
             return new UnaryExpression { Operator = expression.Operator, Expression = IRemap(expression.Expression) };
         }
 
+        /*************************************/
+
         private IExpression Remap(IExpression expression)
         {
             return expression;
         }
 
-        private IExpression IRemap(IExpression expression)
-        {
-            return Remap(expression as dynamic);
-        }
-
-        private object Upgrade()
-        {
-            ExcelReference xlref = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
-            ExcelAsyncUtil.QueueAsMacro(() =>
-            {
-                string formula = XlCall.Excel(XlCall.xlfGetFormula, xlref).ToString();
-                var expr = formula.ToExpression();
-                var newExpr = IRemap(expr);
-                xlref.ToReference().Contents("=" + newExpr.IToFormula());
-            });
-            return ExcelError.ExcelErrorName;
-        }
-
-        private void Register()
-        {
-            lock(m_Mutex)
-            {
-                if(m_Registered.Contains(m_OldName))
-                    return;
-                ExcelIntegration.RegisterDelegates(
-                    new List<Delegate> { new Func<object,object,object,object,object,object,object,object,object,object,object,object,object,object,object>((a,b,c,d,e,f,g,h,i,j,k,l,m,n)=>Upgrade()) },
-                    new List<object> { new ExcelFunctionAttribute { Name = m_OldName } },
-                    new List<List<object>> { new List<object> { } }
-                );
-            }
-        }
+        /*************************************/
+        /**** Private Fields              ****/
+        /*************************************/
 
         private string m_NewName;
         private List<ParamInfo> m_NewParams;
         private string m_OldName;
         private static HashSet<string> m_Registered = new HashSet<string>();
         private static object m_Mutex = new object();
+
+        /*************************************/
     }
 }
