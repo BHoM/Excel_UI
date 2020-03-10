@@ -40,6 +40,9 @@
       <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM_Adapter.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="BHoM_Engine">
+      <HintPath>..\..\BHoM_Engine\Build\BHoM_Engine.dll</HintPath>
+    </Reference>
     <Reference Include="BHoM_UI">
       <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM_UI.dll</HintPath>
       <Private>False</Private>
@@ -148,6 +151,7 @@
     <Compile Include="UI\Components\Engine\ToJson.cs" />
     <Compile Include="UI\Components\oM\CreateData.cs" />
     <Compile Include="UI\Global\ComponentManager.cs" />
+    <Compile Include="UI\Global\ComponentUpgrader.cs" />
     <Compile Include="UI\Templates\CallerValueListFormula.cs" />
     <Compile Include="UI\Components\oM\CreateCustom.cs" />
     <Compile Include="UI\Components\oM\CreateDictionary.cs" />

@@ -135,14 +135,20 @@ namespace BH.UI.Excel.Global
             }
             finally
             {
-                if (app != null)
-                    app.Dispose();
-                if (sheets != null)
-                    sheets.Dispose();
-                if (sheet != null)
-                    sheet.Dispose();
+                if (next != null)
+                    next.Dispose();
                 if (cell != null)
                     cell.Dispose();
+                if (used != null)
+                    used.Dispose();
+                if (sheet != null)
+                    sheet.Dispose();
+                if (sheets != null)
+                    sheets.Dispose();
+                if (workbook != null)
+                    workbook.Dispose();
+                if (app != null)
+                    app.Dispose();
             }
             return formulas;
         }
@@ -154,6 +160,40 @@ namespace BH.UI.Excel.Global
             foreach (var req in GetComponents())
             {
                 ComponentRestored?.Invoke(null, req);
+            }
+
+            // Clear the sheet, it will be repopulated
+            Application app = null;
+            Workbook workbook = null;
+            Sheets sheets = null;
+            Worksheet sheet = null;
+            Range used = null;
+            try
+            {
+                app = Application.GetActiveInstance();
+                workbook = app.ActiveWorkbook;
+                sheets = workbook.Sheets;
+                try
+                {
+                    sheet = sheets["BHoM_ComponetRequests"] as Worksheet;
+
+                    used = sheet.UsedRange;
+                    used.Clear();
+                }
+                catch { }
+            }
+            finally
+            {
+                if (used != null)
+                    used.Dispose();
+                if (sheet != null)
+                    sheet.Dispose();
+                if (sheets != null)
+                    sheets.Dispose();
+                if (workbook != null)
+                    workbook.Dispose();
+                if (app != null)
+                    app.Dispose();
             }
         }
 
@@ -214,14 +254,20 @@ namespace BH.UI.Excel.Global
             }
             finally
             {
-                if (app != null)
-                    app.Dispose();
-                if (sheets != null)
-                    sheets.Dispose();
-                if (sheet != null)
-                    sheet.Dispose();
+                if (next != null)
+                    next.Dispose();
                 if (cell != null)
                     cell.Dispose();
+                if (used != null)
+                    used.Dispose();
+                if (sheet != null)
+                    sheet.Dispose();
+                if (sheets != null)
+                    sheets.Dispose();
+                if (workbook != null)
+                    workbook.Dispose();
+                if (app != null)
+                    app.Dispose();
             }
 
             return components;
