@@ -230,7 +230,7 @@ namespace BH.UI.Excel
                 {
                     if (formula.Function != key)
                     {
-                        if (formula.Caller.WasUpgraded)
+                        if (formula.Caller.SelectedItem != null)
                         {
                             var upgrader = new UI.Global.ComponentUpgrader(key, formula);
                         }
