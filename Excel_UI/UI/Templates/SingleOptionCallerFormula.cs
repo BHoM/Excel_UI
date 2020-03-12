@@ -23,6 +23,7 @@
 using BH.Engine.Reflection;
 using BH.oM.UI;
 using BH.UI.Templates;
+using ExcelDna.Integration;
 using Microsoft.Office.Core;
 using Microsoft.Office.Interop.Excel;
 using System;
@@ -73,7 +74,10 @@ namespace BH.UI.Excel.Templates
 
         public override void Select(string id)
         {
-            FillFormula();
+            ExcelAsyncUtil.QueueAsMacro(() =>
+            {
+                FillFormula(Engine.Excel.Query.Selection());
+            });
         }
 
         /*******************************************/

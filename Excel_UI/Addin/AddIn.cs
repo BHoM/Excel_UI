@@ -44,6 +44,7 @@ using NetOffice.ExcelApi.Enums;
 using System.Drawing;
 using System.Xml;
 using BH.oM.UI;
+using BH.Engine.Base;
 
 namespace BH.UI.Excel
 {
@@ -77,10 +78,11 @@ namespace BH.UI.Excel
                         m_Menus.Add(commandBar);
                 }
 
+                m_Application.NewWorkbookEvent += App_WorkbookNew;
                 m_Application.WorkbookOpenEvent += App_WorkbookOpen;
             }
 
-            InitBHoMAddin();
+            ExcelAsyncUtil.QueueAsMacro(() => InitBHoMAddin());
         }
 
         /*******************************************/
@@ -110,11 +112,23 @@ namespace BH.UI.Excel
         {
             if (m_Initialised)
                 return true;
-            RegisterBHoMMethods();
+            if(m_GlobalSearch == null)
+            {
+                try
+                {
+                    m_GlobalSearch = new SearchMenu_WinForm();
+                    m_GlobalSearch.ItemSelected += GlobalSearch_ItemSelected;
+                }
+                catch (Exception e)
+                {
+                    Engine.Reflection.Compute.RecordError(e.Message);
+                }
+            }
             ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
             AddInternalise();
             ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
             m_Initialised = true;
+            ExcelDna.Logging.LogDisplay.Clear();
             return true;
         }
 
@@ -130,7 +144,7 @@ namespace BH.UI.Excel
         [ExcelCommand(ShortCut = "^B")]
         public static void InitGlobalSearch()
         {
-
+            Instance.m_CurrentSelection = Engine.Excel.Query.Selection();
             var control = new System.Windows.Forms.ContainerControl();
             m_GlobalSearch.SetParent(control);
         }
@@ -155,7 +169,7 @@ namespace BH.UI.Excel
             XmlDocument doc = new XmlDocument();
             XmlElement root = doc.CreateElement("root");
             doc.AppendChild(root);
-            foreach(CallerFormula caller in Instance.Formulea.Values)
+            foreach (CallerFormula caller in Instance.Formulea.Values)
             {
                 try
                 {
@@ -174,7 +188,7 @@ namespace BH.UI.Excel
                         boxes[caller.Category].Add(caller.Caller.GroupIndex, doc.CreateElement("box"));
 
                     XmlElement box = boxes[caller.Category][caller.Caller.GroupIndex];
-                    box.SetAttribute("id", caller.Category+"-group" + caller.Caller.GroupIndex);
+                    box.SetAttribute("id", caller.Category + "-group" + caller.Caller.GroupIndex);
                     box.SetAttribute("boxStyle", "vertical");
 
                     XmlDocument tmp = new XmlDocument();
@@ -186,11 +200,11 @@ namespace BH.UI.Excel
                 }
             }
 
-            foreach(var kvp in boxes)
+            foreach (var kvp in boxes)
             {
                 List<int> ordered = kvp.Value.Keys.ToList();
                 ordered.Sort();
-                foreach(int i in ordered)
+                foreach (int i in ordered)
                 {
                     groups[kvp.Key].AppendChild(kvp.Value[i]);
                     var sep = doc.CreateElement("separator");
@@ -212,8 +226,16 @@ namespace BH.UI.Excel
             {
                 CallerFormula formula = Formulea[e.CallerType.Name];
                 formula.Caller.SetItem(e.SelectedItem);
-                formula.FillFormula();
+                formula.FillFormula(m_CurrentSelection);
             }
+        }
+
+        /*******************************************/
+
+        private void App_WorkbookNew(Workbook workbook)
+        {
+            InitBHoMAddin();
+            var manager = ComponentManager.GetManager(workbook);
         }
 
         /*******************************************/
@@ -253,28 +275,28 @@ namespace BH.UI.Excel
 
             try
             {
-                    selected = m_Application.Selection as Range;
+                selected = m_Application.Selection as Range;
 
-                    foreach (Range objcell in selected)
+                foreach (Range objcell in selected)
+                {
+                    string value;
+                    try
                     {
-                        string value;
-                        try
-                        {
-                            value = (string)objcell.Value;
-                            if (value == null || value.Length == 0)
-                                continue;
-                        }
-                        catch { continue; }
-
-                        Project proj = Project.ForIDs(new string[] { value });
-
-                        if (proj.Count((o) => !(o is Adapter.BHoMAdapter)) == 0)
+                        value = (string)objcell.Value;
+                        if (value == null || value.Length == 0)
                             continue;
-                        proj.SaveData(m_Application.ActiveWorkbook);
-
-                        objcell.Value = value;
-                        objcell.Dispose();
                     }
+                    catch { continue; }
+
+                    Project proj = Project.ForIDs(new string[] { value });
+
+                    if (proj.Count((o) => !(o is Adapter.BHoMAdapter)) == 0)
+                        continue;
+                    proj.SaveData(m_Application.ActiveWorkbook);
+
+                    objcell.Value = value;
+                    objcell.Dispose();
+                }
             }
             finally
             {
@@ -289,7 +311,7 @@ namespace BH.UI.Excel
         {
             List<string> json = new List<string>();
             Sheets sheets = null;
-            _Worksheet newsheet = null;
+            Worksheet newsheet = null;
             Range used = null;
             Range cell = null;
             Range next = null;
@@ -297,28 +319,44 @@ namespace BH.UI.Excel
             {
                 sheets = workbook.Sheets;
 
-                if (sheets.OfType<Worksheet>()
-                    .FirstOrDefault(s => s.Name == "BHoM_Used") != null)
+                bool bhomUsed = sheets.OfType<Worksheet>().FirstOrDefault(s => s.Name == "BHoM_Used") != null;
+                bool hasComponents = sheets.OfType<Worksheet>().FirstOrDefault(s => s.Name == "BHoM_ComponetRequests") != null;
+                if (bhomUsed)
                 {
                     ExcelAsyncUtil.QueueAsMacro(() =>
                     {
                         InitBHoMAddin();
-                        ComponentManager.Restore();
+                        var manager = ComponentManager.GetManager(workbook);
+                        if (!hasComponents)
+                        {
+                            RegisterAllBHoMMethods();
+                        }
+                        else
+                        {
+                            manager.Restore();
+                        }
                         ExcelAsyncUtil.QueueAsMacro(() =>
                         {
-                            foreach (Worksheet sheet in sheets.OfType<Worksheet>())
+                            try
                             {
-                                try
+                                foreach (Worksheet sheet in sheets.OfType<Worksheet>())
                                 {
-                                    bool before = sheet.EnableCalculation;
-                                    sheet.EnableCalculation = false;
-                                    sheet.Calculate();
-                                    sheet.EnableCalculation = before;
+                                    try
+                                    {
+                                        bool before = sheet.EnableCalculation;
+                                        sheet.EnableCalculation = false;
+                                        sheet.Calculate();
+                                        sheet.EnableCalculation = before;
+                                    }
+                                    finally
+                                    {
+                                        sheet.Dispose();
+                                    }
                                 }
-                                finally
-                                {
-                                    sheet.Dispose();
-                                }
+                            } finally
+                            {
+                                if (sheets != null)
+                                    sheets.Dispose();
                             }
                         });
                     });
@@ -361,14 +399,14 @@ namespace BH.UI.Excel
             }
             finally
             {
-                if (newsheet != null)
-                    newsheet.Dispose();
                 if (cell != null)
                     cell.Dispose();
-                if (used != null)
-                    used.Dispose();
                 if (next != null)
                     next.Dispose();
+                if (used != null)
+                    used.Dispose();
+                if (newsheet != null)
+                    newsheet.Dispose();
             }
         }
 
@@ -394,41 +432,24 @@ namespace BH.UI.Excel
                     var f = (s as CallerFormula);
                     FlagUsed();
                     var caller = f.Caller;
-                    caller.Store(f.Function);
+                    string name = Engine.Excel.Query.Filename();
+                    var manager = ComponentManager.GetManager(name);
+                    if(manager != null)
+                    {
+                        manager.Store(caller, f.Function);
+                    }
                 };
             }
         }
 
         /*******************************************/
 
-        private void RegisterBHoMMethods()
+        private void RegisterAllBHoMMethods()
         {
-            try
-            {
-                var searcher = new FormulaSearchMenu(Formulea);
-                //searcher.SetParent(null);
-
-                searcher.ItemSelected += Formula_ItemSelected;
-                m_GlobalSearch = new SearchMenu_WinForm();
-                m_GlobalSearch.ItemSelected += GlobalSearch_ItemSelected;
-            }
-            catch (Exception e)
-            {
-                Compute.RecordError(e.Message);
-            }
+            var searcher = new FormulaSearchMenu(Formulea);
+            searcher.SetParent(null);
         }
 
-        /*******************************************/
-
-        private void Formula_ItemSelected(object sender, oM.UI.ComponentRequest e)
-        {
-            if (Formulea.ContainsKey(e.CallerType.Name))
-            {
-                CallerFormula formula = Formulea[e.CallerType.Name];
-                formula.Caller.SetItem(e.SelectedItem);
-                formula.Run();
-            }
-        }
 
         /*******************************************/
         private void FlagUsed()
@@ -449,32 +470,13 @@ namespace BH.UI.Excel
                 }
             } finally
             {
-                if (workbook != null)
-                    workbook.Dispose();
                 if (sheet != null)
                     sheet.Dispose();
                 if (sheets != null)
                     sheets.Dispose();
+                if (workbook != null)
+                    workbook.Dispose();
             }
-        }
-
-        /*******************************************/
-
-        private static bool IsNullMissingOrEmpty(object obj)
-        {
-            if (obj == null)
-                return true;
-
-            if (obj == ExcelMissing.Value)
-                return true;
-
-            if (obj == ExcelEmpty.Value)
-                return true;
-
-            if (obj is string && string.IsNullOrWhiteSpace(obj as string))
-                return true;
-
-            return false;
         }
 
         /*******************************************/
@@ -501,9 +503,10 @@ namespace BH.UI.Excel
         private Dictionary<string, CallerFormula> m_Formulea;
         private List<CommandBar> m_Menus;
         private Application m_Application;
-        private static SearchMenu m_GlobalSearch;
+        private static SearchMenu m_GlobalSearch = null;
         private bool m_Initialised = false;
         private IEnumerable<CommandBarButton> m_Btns;
+        private oM.Excel.Reference m_CurrentSelection;
 
         /*******************************************/
     }

@@ -35,11 +35,11 @@ namespace BH.Engine.Excel
         /**** Methods                           ****/
         /*******************************************/
 
-        [Description("Gets a reference to this cell (the one from which this method is being called).")]
-        [Output("The reference to the calling cell.")]
-        public static oM.Excel.Reference Caller()
+        [Description("Gets a reference to the selected range.")]
+        [Output("The reference to the selected range.")]
+        public static oM.Excel.Reference Selection()
         {
-            ExcelReference xlref = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
+            ExcelReference xlref = XlCall.Excel(XlCall.xlfSelection) as ExcelReference;
             return xlref.ToReference();
         }
 
