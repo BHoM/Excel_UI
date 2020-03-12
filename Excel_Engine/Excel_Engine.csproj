@@ -66,6 +66,7 @@
     <Compile Include="Compute\Note.cs" />
     <Compile Include="Convert\FromExcel\Expression.cs" />
     <Compile Include="Convert\ToExcel\Formula.cs" />
+    <Compile Include="Query\Selection.cs" />
     <Compile Include="Query\Filename.cs" />
     <Compile Include="Query\Formula.cs" />
     <Compile Include="Objects\Timer.cs" />

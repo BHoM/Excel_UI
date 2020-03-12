@@ -54,27 +54,13 @@ namespace BH.UI.Excel.Global
 
         public override bool SetParent(object parent)
         {
-            List<Delegate> delegates = new List<Delegate>();
-            List<ExcelFunctionAttribute> funcAttrs = new List<ExcelFunctionAttribute>();
-            List<List<object>> argAttrs = new List<List<object>>();
-            Dictionary<string, int> dups = new Dictionary<string, int>();
             foreach(var item in PossibleItems)
             {
                 using (Engine.Excel.Profiling.Timer timer = new Engine.Excel.Profiling.Timer("CreateDelegates"))
                 {
                     try
                     {
-                        var proxy = CreateDelegate(item);
-                        if (proxy == null)
-                            continue;
-                        var name = proxy.Item2.Name;
-                        if (!dups.ContainsKey(name))
-                        {
-                            dups.Add(name, 1);
-                            delegates.Add(proxy.Item1);
-                            funcAttrs.Add(proxy.Item2);
-                            argAttrs.Add(proxy.Item3);
-                        }
+                        RegisterDelegate(item);
                     }
                     catch (Exception e)
                     {
@@ -82,16 +68,8 @@ namespace BH.UI.Excel.Global
                     }
                 }
             }
-            try
-            {
-                using (Engine.Excel.Profiling.Timer timer = new Engine.Excel.Profiling.Timer("RegisterDelegates"))
-                {
-                    ExcelIntegration.RegisterDelegates(delegates, funcAttrs.Cast<object>().ToList(), argAttrs);
-                }
-            } catch
-            {
-                return false;
-            }
+            CallerFormula.RegisterQueue();
+            ExcelDna.Logging.LogDisplay.Hide();
             return true;
         }
 
@@ -99,36 +77,14 @@ namespace BH.UI.Excel.Global
         /**** Private Methods                   ****/
         /*******************************************/
 
-        protected override List<SearchItem> GetAllPossibleItems()
-        {
-            var items = base.GetAllPossibleItems();
-
-            // All Types
-            items.AddRange(Engine.Reflection.Query.BHoMTypeList().Select(x => new SearchItem
-            {
-                Item = x, CallerType = typeof(CreateCustomCaller), Text = x.ToText(true)
-            }));
-
-            items.AddRange(Engine.UI.Query.CreateRequestItems().Select(x => new SearchItem {
-                Item = x, CallerType = typeof(BH.UI.Components.CreateRequestCaller), Text = x.ToText(true)
-            }));
-
-            return items;
-        }
-
-        /*******************************************/
-
-        private Tuple<Delegate, ExcelFunctionAttribute, List<object>> CreateDelegate(SearchItem item)
+        private void RegisterDelegate(SearchItem item)
         {
             if (m_Callers.ContainsKey(item.CallerType.Name))
             {
                 CallerFormula caller = m_Callers[item.CallerType.Name];
                 caller.Caller.SetItem(item.Item);
-                FormulaDataAccessor accessor = caller.Caller.DataAccessor as FormulaDataAccessor;
-                if(accessor != null)
-                    return accessor.Wrap(caller, () => NotifySelection(item));
+                caller.EnqueueRegistration();
             }
-            return null;
         }
 
         /*******************************************/

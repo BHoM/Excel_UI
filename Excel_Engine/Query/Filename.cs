@@ -20,6 +20,7 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
+using BH.oM.Excel;
 using BH.oM.Reflection.Attributes;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
@@ -37,7 +38,17 @@ namespace BH.Engine.Excel
         [Output("A filename.")]
         public static string Filename()
         {
-            string reftext = Caller().RefText();
+            return Caller().Filename();
+        }
+
+        /*******************************************/
+
+        [Description("Gets the filename of the workbook of the given reference.")]
+        [Input("reference", "A reference for which to find the filename.")]
+        [Output("A filename.")]
+        public static string Filename(this Reference reference)
+        {
+            string reftext = reference.RefText();
             return Regex.Match(reftext, @"\[(.*)\]").Groups[1].Value;
         }
 

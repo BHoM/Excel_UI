@@ -21,6 +21,7 @@
  */
 
 using BH.Engine.Reflection;
+using BH.Engine.Excel;
 using BH.oM.UI;
 using BH.UI.Templates;
 using ExcelDna.Integration;
@@ -79,7 +80,6 @@ namespace BH.UI.Excel.Templates
         public CallerFormula()
         {
             Caller.SetDataAccessor(new FormulaDataAccessor());
-            //Caller.ItemSelected += (e,s) => FillFormula();
         }
 
         /*******************************************/
@@ -101,9 +101,9 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
-        public void FillFormula()
+        public void FillFormula(oM.Excel.Reference cell)
         {
-            Register(Fill);
+            Register(() => Fill(cell));
         }
 
         /*******************************************/
@@ -152,7 +152,20 @@ namespace BH.UI.Excel.Templates
 
         public virtual void Select(string id)
         {
-            m_Menu.Select(id);
+            ExcelAsyncUtil.QueueAsMacro(() =>
+            {
+                m_Menu.Select(id);
+                FillFormula(Engine.Excel.Query.Selection());
+            });
+        }
+
+        /*******************************************/
+
+        public Tuple<Delegate, ExcelFunctionAttribute, List<object>> GetExcelDelegate()
+        {
+            var accessor = Caller.DataAccessor as FormulaDataAccessor;
+            object item = Caller.SelectedItem;
+            return accessor.Wrap(this, () => RunItem(item));
         }
 
         /*******************************************/
@@ -166,25 +179,82 @@ namespace BH.UI.Excel.Templates
 
         public void Register(System.Action callback)
         {
-            if (m_Registered.Contains(Function))
+            lock(m_Mutex)
             {
-                callback();
-                return;
+
+                if (m_Registered.Contains(Function))
+                {
+                    callback();
+                    return;
+                }
+
+
+                var formula = GetExcelDelegate();
+                string function = Function;
+
+                ExcelAsyncUtil.QueueAsMacro(() =>
+                {
+                    lock (m_Mutex)
+                    {
+                        if (m_Registered.Contains(function))
+                        {
+                            ExcelAsyncUtil.QueueAsMacro(() => callback());
+                            return;
+                        }
+                        ExcelIntegration.RegisterDelegates(
+                            new List<Delegate>() { formula.Item1 },
+                            new List<object> { formula.Item2 },
+                            new List<List<object>> { formula.Item3 }
+                        );
+                        m_Registered.Add(function);
+                        ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
+                        ExcelAsyncUtil.QueueAsMacro(()=>callback());
+                    }
+                });
             }
-            var accessor = Caller.DataAccessor as FormulaDataAccessor;
-            object item = Caller.SelectedItem;
-            var formula = accessor.Wrap(this, () => RunItem(item));
-            ExcelAsyncUtil.QueueAsMacro(() =>
+        }
+
+        /*******************************************/
+
+        public void EnqueueRegistration()
+        {
+            lock (m_Mutex)
             {
-                ExcelIntegration.RegisterDelegates(
-                    new List<Delegate>() { formula.Item1 },
-                    new List<object> { formula.Item2 },
-                    new List<List<object>> { formula.Item3 }
-                );
-                m_Registered.Add(Function);
-                ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
-                callback();
-            });
+                if (m_Registered.Contains(Function))
+                    return;
+
+                var formula = GetExcelDelegate();
+                m_RegistrationQueue.Enqueue(formula);
+            }
+        }
+
+        /*******************************************/
+
+        public static void RegisterQueue()
+        {
+            lock(m_Mutex)
+            {
+                if (m_RegistrationQueue.Count == 0)
+                    return;
+                var delegates = new List<Delegate>();
+                var attrs = new List<object>();
+                var paramAttrs = new List<List<object>>();
+                while (m_RegistrationQueue.Count > 0)
+                {
+                    var current = m_RegistrationQueue.Dequeue();
+                    if (m_Registered.Contains(current.Item2.Name))
+                        continue;
+                    delegates.Add(current.Item1);
+                    attrs.Add(current.Item2);
+                    paramAttrs.Add(current.Item3);
+                }
+
+                ExcelIntegration.RegisterDelegates(delegates, attrs, paramAttrs);
+                foreach (ExcelFunctionAttribute attr in attrs)
+                {
+                    m_Registered.Add(attr.Name);
+                }
+            }
         }
 
         /*******************************************/
@@ -204,36 +274,35 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
-        protected virtual void Fill()
+        protected virtual void Fill(oM.Excel.Reference cell)
         {
-            Application app = null;
-            Range cell = null;
+            System.Action callback = () => { };
+            var cellcontents = "=" + Function;
+            if (Caller.InputParams.Count == 0)
+            {
+                cellcontents += "()";
+            }
+            else
+            {
+                callback = () =>
+                {
+                    Application.GetActiveInstance().SendKeys("{F2}{(}", true);
+                };
+            }
 
-            try
+            ExcelAsyncUtil.QueueAsMacro(() =>
             {
-                app = Application.GetActiveInstance();
-                cell = app.Selection as Range;
-                var cellcontents = "=" + Function;
-                if (Caller.InputParams.Count == 0)
+                try
                 {
-                    cellcontents += "()";
-                    if (cell != null)
-                        cell.Formula = cellcontents;
+                    var xlRef = cell.ToExcel();
+                    XlCall.Excel(XlCall.xlcFormula, cellcontents, xlRef);
+                    using (new ExcelSelectionHelper(xlRef))
+                    {
+                        callback();
+                    }
                 }
-                else
-                {
-                    if (cell != null)
-                        cell.Formula = cellcontents;
-                    app.SendKeys("{F2}{(}", true);
-                }
-            }
-            finally
-            {
-                if (app != null)
-                    app.Dispose();
-                if (cell != null)
-                    cell.Dispose();
-            }
+                catch { }
+            });
         }
 
         /*******************************************/
@@ -249,7 +318,10 @@ namespace BH.UI.Excel.Templates
         /*******************************************/
 
         private IExcelSelectorMenu m_Menu;
-        private HashSet<string> m_Registered = new HashSet<string>();
+        private static Queue<Tuple<Delegate, ExcelFunctionAttribute, List<object>>> m_RegistrationQueue =
+            new Queue<Tuple<Delegate, ExcelFunctionAttribute, List<object>>>();
+        private static HashSet<string> m_Registered = new HashSet<string>();
+        private static object m_Mutex = new object();
 
         /*******************************************/
     }

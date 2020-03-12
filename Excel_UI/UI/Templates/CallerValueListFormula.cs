@@ -20,6 +20,7 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
+using BH.Engine.Excel;
 using BH.Engine.Reflection;
 using BH.UI.Templates;
 using ExcelDna.Integration;
@@ -74,8 +75,6 @@ namespace BH.UI.Excel.Templates
             Worksheet worksheet = null;
             Workbook workbook = null;
             Sheets sheets = null;
-            Names names = null;
-            Name n = null;
 
             bool success = false;
 
@@ -86,14 +85,13 @@ namespace BH.UI.Excel.Templates
                 app = Application.GetActiveInstance();
                 workbook = app.ActiveWorkbook;
                 sheets = workbook.Sheets;
-                names = workbook.Names;
 
                 if (options.Count() > 0)
                 {
                     ExcelReference xlref = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
                     if (xlref != null)
                     {
-                        var reftext = XlCall.Excel(XlCall.xlfReftext, xlref, true);
+                        string reftext = XlCall.Excel(XlCall.xlfReftext, xlref, true) as string;
                         cell = app.Range(reftext);
                         worksheet = cell.Worksheet;
                         if (worksheet.Name == "BHoM_ValidationHidden")
@@ -112,52 +110,69 @@ namespace BH.UI.Excel.Templates
                         }
                         else
                         {
-                            n = names.FirstOrDefault(nam => nam.Name == name);
-                            if (n == null)
-                            {
-                                try
-                                {
-                                    validation_ws = sheets["BHoM_ValidationHidden"] as Worksheet;
-                                }
-                                catch
-                                {
-                                    validation_ws = sheets.Add() as Worksheet;
-                                    validation_ws.Name = "BHoM_ValidationHidden";
-                                }
-                                validation_ws.Visible = XlSheetVisibility.xlSheetHidden;
-
-                                int row = 1;
-                                Range listcell = validation_ws.Cells[row, 1];
-                                while (listcell.Value != null)
-                                {
-                                    row++;
-                                    listcell = validation_ws.Cells[row, 1];
-                                }
-                                listcell.Formula = $"={Function}()";
-                                names.Add(name, listcell);
-                            }
-
                             ExcelAsyncUtil.QueueAsMacro(() =>
                             {
-                                Validation validation = null;
                                 try
                                 {
-                                    app = Application.GetActiveInstance();
-                                    cell = app.Range(reftext);
-                                    cell.Value = options.FirstOrDefault();
-                                    validation = cell.Validation;
-                                    validation.Delete();
-                                    validation.Add(XlDVType.xlValidateList, null, null, $"={name}");
-                                    validation.IgnoreBlank = true;
+                                    string prefix = reftext.Substring(0, reftext.LastIndexOf('!') + 1);
+                                    var nameDef = XlCall.Excel(XlCall.xlfGetName, prefix + name);
+                                    if (nameDef.Equals(ExcelError.ExcelErrorName))
+                                    {
+                                        try
+                                        {
+                                            validation_ws = sheets["BHoM_ValidationHidden"] as Worksheet;
+                                        }
+                                        catch
+                                        {
+                                            validation_ws = sheets.Add() as Worksheet;
+                                            validation_ws.Name = "BHoM_ValidationHidden";
+                                        }
+                                        validation_ws.Visible = XlSheetVisibility.xlSheetHidden;
+
+                                        int row = 1;
+                                        Range listcell = validation_ws.Cells[row, 1];
+                                        while (listcell.Value != null)
+                                        {
+                                            row++;
+                                            listcell = validation_ws.Cells[row, 1];
+                                        }
+                                        listcell.Formula = $"={Function}()";
+                                    }
+
+                                    ExcelAsyncUtil.QueueAsMacro(() =>
+                                    {
+                                        Validation validation = null;
+                                        try
+                                        {
+                                            app = Application.GetActiveInstance();
+                                            cell = app.Range(reftext);
+                                            cell.Value = options.FirstOrDefault();
+                                            validation = cell.Validation;
+                                            validation.Delete();
+                                            validation.Add(XlDVType.xlValidateList, null, null, $"={name}");
+                                            validation.IgnoreBlank = true;
+                                        }
+                                        finally
+                                        {
+                                            if (validation != null)
+                                                validation.Dispose();
+                                            if (cell != null)
+                                                cell.Dispose();
+                                        }
+                                    });
                                 }
                                 finally
                                 {
-                                    if (app != null)
-                                        app.Dispose();
                                     if (cell != null)
                                         cell.Dispose();
-                                    if (validation != null)
-                                        validation.Dispose();
+                                    if (validation_ws != null)
+                                        validation_ws.Dispose();
+                                    if (worksheet != null)
+                                        worksheet.Dispose();
+                                    if (sheets != null)
+                                        sheets.Dispose();
+                                    if (workbook != null)
+                                        workbook.Dispose();
                                 }
                             });
 
@@ -170,48 +185,18 @@ namespace BH.UI.Excel.Templates
             }
             catch (Exception e)
             {
-                Compute.RecordError(e.GetType().ToText() + ": " + e.Message);
-            }
-            finally
-            {
-                if (app != null)
-                    app.Dispose();
-                if (validation_ws != null)
-                    validation_ws.Dispose();
-                if (workbook != null)
-                    workbook.Dispose();
-                if (worksheet != null)
-                    worksheet.Dispose();
-                if (sheets != null)
-                    sheets.Dispose();
-                if (names != null)
-                    names.Dispose();
-                if (cell != null)
-                    cell.Dispose();
-                if (n != null)
-                    n.Dispose();
+                Engine.Reflection.Compute.RecordError(e.GetType().ToText() + ": " + e.Message);
             }
             return success;
         }
 
-
-        protected override void Fill()
+        protected override void Fill(oM.Excel.Reference cell)
         {
-            Application app = null;
-            Range cell = null;
-            try
+            var cellcontents = "=" + Function + "()";
+            ExcelAsyncUtil.QueueAsMacro(() =>
             {
-                app = Application.GetActiveInstance();
-                cell = app.Selection as Range;
-                cell.Formula = "=" + Function + "()";
-            }
-            finally
-            {
-                if (app != null)
-                    app.Dispose();
-                if (cell != null)
-                    cell.Dispose();
-            }
+                XlCall.Excel(XlCall.xlcFormula, cellcontents, cell.ToExcel());
+            });
         }
 
         /*******************************************/
