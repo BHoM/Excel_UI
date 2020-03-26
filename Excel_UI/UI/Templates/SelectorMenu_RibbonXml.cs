@@ -98,7 +98,12 @@ namespace BH.UI.Excel.Templates
                 element.SetAttribute("onAction", "FillFormula");
                 string description = method.IDescription();
                 if(description.Length > 0)
+                {
+                    // Ribbon XML schema has a hard limit of 1024 characters, truncate if we exceed it
+                    if (description.Length > 1024)
+                        description = description.Substring(0, 1024);
                     element.SetAttribute("supertip", description);
+                }
                 m_ItemLinks[id] = method;
             }
             element.SetAttribute("label", tree.Name);
