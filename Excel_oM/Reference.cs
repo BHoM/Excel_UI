@@ -35,8 +35,8 @@ namespace BH.oM.Excel
         /**** Properties                        ****/
         /*******************************************/
 
-        public List<Rectangle> Rectangles { get; set; }
-        public IntPtr Sheet { get; set; }
+        public virtual List<Rectangle> Rectangles { get; set; }
+        public virtual IntPtr Sheet { get; set; }
 
         /*******************************************/
     }
