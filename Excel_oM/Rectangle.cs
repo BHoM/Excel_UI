@@ -35,10 +35,10 @@ namespace BH.oM.Excel
         /**** Properties                        ****/
         /*******************************************/
 
-        public int RowFirst { get; set; }
-        public int ColumnFirst { get; set; }
-        public int RowLast { get; set; }
-        public int ColumnLast { get; set; }
+        public virtual int RowFirst { get; set; }
+        public virtual int ColumnFirst { get; set; }
+        public virtual int RowLast { get; set; }
+        public virtual int ColumnLast { get; set; }
 
         /*******************************************/
     }
