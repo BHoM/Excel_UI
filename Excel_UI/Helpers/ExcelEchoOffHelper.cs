@@ -22,17 +22,40 @@
 
 using System;
 using System.Collections.Generic;
-using BH.oM.Excel;
+using System.Threading.Tasks;
 using ExcelDna.Integration;
 
-namespace BH.Engine.Excel.Profiling
-
+namespace BH.UI.Excel
 {
-    public static partial class Query
+    // RIIA-style helpers to deal with Excel selections    
+    // Don't use if you agree with Eric Lippert here: http://stackoverflow.com/a/1757344/44264
+    public class ExcelEchoOffHelper : XlCall, IDisposable
     {
-        public static double GetMeanTime(string name)
+        /*******************************************/
+        /**** Constructors                      ****/
+        /*******************************************/
+
+        public ExcelEchoOffHelper()
         {
-            return Timer.GetMean(name);
+            oldEcho = Excel(xlfGetWorkspace, 40);
+            Excel(xlcEcho, false);
         }
+
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
+        public void Dispose()
+        {
+            Excel(xlcEcho, oldEcho);
+        }
+
+        /*******************************************/
+        /**** Private Fields                    ****/
+        /*******************************************/
+
+        object oldEcho;
+
+        /*******************************************/
     }
 }

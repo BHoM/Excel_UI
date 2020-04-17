@@ -4,20 +4,20 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
 using BH.oM.Base;
@@ -48,44 +48,47 @@ namespace BH.UI.Excel.Templates
         }
 
         /*******************************************/
-        /**** Public Methods                    ****/
+        /**** Methods                           ****/
         /*******************************************/
 
         public override bool SetDataItem<T>(int index, T data)
         {
             bool success = base.SetDataItem(index, data);
-            if(current_op != null)
+            if(m_CurrentOp != null)
             {
-                output_cache[current_op] = base.GetOutput();
-                cache_age[current_op] = DateTime.Now;
+                m_OutputCache[m_CurrentOp] = base.GetOutput();
+                m_CacheAge[m_CurrentOp] = DateTime.Now;
             }
             return success;
         }
 
+        /*******************************************/
+
         public override bool Store(string function, params object[] in_)
         {
-            if (function == null) function = "";
+            if (function == null)
+                function = "";
             try
             {
                 string reference = Engine.Excel.Query.Caller().RefText();
                 string key = $"{reference}:::{function}";
 
-                current_op = key;
+                m_CurrentOp = key;
 
-                if (cache_age.ContainsKey(current_op))
+                if (m_CacheAge.ContainsKey(m_CurrentOp))
                 {
-                    var age = DateTime.Now.Subtract(cache_age[current_op]);
+                    var age = DateTime.Now.Subtract(m_CacheAge[m_CurrentOp]);
                     if (age.TotalSeconds > 60)
                     {
-                        cache_age.Remove(current_op);
-                        output_cache.Remove(current_op);
-                        input_cache.Remove(current_op);
+                        m_CacheAge.Remove(m_CurrentOp);
+                        m_OutputCache.Remove(m_CurrentOp);
+                        m_InputCache.Remove(m_CurrentOp);
                     }
                 }
 
-                if (function.Length > 0 && input_cache.ContainsKey(key))
+                if (function.Length > 0 && m_InputCache.ContainsKey(key))
                 {
-                    var cached = input_cache[key];
+                    var cached = m_InputCache[key];
                     if (in_.Length == cached.Length)
                     {
                         bool same = true;
@@ -97,10 +100,11 @@ namespace BH.UI.Excel.Templates
                                 break;
                             }
                         }
-                        if (same) return false;
+                        if (same)
+                            return false;
                     }
                 }
-                input_cache[key] = in_;
+                m_InputCache[key] = in_;
             } catch { }
 
             return base.Store(function, in_);
@@ -110,10 +114,11 @@ namespace BH.UI.Excel.Templates
 
         public override object GetOutput()
         {
-            if (current_op == null) return base.GetOutput();
+            if (m_CurrentOp == null)
+                return base.GetOutput();
 
             object output = null;
-            output_cache.TryGetValue(current_op, out output);
+            m_OutputCache.TryGetValue(m_CurrentOp, out output);
 
             base.SetDataItem(0, output);
 
@@ -125,10 +130,12 @@ namespace BH.UI.Excel.Templates
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private string current_op;
-        private Dictionary<string, object[]> input_cache = new Dictionary<string, object[]>();
-        private Dictionary<string, object> output_cache = new Dictionary<string, object>();
-        private Dictionary<string, DateTime> cache_age = new Dictionary<string, DateTime>();
+        private string m_CurrentOp;
+        private Dictionary<string, object[]> m_InputCache = new Dictionary<string, object[]>();
+        private Dictionary<string, object> m_OutputCache = new Dictionary<string, object>();
+        private Dictionary<string, DateTime> m_CacheAge = new Dictionary<string, DateTime>();
+
+        /*******************************************/
     }
 }
 

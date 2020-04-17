@@ -20,55 +20,80 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using BH.Engine.Reflection;
-using BH.oM.Base;
+using ExcelDna.Integration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BH.UI.Excel.Callers
+namespace BH.Engine.Excel.Profiling
 {
-    class CreateCustomCaller : UI.Components.CreateCustomCaller
+    public class Timer : IDisposable
     {
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/
 
-        public CreateCustomCaller() : base()
+        public Timer(string name)
         {
-            InputParams = new List<oM.UI.ParamInfo>();
-            AddInput(0, "Properties", typeof(List<string>));
-            AddInput(1, "Values", typeof(List<object>));
+            m_Name = name;
+            m_Start = DateTime.Now;
         }
 
         /*******************************************/
         /**** Methods                           ****/
         /*******************************************/
 
-        public override object Run(object[] inputs)
+        public static double GetTotal(string name)
         {
-            CustomObject obj = new CustomObject();
-
-            List<string> props = inputs[0] as List<string>;
-            List<object> values = inputs[1] as List<object>;
-            if (props.Count == values.Count)
+            if(m_Records.ContainsKey(name))
             {
-                for (int i = 0; i < props.Count; i++)
-                    obj.SetPropertyValue(props[i], values[i]);
+                return m_Records[name].Sum();
             }
-
-            return obj;
+            return 0;
         }
 
         /*******************************************/
 
-        public override bool SetItem(object item)
+        public static double GetMean(string name)
         {
-            SelectedItem = item;
-            return true;
+            if(m_Records.ContainsKey(name) && m_Records[name].Count > 0)
+            {
+                return m_Records[name].Sum() / m_Records[name].Count;
+            }
+            return 0;
         }
+
+        /*******************************************/
+
+        public void Dispose()
+        {
+            RecordTime(m_Name, (DateTime.Now - m_Start).TotalMilliseconds);
+        }
+
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
+
+        private static void RecordTime(string name, double time)
+        {
+            if (m_Records.ContainsKey(name))
+            {
+                m_Records[name].Add(time);
+            } else
+            {
+                m_Records.Add(name, new List<double> { time });
+            }
+        }
+
+        /*******************************************/
+        /**** Private Fields                    ****/
+        /*******************************************/
+
+        private string m_Name;
+        private DateTime m_Start;
+        private static Dictionary<string, List<double>> m_Records = new Dictionary<string, List<double>>();
 
         /*******************************************/
     }

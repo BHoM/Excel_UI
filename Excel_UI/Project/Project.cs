@@ -4,20 +4,20 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
 using System;
@@ -39,61 +39,53 @@ namespace BH.UI.Excel
 
     public class Project
     {
-        /*****************************************/
-        /**** Data fields               **********/
-        /*****************************************/
-
-        private Dictionary<string, object> m_objects;
-
-
-        /*****************************************/
-        /**** Static singleton instance **********/
-        /*****************************************/
-
-        private static Project m_instance = null;
-
-        /*****************************************/
-        /**** Constructor               **********/
-        /*****************************************/
-
-        private Project()
-        {
-            m_objects = new Dictionary<string, object>();
-        }
-
-        /*****************************************/
-        /**** Get singleton method      **********/
-        /*****************************************/
+        /*******************************************/
+        /**** Properties                        ****/
+        /*******************************************/
 
         public static Project ActiveProject
         {
             get
             {
-                if (m_instance == null)
-                    m_instance = new Project();
+                if (m_Instance == null)
+                    m_Instance = new Project();
 
-                return m_instance;
+                return m_Instance;
             }
         }
 
-        public bool Empty => Count() == 0;
+        public bool Empty {
+            get
+            {
+                return Count() == 0;
+            }
+        }
 
-        /*****************************************/
-        /**** Public get methods        **********/
-        /*****************************************/
+        /*******************************************/
+        /**** Constructors                      ****/
+        /*******************************************/
+
+        private Project()
+        {
+            m_Objects = new Dictionary<string, object>();
+        }
+
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
 
         public IBHoMObject GetBHoM(string str)
         {
             return GetAny(str) as IBHoMObject;
         }
 
-        /*****************************************/
+        /*******************************************/
 
         public string GetId(string str)
         {
-            if(m_objects.ContainsKey(str))
+            if(m_Objects.ContainsKey(str))
             {
-                return str; 
+                return str;
             } else
             {
                 int start = str.LastIndexOf("[");
@@ -106,44 +98,56 @@ namespace BH.UI.Excel
             return null;
         }
 
+        /*******************************************/
+
         public object GetAny(string str)
         {
             string id = GetId(str);
             if (id != null)
             {
-                return m_objects[id];
+                return m_Objects[id];
             }
             return null;
         }
 
+        /*******************************************/
 
-        /*****************************************/
-        /****** "Interface" Add method     *******/
-        /*****************************************/
         public string IAdd(object obj)
         {
-            return Add(obj as dynamic);
+            return IAdd(obj, ToString(Guid.NewGuid()));
+
+        }
+
+        /*******************************************/
+
+        public string IAdd(object obj, Guid id)
+        {
+            return IAdd(obj, ToString(id));
         }
 
         /*****************************************/
-        /***** Add methods             ***********/
+
+        public string IAdd(object obj, string id)
+        {
+            return Add(obj as dynamic, id);
+        }
+
         /*****************************************/
 
-        public string Add(IBHoMObject obj)
+        public string Add(IBHoMObject obj, string id)
         {
-            string guid = ToString(Guid.NewGuid());
-            if (m_objects.ContainsKey(guid))
-                return guid;
+            if (m_Objects.ContainsKey(id))
+                return id;
 
-            m_objects.Add(guid, obj);
+            m_Objects.Add(id, obj);
 
             //Recurively add the objects dependecies
             foreach (object o in obj.PropertyObjects())
             {
                 if (o is IBHoMObject)
                 {
-                    Add(o as IBHoMObject);
-                } 
+                    IAdd(o);
+                }
             }
 
             //Add all objects in the custom data
@@ -151,29 +155,13 @@ namespace BH.UI.Excel
             {
                 if (kvp.Value is IBHoMObject)
                 {
-                    Add(kvp.Value as IBHoMObject);
+                    IAdd(kvp.Value);
                 }
             }
-            return guid;
+            return id;
         }
 
-        /*****************************************/
-
-        private static string ToString(Guid id)
-        {
-            return System.Convert.ToBase64String(id.ToByteArray()).Remove(8);
-        }
-
-        /*****************************************/
-
-        private string Add(object obj)
-        {
-            string guid = ToString(Guid.NewGuid());
-            m_objects[guid] = obj;
-            return guid;
-        }
-
-        /*****************************************/
+        /*******************************************/
 
         public static Project ForIDs(IEnumerable<string> ids)
         {
@@ -185,7 +173,7 @@ namespace BH.UI.Excel
                     object obj = ActiveProject.GetAny(id);
                     if (obj != null)
                     {
-                        proj.m_objects.Add(ActiveProject.GetId(id), obj);
+                        proj.m_Objects.Add(ActiveProject.GetId(id), obj);
                     }
                 }
                 catch { }
@@ -193,25 +181,25 @@ namespace BH.UI.Excel
             return proj;
         }
 
-        /*****************************************/
+        /*******************************************/
 
         public int Count()
         {
-            return m_objects.Count;
+            return m_Objects.Count;
         }
 
-        /*****************************************/
+        /*******************************************/
 
         public int Count(Func<object, bool> predicate)
         {
-            return m_objects.Count((kvp) => predicate(kvp.Value));
+            return m_Objects.Count((kvp) => predicate(kvp.Value));
         }
 
-        /*****************************************/
+        /*******************************************/
 
         public IEnumerable<string> Serialize()
         {
-            foreach(var kvp in m_objects)
+            foreach(var kvp in m_Objects)
             {
                 string json = null;
                 try
@@ -235,12 +223,13 @@ namespace BH.UI.Excel
                     }
                 }
                 catch { }
-                if (json != null) yield return json;
+                if (json != null)
+                    yield return json;
             }
             yield break;
         }
 
-        /*****************************************/
+        /*******************************************/
 
         public void Deserialize(IEnumerable<string> objs)
         {
@@ -249,21 +238,15 @@ namespace BH.UI.Excel
                 try
                 {
                     var obj = Engine.Serialiser.Convert.FromJson(str);
-                    if (obj == null) continue;
+                    if (obj == null)
+                        continue;
                     if (obj is KeyValuePair<string, object>)
                     {
                         var kvp = (KeyValuePair<string, object>)obj;
-                        m_objects.Add(kvp.Key, kvp.Value);
-                    } else if (obj is CustomObject)
-                    {
-                        var co = obj as CustomObject;
-                        foreach (var kvp in co.CustomData)
-                        {
-                            m_objects.Add(kvp.Key, kvp.Value);
-                        }
+                        m_Objects.Add(kvp.Key, kvp.Value);
                     } else if (obj is IBHoMObject)
                     {
-                        Add(obj as IBHoMObject);
+                        IAdd(obj, (obj as IBHoMObject).BHoM_Guid);
                     }
                 }
                 catch (Exception e)
@@ -273,26 +256,26 @@ namespace BH.UI.Excel
             }
         }
 
-        /*****************************************/
+        /*******************************************/
 
-        public void SaveData(Workbook Wb)
+        public void SaveData(Workbook workbook)
         {
             Worksheet newsheet;
             try
             {
                 try
                 {
-                    newsheet = Wb.Sheets["BHoM_DataHidden"] as Worksheet;
+                    newsheet = workbook.Sheets["BHoM_DataHidden"] as Worksheet;
                 }
                 catch
                 {
                     // Backwards compatibility
-                    newsheet = Wb.Sheets["BHoM_Data"] as Worksheet;
+                    newsheet = workbook.Sheets["BHoM_Data"] as Worksheet;
                 }
             }
             catch
             {
-                newsheet = Wb.Sheets.Add() as Worksheet;
+                newsheet = workbook.Sheets.Add() as Worksheet;
             }
             newsheet.Name = "BHoM_DataHidden";
             newsheet.Visible = XlSheetVisibility.xlSheetHidden;
@@ -322,6 +305,42 @@ namespace BH.UI.Excel
                 }
             }
         }
+
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
+
+        private string Add(object obj)
+        {
+            string guid = ToString(Guid.NewGuid());
+            m_Objects[guid] = obj;
+            return guid;
+        }
+
+        /*****************************************/
+
+        private string Add(object obj, string id)
+        {
+            m_Objects[id] = obj;
+            return id;
+        }
+
+        /*****************************************/
+
+        private static string ToString(Guid id)
+        {
+            return System.Convert.ToBase64String(id.ToByteArray()).Remove(8);
+        }
+
+
+        /*****************************************/
+        /**** Private Fields            **********/
+        /*****************************************/
+
+        private Dictionary<string, object> m_Objects;
+        private static Project m_Instance = null;
+
+        /*******************************************/
     }
 }
 

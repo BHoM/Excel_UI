@@ -4,20 +4,20 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
 using System;
@@ -30,6 +30,9 @@ namespace BH.UI.Excel
     //Method for automatic resizing of arrays. https://github.com/Excel-DNA/ExcelDna/blob/master/Distribution/Samples/ArrayResizer.dna
     public class ArrayResizer : XlCall
     {
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
 
         public static object Resize(object[] array)
         {
@@ -41,8 +44,9 @@ namespace BH.UI.Excel
             }
 
             return Resize(largeArr);
-
         }
+
+        /*******************************************/
 
         // This function will run in the UDF context.
         // Needs extra protection to allow multithreaded use.
@@ -92,6 +96,10 @@ namespace BH.UI.Excel
             // Return what we have - to prevent flashing #N/A
             return array;
         }
+
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
 
         static void DoResize(ExcelReference target)
         {
@@ -149,83 +157,7 @@ namespace BH.UI.Excel
                 }
             }
         }
+
+        /*******************************************/
     }
-
-    // RIIA-style helpers to deal with Excel selections    
-    // Don't use if you agree with Eric Lippert here: http://stackoverflow.com/a/1757344/44264
-    public class ExcelEchoOffHelper : XlCall, IDisposable
-    {
-        object oldEcho;
-
-        public ExcelEchoOffHelper()
-        {
-            oldEcho = Excel(xlfGetWorkspace, 40);
-            Excel(xlcEcho, false);
-        }
-
-        public void Dispose()
-        {
-            Excel(xlcEcho, oldEcho);
-        }
-    }
-
-    public class ExcelCalculationManualHelper : XlCall, IDisposable
-    {
-        object oldCalculationMode;
-
-        public ExcelCalculationManualHelper()
-        {
-            oldCalculationMode = Excel(xlfGetDocument, 14);
-            Excel(xlcOptionsCalculation, 3);
-        }
-
-        public void Dispose()
-        {
-            Excel(xlcOptionsCalculation, oldCalculationMode);
-        }
-    }
-
-    // Select an ExcelReference (perhaps on another sheet) allowing changes to be made there.
-    // On clean-up, resets all the selections and the active sheet.
-    // Should not be used if the work you are going to do will switch sheets, amke new sheets etc.
-    public class ExcelSelectionHelper : XlCall, IDisposable
-    {
-        object oldSelectionOnActiveSheet;
-        object oldActiveCellOnActiveSheet;
-
-        object oldSelectionOnRefSheet;
-        object oldActiveCellOnRefSheet;
-
-        public ExcelSelectionHelper(ExcelReference refToSelect)
-        {
-            // Remember old selection state on the active sheet
-            oldSelectionOnActiveSheet = Excel(xlfSelection);
-            oldActiveCellOnActiveSheet = Excel(xlfActiveCell);
-
-            // Switch to the sheet we want to select
-            string refSheet = (string)Excel(xlSheetNm, refToSelect);
-            Excel(xlcWorkbookSelect, new object[] { refSheet });
-
-            // record selection and active cell on the sheet we want to select
-            oldSelectionOnRefSheet = Excel(xlfSelection);
-            oldActiveCellOnRefSheet = Excel(xlfActiveCell);
-
-            // make the selection
-            Excel(xlcFormulaGoto, refToSelect);
-        }
-
-        public void Dispose()
-        {
-            // Reset the selection on the target sheet
-            Excel(xlcSelect, oldSelectionOnRefSheet, oldActiveCellOnRefSheet);
-
-            // Reset the sheet originally selected
-            string oldActiveSheet = (string)Excel(xlSheetNm, oldSelectionOnActiveSheet);
-            Excel(xlcWorkbookSelect, new object[] { oldActiveSheet });
-
-            // Reset the selection in the active sheet (some bugs make this change sometimes too)
-            Excel(xlcSelect, oldSelectionOnActiveSheet, oldActiveCellOnActiveSheet);
-        }
-    }
-
 }

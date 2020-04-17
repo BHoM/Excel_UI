@@ -20,13 +20,9 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.ComponentModel;
-using BH.oM.Excel;
 using BH.oM.Reflection.Attributes;
-using ExcelDna.Integration;
+using System.ComponentModel;
+using System.Text.RegularExpressions;
 
 namespace BH.Engine.Excel
 {
@@ -37,12 +33,12 @@ namespace BH.Engine.Excel
         /*******************************************/
 
 
-        [Description("Removes nulls from a list.")]
-        [Input("list", "The list to clean.")]
-        [Output("A list without nulls in it.")]
-        public static List<T> CleanList<T>(this List<T> list)
+        [Description("Gets the filename of this workbook.")]
+        [Output("A filename.")]
+        public static string Filename()
         {
-            return list.FindAll(item => item != null);
+            string reftext = Caller().RefText();
+            return Regex.Match(reftext, @"\[(.*)\]").Groups[1].Value;
         }
 
         /*******************************************/

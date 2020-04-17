@@ -4,25 +4,27 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
+using BH.oM.Reflection.Attributes;
 using ExcelDna.Integration;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -31,7 +33,15 @@ namespace BH.Engine.Excel
 {
     public static partial class Compute
     {
-        public static bool SetNote(this oM.Excel.Reference reference, string message)
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
+        [Description("Sets the note of a cell.")]
+        [Input("reference", "The reference of the cell to set the note of.")]
+        [Input("message", "The value to set the note to.")]
+        [Output("Whether the note was set successfully.")]
+        public static bool Note(this oM.Excel.Reference reference, string message)
         {
             ExcelAsyncUtil.QueueAsMacro(() =>
             {
@@ -46,5 +56,7 @@ namespace BH.Engine.Excel
             });
             return true;
         }
+
+        /*******************************************/
     }
 }

@@ -4,20 +4,20 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
 using BH.oM.Base;
@@ -49,16 +49,16 @@ namespace BH.UI.Excel.Templates
         }
 
         /*******************************************/
-        /**** Public Methods                    ****/
+        /**** Methods                           ****/
         /*******************************************/
 
         public override T GetDataItem<T>(int index)
         {
             Type type = typeof(T);
-            object item = inputs[index];
+            object item = m_Inputs[index];
 
             if (item is ExcelEmpty || item is ExcelMissing) {
-                object def = defaults[index];
+                object def = m_Defaults[index];
                 return def == null ? default(T) : (T)(def as dynamic);
             }
             if (item is object[,])
@@ -91,10 +91,10 @@ namespace BH.UI.Excel.Templates
 
         public override List<T> GetDataList<T>(int index)
         {
-            object item = inputs[index];
+            object item = m_Inputs[index];
             if (IsBlankOrError<T>(item))
             {
-                return defaults[index] as List<T>;
+                return m_Defaults[index] as List<T>;
             }
             if (item is List<T>)
             {
@@ -124,10 +124,10 @@ namespace BH.UI.Excel.Templates
 
         public override List<List<T>> GetDataTree<T>(int index)
         {
-            object item = inputs[index];
+            object item = m_Inputs[index];
             if (IsBlankOrError<T>(item))
             {
-                return defaults[index] as List<List<T>>;
+                return m_Defaults[index] as List<List<T>>;
             }
             if (item is List<List<T>>)
             {
@@ -137,9 +137,9 @@ namespace BH.UI.Excel.Templates
             {
                 // Convert 2D arrays to List<List<T>> with columns as the
                 // inner list, e.g.
-                //     a1 b1 c1 
-                //     a2 b2 c2 
-                //     a3 b3 c3 
+                //     a1 b1 c1
+                //     a2 b2 c2
+                //     a3 b3 c3
                 //       ->
                 //     new List<List<T>>() {
                 //         new List<T>() { a1, a2, a3 },
@@ -222,16 +222,16 @@ namespace BH.UI.Excel.Templates
                 return ExcelError.ExcelErrorValue;
             }
         }
-        
+
         /*******************************************/
 
         public override bool SetDataItem<T>(int index, T data)
         {
-            if (output.Length <= index)
+            if (m_Output.Length <= index)
             {
-                Array.Resize(ref output, index + 1);
+                Array.Resize(ref m_Output, index + 1);
             }
-            output[index] = ToExcel(data);
+            m_Output[index] = ToExcel(data);
             return true;
         }
 
@@ -264,7 +264,7 @@ namespace BH.UI.Excel.Templates
         {
             // Collect default values from ParamInfo so defaultable
             // arguments can be ommited in excel
-            defaults = params_;
+            m_Defaults = params_;
         }
 
         /*******************************************/
@@ -273,10 +273,10 @@ namespace BH.UI.Excel.Templates
         {
             // Store some inputs in this DataAccessor
             // convert Guid strings to objects
-            inputs = new object[in_.Length];
+            m_Inputs = new object[in_.Length];
             for (int i = 0; i < in_.Length; i++)
             {
-                inputs[i] = Evaluate(in_[i]);
+                m_Inputs[i] = Evaluate(in_[i]);
             }
             ResetOutput();
             return true;
@@ -294,30 +294,30 @@ namespace BH.UI.Excel.Templates
                 string msg = errors
                     .Select(e => e.Message)
                     .Aggregate((a, b) => a + "\n" + b);
-                Engine.Excel.Query.Caller().SetNote(msg);
+                Engine.Excel.Query.Caller().Note(msg);
             }
             else
             {
-                Engine.Excel.Query.Caller().SetNote("");
+                Engine.Excel.Query.Caller().Note("");
             }
 
-            if(output.Length == 0)
+            if(m_Output.Length == 0)
             {
                 return ExcelError.ExcelErrorNull;
             }
-            if (output.Length == 1)
+            if (m_Output.Length == 1)
             {
-                return output[0];
+                return m_Output[0];
             }
-            return ToExcel(output.ToList());
+            return ToExcel(m_Output.ToList());
         }
 
         /*******************************************/
 
         public virtual void ResetOutput()
         {
-            Engine.Excel.Query.Caller().SetNote("");
-            output = new object[] { ExcelError.ExcelErrorNull };
+            Engine.Excel.Query.Caller().Note("");
+            m_Output = new object[] { ExcelError.ExcelErrorNull };
         }
 
         /*******************************************/
@@ -411,7 +411,8 @@ namespace BH.UI.Excel.Templates
                             int limit = 253 - name.Length;
                             string desc = p.Description + postfix;
 
-                            if (desc.Length >= limit) desc = p.Description.Substring(limit - postfix.Length) + postfix;
+                            if (desc.Length >= limit)
+                                desc = p.Description.Substring(limit - postfix.Length) + postfix;
 
                             return new ExcelArgumentAttribute()
                             {
@@ -498,7 +499,8 @@ namespace BH.UI.Excel.Templates
         {
             int limit = 254;
             string description = caller.Caller.Description;
-            if (description.Length >= limit) description = description.Substring(0, limit-1);
+            if (description.Length >= limit)
+                description = description.Substring(0, limit-1);
             return new ExcelFunctionAttribute()
             {
                 Name = caller.Function,
@@ -512,9 +514,11 @@ namespace BH.UI.Excel.Templates
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private object[] inputs;
-        private object[] defaults;
-        private object[] output = new object[] { ExcelError.ExcelErrorNull };
+        private object[] m_Output = new object[] { ExcelError.ExcelErrorNull };
+        private object[] m_Inputs;
+        private object[] m_Defaults;
+
+        /*******************************************/
     }
 }
 

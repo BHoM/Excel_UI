@@ -4,20 +4,20 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
 using System;
@@ -36,22 +36,16 @@ namespace BH.UI.Excel
 {
     public static class InOutHelp
     {
-        /*****************************************************************/
-        /******* Public methods                             **************/
-        /*****************************************************************/
-
-
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
 
         public static object ReturnTypeHelper(this object obj)
         {
             return Templates.FormulaDataAccessor.ToExcel(obj);
         }
 
-        /*****************************************************************/
-
-        private static Type iTupleType = Type.GetType("System.ITuple, mscorlib"); //the ITuple interface is "internal" for some reason. getting it out once via reflection to be used for checking in the method above...
-
-        /*****************************************************************/
+        /*******************************************/
 
         public static bool IsNumeric(this object obj)
         {
@@ -69,7 +63,7 @@ namespace BH.UI.Excel
             return false;
         }
 
-        /*****************************************************************/
+        /*******************************************/
 
         public static bool IsValidArray(object[] arr)
         {
@@ -85,14 +79,14 @@ namespace BH.UI.Excel
             return true;
         }
 
-        /*****************************************************************/
+        /*******************************************/
 
         public static object[] CleanArray(this object[] arr)
         {
             return arr.Where(x => x != null && x != ExcelMissing.Value && x != ExcelEmpty.Value).ToArray();
         }
 
-        /*****************************************************************/
+        /*******************************************/
     }
 }
 

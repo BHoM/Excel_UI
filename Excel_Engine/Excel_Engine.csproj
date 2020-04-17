@@ -47,6 +47,10 @@
       <HintPath>..\..\BHoM_Engine\Build\Reflection_Engine.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="Reflection_oM">
+      <HintPath>..\..\BHoM\Build\Reflection_oM.dll</HintPath>
+      <Private>False</Private>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />
@@ -59,19 +63,19 @@
   <ItemGroup>
     <Compile Include="Compute\Contents.cs" />
     <Compile Include="Compute\Note.cs" />
-    <Compile Include="Query\GetFilename.cs" />
+    <Compile Include="Query\Filename.cs" />
     <Compile Include="Query\Formula.cs" />
-    <Compile Include="Timer.cs" />
+    <Compile Include="Objects\Timer.cs" />
     <Compile Include="Compute\NumberFormat.cs" />
     <Compile Include="Create\Reference.cs" />
     <Compile Include="Convert\FromExcel\Reference.cs" />
     <Compile Include="Convert\ToExcel\Reference.cs" />
     <Compile Include="Convert\ToExcel\DateTime.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Query\GetMeanTime.cs" />
-    <Compile Include="Query\GetTotalTime.cs" />
+    <Compile Include="Query\MeanTime.cs" />
+    <Compile Include="Query\TotalTime.cs" />
     <Compile Include="Query\CleanList.cs" />
-    <Compile Include="Query\TextRef.cs" />
+    <Compile Include="Query\RefText.cs" />
     <Compile Include="Query\Caller.cs" />
   </ItemGroup>
   <ItemGroup>

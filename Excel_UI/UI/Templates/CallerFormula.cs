@@ -4,20 +4,20 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
 using BH.Engine.Reflection;
@@ -35,26 +35,9 @@ namespace BH.UI.Excel.Templates
 {
     public abstract class CallerFormula
     {
-        private IExcelSelectorMenu m_menu;
-
         /*******************************************/
         /**** Properties                        ****/
         /*******************************************/
-
-        public virtual string Name
-        {
-            get
-            {
-                if (Caller is MethodCaller && Caller.SelectedItem != null)
-                {
-                    Type decltype = (Caller as MethodCaller).Method.DeclaringType;
-                    string ns = decltype.Namespace;
-                    if (ns.StartsWith("BH")) ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
-                    return decltype.Name + "." + ns + "." + Caller.Name;
-                }
-                return Category + "." + Caller.Name;
-            }
-        }
 
         public virtual string Category { get { return Caller.Category; } }
 
@@ -82,7 +65,7 @@ namespace BH.UI.Excel.Templates
                         .Aggregate((a, b) => $"{a}_{b}");
                 }
 
-                return Name + params_;
+                return GetName() + params_;
             }
         }
 
@@ -99,7 +82,22 @@ namespace BH.UI.Excel.Templates
         }
 
         /*******************************************/
-        /**** Private Methods                   ****/
+        /**** Methods                           ****/
+        /*******************************************/
+
+        public virtual string GetName()
+        {
+            if (Caller is MethodCaller && Caller.SelectedItem != null)
+            {
+                Type decltype = (Caller as MethodCaller).Method.DeclaringType;
+                string ns = decltype.Namespace;
+                if (ns.StartsWith("BH"))
+                    ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
+                return decltype.Name + "." + ns + "." + Caller.Name;
+            }
+            return Category + "." + Caller.Name;
+        }
+
         /*******************************************/
 
         public virtual void FillFormula()
@@ -115,20 +113,23 @@ namespace BH.UI.Excel.Templates
                 if (Caller.InputParams.Count == 0)
                 {
                     cellcontents += "()";
-                    if (cell != null) cell.Formula = cellcontents;
+                    if (cell != null)
+                        cell.Formula = cellcontents;
                 }
                 else
                 {
-                    if (cell != null) cell.Formula = cellcontents;
+                    if (cell != null)
+                        cell.Formula = cellcontents;
                     app.SendKeys("{F2}{(}", true);
                 }
             } finally
             {
-                if (app != null) app.Dispose();
-                if (cell != null) cell.Dispose();
+                if (app != null)
+                    app.Dispose();
+                if (cell != null)
+                    cell.Dispose();
             }
         }
-
 
         /*******************************************/
 
@@ -136,7 +137,7 @@ namespace BH.UI.Excel.Templates
         {
             return Caller.Run();
         }
-        
+
         /*******************************************/
 
         public virtual string GetRibbonXml()
@@ -157,22 +158,33 @@ namespace BH.UI.Excel.Templates
         public virtual string GetInnerRibbonXml()
         {
             Caller.SelectedItem = null;
-            m_menu = SelectorMenuUtil.ISetExcelSelectorMenu(Caller.Selector);
-            m_menu.RootName = Caller.GetType().Name;
+            m_Menu = SelectorMenuUtil.ISetExcelSelectorMenu(Caller.Selector);
+            m_Menu.RootName = Caller.GetType().Name;
             XmlDocument doc = new XmlDocument();
             XmlElement root = doc.CreateElement("root");
             Caller.AddToMenu(root);
             XmlElement menu = root.FirstChild as XmlElement;
-            if (menu == null) return "";
+            if (menu == null)
+                return "";
             menu.RemoveAllAttributes();
             menu.SetAttribute("xmlns", "http://schemas.microsoft.com/office/2006/01/customui");
             return root.InnerXml;
         }
 
+        /*******************************************/
+
         public virtual void Select(string id)
         {
-            m_menu.Select(id);
+            m_Menu.Select(id);
         }
+
+        /*******************************************/
+        /**** Private Fields                    ****/
+        /*******************************************/
+
+        private IExcelSelectorMenu m_Menu;
+
+        /*******************************************/
     }
 }
 

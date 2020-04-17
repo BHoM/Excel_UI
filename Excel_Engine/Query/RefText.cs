@@ -20,54 +20,26 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using BH.Engine.Reflection;
-using BH.oM.Base;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.ComponentModel;
+using BH.oM.Reflection.Attributes;
+using ExcelDna.Integration;
 
-namespace BH.UI.Excel.Callers
+namespace BH.Engine.Excel
 {
-    class CreateCustomCaller : UI.Components.CreateCustomCaller
+    public static partial class Query
     {
-        /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public CreateCustomCaller() : base()
-        {
-            InputParams = new List<oM.UI.ParamInfo>();
-            AddInput(0, "Properties", typeof(List<string>));
-            AddInput(1, "Values", typeof(List<object>));
-        }
-
         /*******************************************/
         /**** Methods                           ****/
         /*******************************************/
 
-        public override object Run(object[] inputs)
+        [Description("Gets the Excel textual reference of the Reference object.")]
+        [Input("reference", "A reference to a cell or range.")]
+        [Output("The string value of the reference in the given cell or range.")]
+        public static string RefText(this oM.Excel.Reference reference)
         {
-            CustomObject obj = new CustomObject();
-
-            List<string> props = inputs[0] as List<string>;
-            List<object> values = inputs[1] as List<object>;
-            if (props.Count == values.Count)
-            {
-                for (int i = 0; i < props.Count; i++)
-                    obj.SetPropertyValue(props[i], values[i]);
-            }
-
-            return obj;
-        }
-
-        /*******************************************/
-
-        public override bool SetItem(object item)
-        {
-            SelectedItem = item;
-            return true;
+            return XlCall.Excel(XlCall.xlfReftext, reference.ToExcel(), true).ToString();
         }
 
         /*******************************************/

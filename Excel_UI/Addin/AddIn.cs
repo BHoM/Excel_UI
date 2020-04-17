@@ -4,20 +4,20 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
 using System;
@@ -48,12 +48,15 @@ namespace BH.UI.Excel
 {
     public class AddIn : IExcelAddIn
     {
-        private Dictionary<string, CallerFormula> m_formulea;
-        private List<CommandBar> m_menus;
-        private Application m_application;
-        /*****************************************************************/
-        /******* Public methods                             **************/
-        /*****************************************************************/
+        /*******************************************/
+        /**** Properties                        ****/
+        /*******************************************/
+
+        public static bool Enabled { get { return Instance.m_Initialised; } }
+
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
 
         public void AutoOpen()
         {
@@ -61,24 +64,33 @@ namespace BH.UI.Excel
 
             ExcelDna.IntelliSense.IntelliSenseServer.Install();
 
-            m_application = Application.GetActiveInstance();
+            m_Application = Application.GetActiveInstance();
             using (Engine.Excel.Profiling.Timer timer = new Engine.Excel.Profiling.Timer("open"))
             {
-                m_menus = new List<CommandBar>();
-                foreach (CommandBar commandBar in m_application.CommandBars)
+                m_Menus = new List<CommandBar>();
+                foreach (CommandBar commandBar in m_Application.CommandBars)
                 {
                     if (commandBar.Name == "Cell" || commandBar.Name.Contains("List Range"))
-                        m_menus.Add(commandBar);
+                        m_Menus.Add(commandBar);
                 }
 
-                m_application.WorkbookOpenEvent += App_WorkbookOpen;
+                m_Application.WorkbookOpenEvent += App_WorkbookOpen;
             }
-            
+
         }
+
+        /*******************************************/
+
+        public void AutoClose()
+        {
+            ExcelDna.IntelliSense.IntelliSenseServer.Uninstall();
+        }
+
+        /*******************************************/
 
         private void AddInternalise()
         {
-            m_btns = m_menus.Select((menu, i) =>
+            m_Btns = m_Menus.Select((menu, i) =>
             {
                 var btn = menu.Controls.Add(MsoControlType.msoControlButton, null, null, null, true) as CommandBarButton;
                 btn.Tag = "Internalise_Data" + i;
@@ -88,6 +100,120 @@ namespace BH.UI.Excel
             }).ToList();
         }
 
+        /*******************************************/
+
+        public bool InitBHoMAddin()
+        {
+            if (m_Initialised)
+                return true;
+            RegisterBHoMMethods();
+            ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
+            AddInternalise();
+            ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
+            m_Initialised = true;
+            return true;
+        }
+
+        /*******************************************/
+
+        public static void EnableBHoM(Action<bool> callback)
+        {
+            ExcelAsyncUtil.QueueAsMacro(() => callback(Instance.InitBHoMAddin()));
+        }
+
+        /*******************************************/
+
+        [ExcelCommand(ShortCut = "^B")]
+        public static void InitGlobalSearch()
+        {
+
+            var control = new System.Windows.Forms.ContainerControl();
+            m_GlobalSearch.SetParent(control);
+        }
+
+        /*******************************************/
+
+        public static CallerFormula GetCaller(string caller)
+        {
+            if (Instance.Formulea.ContainsKey(caller))
+            {
+                return Instance.Formulea[caller];
+            }
+            return null;
+        }
+
+        /*******************************************/
+
+        public static string GetRibbonXml()
+        {
+            Dictionary<string, XmlElement> groups = new Dictionary<string, XmlElement>();
+            Dictionary<string, Dictionary<int, XmlElement>> boxes = new Dictionary<string, Dictionary<int, XmlElement>>();
+            XmlDocument doc = new XmlDocument();
+            XmlElement root = doc.CreateElement("root");
+            doc.AppendChild(root);
+            foreach(CallerFormula caller in Instance.Formulea.Values)
+            {
+                try
+                {
+                    XmlElement group;
+                    groups.TryGetValue(caller.Category, out group);
+                    if (group == null)
+                    {
+                        group = (XmlElement)root.AppendChild(doc.CreateElement("group"));
+                        group.SetAttribute("id", caller.Category);
+                        group.SetAttribute("label", caller.Category);
+                        group.SetAttribute("getVisible", "GetVisible");
+                        groups.Add(caller.Category, group);
+                        boxes.Add(caller.Category, new Dictionary<int, XmlElement>());
+                    }
+                    if (!boxes[caller.Category].ContainsKey(caller.Caller.GroupIndex))
+                        boxes[caller.Category].Add(caller.Caller.GroupIndex, doc.CreateElement("box"));
+
+                    XmlElement box = boxes[caller.Category][caller.Caller.GroupIndex];
+                    box.SetAttribute("id", caller.Category+"-group" + caller.Caller.GroupIndex);
+                    box.SetAttribute("boxStyle", "vertical");
+
+                    XmlDocument tmp = new XmlDocument();
+                    tmp.LoadXml(caller.GetRibbonXml());
+                    box.AppendChild(doc.ImportNode(tmp.DocumentElement, true));
+                } catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+
+            foreach(var kvp in boxes)
+            {
+                List<int> ordered = kvp.Value.Keys.ToList();
+                ordered.Sort();
+                foreach(int i in ordered)
+                {
+                    groups[kvp.Key].AppendChild(kvp.Value[i]);
+                    var sep = doc.CreateElement("separator");
+                    sep.SetAttribute("id", $"sep-{kvp.Key}-{i}");
+                    groups[kvp.Key].AppendChild(sep);
+                }
+                groups[kvp.Key].RemoveChild(groups[kvp.Key].LastChild);
+            }
+            return root.InnerXml;
+        }
+
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
+
+        private void GlobalSearch_ItemSelected(object sender, oM.UI.ComponentRequest e)
+        {
+            if (e != null && e.CallerType != null && Formulea.ContainsKey(e.CallerType.Name))
+            {
+                CallerFormula formula = Formulea[e.CallerType.Name];
+                formula.Caller.SetItem(e.SelectedItem);
+                formula.FillFormula();
+            }
+        }
+
+        /*******************************************/
+
         private void Internalise_Click(CommandBarButton Ctrl, ref bool CancelDefault)
         {
             Range selected = null;
@@ -95,7 +221,7 @@ namespace BH.UI.Excel
 
             try
             {
-                    selected = m_application.Selection as Range;
+                    selected = m_Application.Selection as Range;
 
                     foreach (Range objcell in selected)
                     {
@@ -103,14 +229,16 @@ namespace BH.UI.Excel
                         try
                         {
                             value = (string)objcell.Value;
-                            if (value == null || value.Length == 0) continue;
+                            if (value == null || value.Length == 0)
+                                continue;
                         }
                         catch { continue; }
 
                         Project proj = Project.ForIDs(new string[] { value });
 
-                        if (proj.Count((o) => !(o is Adapter.BHoMAdapter)) == 0) continue;
-                        proj.SaveData(m_application.ActiveWorkbook);
+                        if (proj.Count((o) => !(o is Adapter.BHoMAdapter)) == 0)
+                            continue;
+                        proj.SaveData(m_Application.ActiveWorkbook);
 
                         objcell.Value = value;
                         objcell.Dispose();
@@ -118,14 +246,14 @@ namespace BH.UI.Excel
             }
             finally
             {
-                if (selected != null) selected.Dispose();
+                if (selected != null)
+                    selected.Dispose();
             }
         }
 
+        /*******************************************/
 
-        /*****************************************************************/
-
-        private void App_WorkbookOpen(Workbook Wb)
+        private void App_WorkbookOpen(Workbook workbook)
         {
             List<string> json = new List<string>();
             Sheets sheets = null;
@@ -135,7 +263,7 @@ namespace BH.UI.Excel
             Range next = null;
             try
             {
-                sheets = Wb.Sheets;
+                sheets = workbook.Sheets;
 
                 if (sheets.OfType<Worksheet>()
                     .FirstOrDefault(s => s.Name == "BHoM_Used") != null)
@@ -197,23 +325,18 @@ namespace BH.UI.Excel
             }
             finally
             {
-                if (newsheet != null) newsheet.Dispose();
-                if (cell != null) cell.Dispose();
-                if (used != null) used.Dispose();
-                if (next != null) next.Dispose();
+                if (newsheet != null)
+                    newsheet.Dispose();
+                if (cell != null)
+                    cell.Dispose();
+                if (used != null)
+                    used.Dispose();
+                if (next != null)
+                    next.Dispose();
             }
         }
-        
-        /***************************************************/
 
-        public void AutoClose()
-        {
-            ExcelDna.IntelliSense.IntelliSenseServer.Uninstall();
-        }
-
-        /*****************************************************************/
-        /******* Private methods                            **************/
-        /*****************************************************************/
+        /*******************************************/
 
         private void InitCallers()
         {
@@ -222,13 +345,15 @@ namespace BH.UI.Excel
             Type[] constrtypes = new Type[] { };
             object[] args = new object[] { };
 
-            m_formulea = ExcelIntegration.GetExportedAssemblies()
+            m_Formulea = ExcelIntegration.GetExportedAssemblies()
                 .SelectMany(a => a.GetTypes())
                 .Where(t => t.Namespace == "BH.UI.Excel.Components"
                             && callform.IsAssignableFrom(t))
                 .Select(t => t.GetConstructor(constrtypes).Invoke(args) as CallerFormula)
                 .ToDictionary(o => o.Caller.GetType().Name);
         }
+
+        /*******************************************/
 
         private void RegisterBHoMMethods()
         {
@@ -238,14 +363,16 @@ namespace BH.UI.Excel
                 searcher.SetParent(null);
 
                 searcher.ItemSelected += Formula_ItemSelected;
-                globalSearch = new SearchMenu_WinForm();
-                globalSearch.ItemSelected += GlobalSearch_ItemSelected;
+                m_GlobalSearch = new SearchMenu_WinForm();
+                m_GlobalSearch.ItemSelected += GlobalSearch_ItemSelected;
             }
             catch (Exception e)
             {
                 Compute.RecordError(e.Message);
             }
         }
+
+        /*******************************************/
 
         private void Formula_ItemSelected(object sender, oM.UI.ComponentRequest e)
         {
@@ -257,17 +384,17 @@ namespace BH.UI.Excel
                 FlagUsed();
             }
         }
-        
-        /*****************************************************************/
+
+        /*******************************************/
         private void FlagUsed()
         {
-            Workbook Wb = null;
+            Workbook workbook = null;
             Sheets sheets = null;
             Worksheet sheet = null;
             try
             {
-                Wb = m_application.ActiveWorkbook;
-                sheets = Wb.Worksheets;
+                workbook = m_Application.ActiveWorkbook;
+                sheets = workbook.Worksheets;
                 if (sheets.OfType<Worksheet>()
                     .FirstOrDefault(s => s.Name == "BHoM_Used") == null)
                 {
@@ -277,68 +404,16 @@ namespace BH.UI.Excel
                 }
             } finally
             {
-                if (Wb != null) Wb.Dispose();
-                if (sheet != null) sheet.Dispose();
-                if (sheets != null) sheets.Dispose();
+                if (workbook != null)
+                    workbook.Dispose();
+                if (sheet != null)
+                    sheet.Dispose();
+                if (sheets != null)
+                    sheets.Dispose();
             }
         }
 
-        /*****************************************************************/
-      
-        [ExcelCommand(ShortCut = "^B")]
-        public static void InitGlobalSearch()
-        {
-
-            var control = new System.Windows.Forms.ContainerControl();
-            globalSearch.SetParent(control);
-        }
-        private static SearchMenu globalSearch;
-        
-        public static void EnableBHoM(Action<bool> callback)
-        {
-            ExcelAsyncUtil.QueueAsMacro(() => callback(Instance.InitBHoMAddin()));
-        }
-
-        public bool InitBHoMAddin()
-        {
-            if (initialised) return true;
-            RegisterBHoMMethods();
-            ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
-            AddInternalise();
-            ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
-            initialised = true;
-            return true;
-        }
-
-        
-        private bool initialised = false;
-        private IEnumerable<CommandBarButton> m_btns;
-
-        public static bool Enabled { get { return Instance.initialised; } }
-
-        public static CallerFormula GetCaller(string caller)
-        {
-            if (Instance.Formulea.ContainsKey(caller))
-            {
-                return Instance.Formulea[caller];
-            }
-            return null;
-        }
-
-        /*****************************************************************/
-
-        private void GlobalSearch_ItemSelected(object sender, oM.UI.ComponentRequest e)
-        {
-            if (e != null && e.CallerType != null && Formulea.ContainsKey(e.CallerType.Name))
-            {
-                CallerFormula formula = Formulea[e.CallerType.Name];
-                formula.Caller.SetItem(e.SelectedItem);
-                formula.FillFormula();
-            }
-        }
-
-
-        /*****************************************************************/
+        /*******************************************/
 
         private static bool IsNullMissingOrEmpty(object obj)
         {
@@ -357,69 +432,35 @@ namespace BH.UI.Excel
             return false;
         }
 
-        public static string GetRibbonXml()
-        {
-            Dictionary<string, XmlElement> groups = new Dictionary<string, XmlElement>();
-            Dictionary<string, Dictionary<int, XmlElement>> boxes = new Dictionary<string, Dictionary<int, XmlElement>>();
-            XmlDocument doc = new XmlDocument();
-            XmlElement root = doc.CreateElement("root");
-            doc.AppendChild(root);
-            foreach(CallerFormula caller in Instance.Formulea.Values)
-            {
-                try
-                {
-                    XmlElement group;
-                    groups.TryGetValue(caller.Category, out group);
-                    if (group == null)
-                    {
-                        group = (XmlElement)root.AppendChild(doc.CreateElement("group"));
-                        group.SetAttribute("id", caller.Category);
-                        group.SetAttribute("label", caller.Category);
-                        group.SetAttribute("getVisible", "GetVisible");
-                        groups.Add(caller.Category, group);
-                        boxes.Add(caller.Category, new Dictionary<int, XmlElement>());
-                    }
-                    if (!boxes[caller.Category].ContainsKey(caller.Caller.GroupIndex))
-                        boxes[caller.Category].Add(caller.Caller.GroupIndex, doc.CreateElement("box"));
-
-                    XmlElement box = boxes[caller.Category][caller.Caller.GroupIndex];
-                    box.SetAttribute("id", caller.Category+"-group" + caller.Caller.GroupIndex);
-                    box.SetAttribute("boxStyle", "vertical");
-
-                    XmlDocument tmp = new XmlDocument();
-                    tmp.LoadXml(caller.GetRibbonXml());
-                    box.AppendChild(doc.ImportNode(tmp.DocumentElement, true));
-                } catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                }
-            }
-
-            foreach(var kvp in boxes)
-            {
-                List<int> ordered = kvp.Value.Keys.ToList();
-                ordered.Sort();
-                foreach(int i in ordered)
-                {
-                    groups[kvp.Key].AppendChild(kvp.Value[i]);
-                    var sep = doc.CreateElement("separator");
-                    sep.SetAttribute("id", $"sep-{kvp.Key}-{i}");
-                    groups[kvp.Key].AppendChild(sep);
-                }
-                groups[kvp.Key].RemoveChild(groups[kvp.Key].LastChild);
-            }
-            return root.InnerXml;
-        }
+        /*******************************************/
+        /**** Private properties                ****/
+        /*******************************************/
 
         private static AddIn Instance { get; set; }
+
+        /*******************************************/
 
         private Dictionary<string, CallerFormula> Formulea {
             get
             {
-                if(m_formulea == null) InitCallers();
-                return m_formulea;
+                if(m_Formulea == null)
+                    InitCallers();
+                return m_Formulea;
             }
         }
+
+        /*******************************************/
+        /**** Private Fields                    ****/
+        /*******************************************/
+
+        private Dictionary<string, CallerFormula> m_Formulea;
+        private List<CommandBar> m_Menus;
+        private Application m_Application;
+        private static SearchMenu m_GlobalSearch;
+        private bool m_Initialised = false;
+        private IEnumerable<CommandBarButton> m_Btns;
+
+        /*******************************************/
     }
 }
 

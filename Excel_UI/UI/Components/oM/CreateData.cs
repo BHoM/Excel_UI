@@ -4,23 +4,24 @@
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
- *                                           
- *                                                                              
- * The BHoM is free software: you can redistribute it and/or modify         
- * it under the terms of the GNU Lesser General Public License as published by  
- * the Free Software Foundation, either version 3.0 of the License, or          
- * (at your option) any later version.                                          
- *                                                                              
- * The BHoM is distributed in the hope that it will be useful,              
- * but WITHOUT ANY WARRANTY; without even the implied warranty of               
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the                 
- * GNU Lesser General Public License for more details.                          
- *                                                                            
- * You should have received a copy of the GNU Lesser General Public License     
- * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
+ *
+ *
+ * The BHoM is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3.0 of the License, or
+ * (at your option) any later version.
+ *
+ * The BHoM is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
 using BH.Engine.Reflection;
+using BH.oM.Base;
 using BH.UI.Components;
 using BH.UI.Excel.Templates;
 using BH.UI.Templates;
@@ -39,17 +40,17 @@ namespace BH.UI.Excel.Components
         /**** Properties                        ****/
         /*******************************************/
 
-        public override string Name {
-            get {
-                
-                return "CreateData." + valid.Replace(Caller.Name, "_");
-            }
-        }
         public override Caller Caller { get; } = new CreateDataCaller();
 
         public override string MenuRoot { get; } = "Create Data";
 
-        public override string Function => Name;
+        public override string Function
+        {
+            get
+            {
+                return GetName();
+            }
+        }
 
         /*******************************************/
         /**** Constructors                      ****/
@@ -57,16 +58,43 @@ namespace BH.UI.Excel.Components
 
         public CreateDataFormula() : base() { }
 
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
         protected override List<string> GetChoices()
         {
             var names = MultiChoiceCaller.GetChoiceNames();
             return MultiChoiceCaller.Choices.Select((o, i) =>
             {
-                string id = Project.ActiveProject.IAdd(o);
+                string id;
+                if (o is IBHoMObject)
+                {
+                    id = Project.ActiveProject.IAdd(o, ((IBHoMObject)o).BHoM_Guid);
+                }
+                else
+                {
+                    id = Project.ActiveProject.IAdd(o);
+                }
                 return $"{names[i]} [{id}]";
             }).ToList();
         }
-        private static System.Text.RegularExpressions.Regex valid = new System.Text.RegularExpressions.Regex("[^a-z0-9?_]", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        /*******************************************/
+
+        public override string GetName()
+        {
+            return "CreateData." + m_Valid.Replace(Caller.Name, "_");
+        }
+
+        /*******************************************/
+        /**** Private Fields                    ****/
+        /*******************************************/
+
+        private static System.Text.RegularExpressions.Regex m_Valid =
+            new System.Text.RegularExpressions.Regex("[^a-z0-9?_]", System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+        /*******************************************/
     }
 }
 

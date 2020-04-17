@@ -20,54 +20,22 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using BH.Engine.Reflection;
-using BH.oM.Base;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BH.oM.Excel;
+using ExcelDna.Integration;
 
-namespace BH.UI.Excel.Callers
+namespace BH.Engine.Excel.Profiling
 {
-    class CreateCustomCaller : UI.Components.CreateCustomCaller
+    public static partial class Query
     {
-        /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public CreateCustomCaller() : base()
-        {
-            InputParams = new List<oM.UI.ParamInfo>();
-            AddInput(0, "Properties", typeof(List<string>));
-            AddInput(1, "Values", typeof(List<object>));
-        }
-
         /*******************************************/
         /**** Methods                           ****/
         /*******************************************/
 
-        public override object Run(object[] inputs)
+        public static double TotalTime(string name)
         {
-            CustomObject obj = new CustomObject();
-
-            List<string> props = inputs[0] as List<string>;
-            List<object> values = inputs[1] as List<object>;
-            if (props.Count == values.Count)
-            {
-                for (int i = 0; i < props.Count; i++)
-                    obj.SetPropertyValue(props[i], values[i]);
-            }
-
-            return obj;
-        }
-
-        /*******************************************/
-
-        public override bool SetItem(object item)
-        {
-            SelectedItem = item;
-            return true;
+            return Timer.GetTotal(name);
         }
 
         /*******************************************/
