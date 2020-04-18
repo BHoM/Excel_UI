@@ -25,8 +25,11 @@ using BH.oM.Base;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
+using BH.Engine.Adapter;
+using ClosedXML.Excel;
+using BH.oM.Data.Collections;
+using System.Data;
 
 namespace BH.Adapter.ExcelAdapter
 {
@@ -34,29 +37,71 @@ namespace BH.Adapter.ExcelAdapter
     {
         protected override IEnumerable<IBHoMObject> IRead(Type type, IList ids, ActionConfig actionConfig = null)
         {
-            IEnumerable<BHoMObject> everything = ReadXlsx();
-
-            if (type != null)
-                everything = everything.Where(x => type.IsAssignableFrom(x.GetType()));
-
-            if (ids != null)
-            {
-                HashSet<Guid> toDelete = new HashSet<Guid>(ids.Cast<Guid>());
-                everything = everything.Where(x => !toDelete.Contains((Guid)x.CustomData[AdapterIdName]));
-            }
-
-
-            return everything;
+            return Read();
         }
 
-
-        private IEnumerable<BHoMObject> ReadXlsx()
+        private IEnumerable<IBHoMObject> Read()
         {
-            string[] json = File.ReadAllLines(m_FilePath);
-            var converted = json.Select(x => Engine.Serialiser.Convert.FromJson(x) as BHoMObject).Where(x => x != null);
-            if (converted.Count() < json.Count())
-                BH.Engine.Reflection.Compute.RecordWarning("Could not convert some object to BHoMObject.");
-            return converted;
+            XLWorkbook workbook = new XLWorkbook(_fileSettings.GetFullFileName());
+            return ReadExcelFile(workbook);
+        }
+        /***************************************************/
+        /**** Private Methods                           ****/
+        /***************************************************/
+        private List<IBHoMObject> ReadExcelFile(XLWorkbook workbook, List<string> ids = null)
+        {
+            List<IBHoMObject> objects = new List<IBHoMObject>();
+            foreach (IXLWorksheet worksheet in Worksheets(workbook))
+            {
+                IXLRange range = Range(worksheet);
+                if(range == null)
+                {
+                    Engine.Reflection.Compute.RecordError("Range provided is not in the correct format for and xlsx file");
+                    return objects;
+                }
+                List<DataColumn> columns = new List<DataColumn>();
+                foreach (IXLRangeColumn column in range.Columns())
+                {
+                    columns.Add(new DataColumn(column.ColumnLetter(), typeof(object)));
+                }
+                DataTable table = new DataTable();
+                table.Columns.AddRange(columns.ToArray());
+
+                foreach (IXLRangeRow row in range.Rows())
+                {
+                    List<object> dataRow = new List<object>();
+                    foreach (IXLRangeColumn column in range.Columns())
+                        dataRow.Add(worksheet.Cell(row.RowNumber(),column.ColumnNumber()).GetValue<object>());
+                    table.Rows.Add(dataRow.ToArray());
+                }
+                objects.Add(new Table { Data = table, Name = worksheet.Name });
+            }
+            return objects;
+        }
+        /***************************************************/
+        private IXLRange Range(IXLWorksheet worksheet)
+        {
+            if (_excelSettings.Range != null)
+            {
+
+                return worksheet.Range(_excelSettings.Range);
+            }
+            return worksheet.Range(worksheet.FirstCellUsed().Address,worksheet.LastCellUsed().Address);
+        }
+        /***************************************************/
+        private List<IXLWorksheet> Worksheets(XLWorkbook workbook)
+        {
+            if(_excelSettings.Worksheets != null)
+            {
+                List<IXLWorksheet> sheets = new List<IXLWorksheet>();
+                foreach(string wsName in _excelSettings.Worksheets)
+                {
+                    if (workbook.Worksheet(wsName) != null)
+                        sheets.Add(workbook.Worksheet(wsName));
+                }
+                return sheets;
+            }
+            return workbook.Worksheets.ToList();
         }
     }
 }

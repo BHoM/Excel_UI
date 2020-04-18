@@ -35,38 +35,29 @@ namespace BH.Adapter.ExcelAdapter
     {
         public override List<object> Push(IEnumerable<object> objects, string tag = "", PushType pushType = PushType.AdapterDefault, ActionConfig actionConfig = null)
         {
-            // --------------- SET-UP ------------------
-
-            // Process the objects (verify they are valid; DeepClone them, wrap them, etc).
-            IEnumerable<IBHoMObject> objectsToPush = ProcessObjectsForPush(objects, actionConfig); // Note: default Push only supports IBHoMObjects.
-
-            if (objectsToPush.Count() == 0)
-            {
-                Engine.Reflection.Compute.RecordError("Input objects were invalid.");
-                return new List<object>();
-            }
-
-            // If unset, set the actionConfig to a new ActionConfig.
-            actionConfig = actionConfig == null ? new ActionConfig() : actionConfig;
-
             // If unset, set the pushType to AdapterSettings' value (base AdapterSettings default is FullCRUD).
             if (pushType == PushType.AdapterDefault)
                 pushType = m_AdapterSettings.DefaultPushType;
 
-            // ------------- ACTUAL PUSH ---------------
+            if (_excelSettings == null)
+            {
+                BH.Engine.Reflection.Compute.RecordError("Please set some Excel Settings on the Excel Adapter before pushing to an Excel File");
+                return new List<object>();
+            }
 
-            if (!ProcessExtension(ref m_FilePath))
-                return null;
+            IEnumerable<IBHoMObject> objectsToPush = ProcessObjectsForPush(objects, actionConfig); // Note: default Push only supports IBHoMObjects.
 
-            CreateFileAndFolder();
+            bool success = true;
 
-            if (objectsToPush.Count() != objects.Count())
-                Engine.Reflection.Compute.RecordWarning("The file adapter can currently only be used with BHoMObjects." + Environment.NewLine +
-                    "If you want to push non-BHoMobject, specify a push config with the option `WrapNonBHoMObject` set to true.");
+            MethodInfo methodInfos = typeof(Enumerable).GetMethod("Cast");
+            foreach (var typeGroup in objectsToPush.GroupBy(x => x.GetType()))
+            {
+                MethodInfo mInfo = methodInfos.MakeGenericMethod(new[] { typeGroup.Key });
+                var list = mInfo.Invoke(typeGroup, new object[] { typeGroup });
+                success &= ICreate(list as dynamic);
+            }
 
-            bool success = this.FullCRUD(objectsToPush, pushType, tag, actionConfig);
-
-            return success ? objectsToPush.Cast<object>().ToList() : new List<IObject>().Cast<object>().ToList();
+            return success ? objects.ToList() : new List<object>();
         }
     }
 }

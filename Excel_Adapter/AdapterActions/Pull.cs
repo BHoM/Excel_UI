@@ -36,20 +36,12 @@ namespace BH.Adapter.ExcelAdapter
     {
         public override IEnumerable<object> Pull(IRequest request, PullType pullOption = PullType.AdapterDefault, ActionConfig actionConfig = null)
         {
-            if (!System.IO.File.Exists(m_FilePath))
+            if (!System.IO.File.Exists(System.IO.Path.Combine(_fileSettings.Directory, _fileSettings.FileName)))
             {
-                Engine.Reflection.Compute.RecordError($"File not found: {m_FilePath} - Cannot pull from this file");
-                return null;
+                BH.Engine.Reflection.Compute.RecordError("File does not exist to pull from");
+                return new List<IBHoMObject>();
             }
-            else if (!Path.HasExtension(m_FilePath))
-            {
-                Engine.Reflection.Compute.RecordNote($"No extension specified in the FileName input. Default is .xlxs.");
-                m_FilePath += ".xlsx";
-
-                return null;
-            }
-
-            return base.Pull(request, pullOption, actionConfig);
+            return Read();
         }
     }
 }

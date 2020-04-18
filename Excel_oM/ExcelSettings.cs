@@ -20,18 +20,26 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-namespace BH.Adapter.ExcelAdapter
-{
-    public partial class ExcelAdapter
-    {
-        //protected override bool PushType<T>(List<T> objectsToPush, string tag = "") 
-        //{
-        //    if (objectsToPush.Count == 0)
-        //        return true;
+using System;
+using System.Collections.Generic;
+using BH.oM.Base;
 
-        //    Type type = objectsToPush[0].GetType();
-        //    return ReplaceByTypeAndTag(objectsToPush.Cast<BHoMObject>().ToList(), typeof(T), tag);
-        //}
+using System.ComponentModel;
+
+namespace BH.oM.Excel.Settings
+{
+    public class ExcelSettings : BHoMObject
+    {
+        /***************************************************/
+        /**** Properties                                ****/
+        /***************************************************/
+        [Description("Names of the worksheet(s) to read or write")]
+        public virtual List<string> Worksheets { get; set; } = null;
+
+        [Description("Range to read or write")]
+        public virtual string Range { get; set; } = null;
+
+        /***************************************************/
     }
 }
 

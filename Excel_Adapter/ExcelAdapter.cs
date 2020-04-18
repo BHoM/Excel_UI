@@ -20,15 +20,11 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using System.Linq;
 using System;
+using System.ComponentModel;
 using System.IO;
 using BH.oM.Reflection.Attributes;
-using System.Collections.Generic;
-using BH.oM.Base;
-
-using BH.Engine.Base;
-using BH.oM.Adapter;
+using BH.oM.Excel.Settings;
 
 namespace BH.Adapter.ExcelAdapter
 {
@@ -37,76 +33,42 @@ namespace BH.Adapter.ExcelAdapter
         /***************************************************/
         /**** Constructor                               ****/
         /***************************************************/
-        [Input("folder", "Defaults to the path of your default drive (usually C://)")]
-        [Input("fileName", "Insert filename with extension.\nCurrently supports only .xlsx file type.")]
-        public ExcelAdapter(string folder = null, string fileName = "")
+        [Description("Specify Excel file and properties for data transfer")]
+        [Input("fileSettings", "Input the file settings to get the file name and directory the Excel Adapter should use")]
+        [Input("excelSettings", "Input the additional Excel Settings the adapter should use. Default null")]
+        [Output("adapter", "Adapter to Excel")]
+        public ExcelAdapter(BH.oM.Adapter.FileSettings fileSettings = null, ExcelSettings excelSettings = null)
         {
-            if (folder == null)
-                folder = Path.GetPathRoot(Environment.SystemDirectory);
+            if (fileSettings == null)
+            {
+                BH.Engine.Reflection.Compute.RecordError("Please set the File Settings correctly to enable the Excel Adapter to work correctly");
+                return;
+            }
 
-            if (string.IsNullOrEmpty(fileName))
-                fileName = "objects.xlsx";
+            if (!Path.HasExtension(fileSettings.FileName) || Path.GetExtension(fileSettings.FileName) != ".xlsx")
+            {
+                BH.Engine.Reflection.Compute.RecordError("File name must contain a file extension");
+                return;
+            }
 
-            //if (folder.Count() > 2 && folder.ElementAt(1) != ':')
-            //    folder = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "BHoM", "DataSets", folder);
+            _fileSettings = fileSettings;
+            _excelSettings = excelSettings;
 
-            m_FilePath = Path.Combine(folder, fileName);
-
-            ProcessExtension(ref m_FilePath);
-
-            m_isXLSX = Path.GetExtension(m_FilePath) == ".xlsx";
-            this.m_AdapterSettings.UseAdapterId = false;
+            AdapterIdName = "Excel_Adapter";
         }
 
         /***************************************************/
         /**** Public Adapter Methods overrides          ****/
         /***************************************************/
 
-        /***************************************************/
-        /**** Private Methods                           ****/
-        /***************************************************/
-
-        private bool ProcessExtension(ref string filePath)
-        {
-            string ext = Path.GetExtension(filePath);
-
-            if (!Path.HasExtension(m_FilePath))
-            {
-                Engine.Reflection.Compute.RecordNote($"No extension specified in the FileName input. Default is .xlsx.");
-                ext = ".xlxs";
-                filePath += ext;
-            }
-
-            if (ext != ".xlxs")
-            {
-                Engine.Reflection.Compute.RecordError($"File_Adapter currently supports only .xlxs extension type.\nSpecified file extension: {ext}");
-                return false;
-            }
-
-            return true;
-        }
-
-        private void CreateFileAndFolder()
-        {
-            string directoryPath = Path.GetDirectoryName(m_FilePath);
-            if (!Directory.Exists(directoryPath))
-                Directory.CreateDirectory(directoryPath);
-
-
-            if (!File.Exists(m_FilePath))
-            {
-                FileStream stream = File.Create(m_FilePath);
-                stream.Dispose();
-                stream.Close();
-            }
-        }
+        
 
         /***************************************************/
         /**** Private Fields                            ****/
         /***************************************************/
 
-        private string m_FilePath;
-        private bool m_isXLSX;
+        private BH.oM.Adapter.FileSettings _fileSettings { get; set; } = null;
+        private ExcelSettings _excelSettings { get; set; } = null;
     }
 }
 
