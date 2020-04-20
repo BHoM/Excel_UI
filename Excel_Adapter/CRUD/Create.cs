@@ -29,6 +29,8 @@ using BH.Engine.Serialiser;
 using BH.oM.Adapter;
 using BH.Engine.Adapter;
 using ClosedXML.Excel;
+using BH.oM.Data.Collections;
+using System.Data;
 
 namespace BH.Adapter.ExcelAdapter
 {
@@ -42,7 +44,15 @@ namespace BH.Adapter.ExcelAdapter
         {
             string fileName = _fileSettings.GetFullFileName();
             IXLWorkbook workbook = new XLWorkbook();
-            IXLWorksheet worksheet = workbook.Worksheets.Add("Sample Sheet");
+            foreach(T obj in objects)
+            {
+                //add table to sheet
+                if(obj is Table)
+                {
+                    AddTable(workbook, obj as Table);
+                }
+                
+            }
             workbook.SaveAs(fileName); 
             return true;
         }
@@ -52,9 +62,10 @@ namespace BH.Adapter.ExcelAdapter
         /**** Private Methods                           ****/
         /***************************************************/
 
-        private bool CreateExcel(IEnumerable<IBHoMObject> objects, bool clearFile = false)
+        private bool AddTable(IXLWorkbook workbook,Table table, string sheetname = "")
         {
-            
+            IXLWorksheet worksheet = workbook.Worksheets.Add(table.Name);
+            worksheet.Cell(1,1).InsertTable(table.Data.AsEnumerable());
             return true;
         }
 
