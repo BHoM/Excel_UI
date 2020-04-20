@@ -57,8 +57,31 @@ namespace BH.UI.Excel.Global
 
         public override bool SetParent(object parent)
         {
+            var deduplicated = new Dictionary<string, SearchItem>();
             foreach(var item in PossibleItems)
             {
+                try
+                {
+                    string fn = GetFormula(item);
+                    if (deduplicated.ContainsKey(fn))
+                    {
+                        if (deduplicated[fn].Item.IIsDeprecated())
+                        {
+                            deduplicated[fn] = item;
+                        }
+                        continue;
+                    }
+
+                    deduplicated.Add(fn, item);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
+                }
+            }
+
+            foreach (var item in deduplicated.Values)
+            { 
                 using (Engine.Excel.Profiling.Timer timer = new Engine.Excel.Profiling.Timer("CreateDelegates"))
                 {
                     try
@@ -72,6 +95,7 @@ namespace BH.UI.Excel.Global
                 }
             }
             CallerFormula.RegisterQueue();
+            ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
             ExcelDna.Logging.LogDisplay.Hide();
             return true;
         }
@@ -88,6 +112,19 @@ namespace BH.UI.Excel.Global
                 caller.Caller.SetItem(item.Item);
                 caller.EnqueueRegistration();
             }
+        }
+        
+        /*******************************************/
+
+        private string GetFormula(SearchItem item)
+        {
+            if (m_Callers.ContainsKey(item.CallerType.Name))
+            {
+                CallerFormula caller = m_Callers[item.CallerType.Name];
+                caller.Caller.SetItem(item.Item);
+                return caller.Function;
+            }
+            return null;
         }
 
         protected override List<SearchItem> GetAllPossibleItems()
