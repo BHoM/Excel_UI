@@ -27,6 +27,8 @@ using System.IO;
 using System.Linq;
 using BH.Engine.Serialiser;
 using BH.oM.Adapter;
+using BH.Engine.Adapter;
+using ClosedXML.Excel;
 
 namespace BH.Adapter.ExcelAdapter
 {
@@ -38,7 +40,10 @@ namespace BH.Adapter.ExcelAdapter
 
         protected override bool ICreate<T>(IEnumerable<T> objects, ActionConfig actionConfig = null)
         {
-            bool clearFile = m_AdapterSettings.ProcessInMemory;
+            string fileName = _fileSettings.GetFullFileName();
+            IXLWorkbook workbook = new XLWorkbook();
+            IXLWorksheet worksheet = workbook.Worksheets.Add("Sample Sheet");
+            workbook.SaveAs(fileName); 
             return true;
         }
 
@@ -47,8 +52,9 @@ namespace BH.Adapter.ExcelAdapter
         /**** Private Methods                           ****/
         /***************************************************/
 
-        private bool CreateXlsx(IEnumerable<IBHoMObject> objects, bool clearFile = false)
+        private bool CreateExcel(IEnumerable<IBHoMObject> objects, bool clearFile = false)
         {
+            
             return true;
         }
 

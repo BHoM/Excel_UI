@@ -39,6 +39,9 @@ namespace BH.oM.Excel.Settings
         [Description("Range to read or write")]
         public virtual string Range { get; set; } = null;
 
+        [Description("Set to false if you want to append to a file when pushing Excel. If set to true then a file will be created. If a file exists, it will be overwritten. Default true")]
+        public virtual bool NewFile { get; set; } = true;
+
         /***************************************************/
     }
 }

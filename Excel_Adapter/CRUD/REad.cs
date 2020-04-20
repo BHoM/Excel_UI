@@ -30,6 +30,7 @@ using BH.Engine.Adapter;
 using ClosedXML.Excel;
 using BH.oM.Data.Collections;
 using System.Data;
+using BH.oM.Excel;
 
 namespace BH.Adapter.ExcelAdapter
 {
@@ -37,18 +38,23 @@ namespace BH.Adapter.ExcelAdapter
     {
         protected override IEnumerable<IBHoMObject> IRead(Type type, IList ids, ActionConfig actionConfig = null)
         {
-            return Read();
+            return Read(type);
         }
 
-        private IEnumerable<IBHoMObject> Read()
+        private IEnumerable<IBHoMObject> Read(Type type = null)
         {
             XLWorkbook workbook = new XLWorkbook(_fileSettings.GetFullFileName());
-            return ReadExcelFile(workbook);
+            if (type == typeof(ValuesRequest))
+                return ReadExcelFile(workbook);
+            else
+                return ReadExcelFile(workbook);
         }
+
         /***************************************************/
         /**** Private Methods                           ****/
         /***************************************************/
-        private List<IBHoMObject> ReadExcelFile(XLWorkbook workbook, List<string> ids = null)
+
+        private List<IBHoMObject> ReadExcelFile(XLWorkbook workbook)
         {
             List<IBHoMObject> objects = new List<IBHoMObject>();
             foreach (IXLWorksheet worksheet in Worksheets(workbook))
@@ -78,7 +84,9 @@ namespace BH.Adapter.ExcelAdapter
             }
             return objects;
         }
+
         /***************************************************/
+
         private IXLRange Range(IXLWorksheet worksheet)
         {
             if (_excelSettings.Range != null)
@@ -88,7 +96,9 @@ namespace BH.Adapter.ExcelAdapter
             }
             return worksheet.Range(worksheet.FirstCellUsed().Address,worksheet.LastCellUsed().Address);
         }
+
         /***************************************************/
+
         private List<IXLWorksheet> Worksheets(XLWorkbook workbook)
         {
             if(_excelSettings.Worksheets != null)
