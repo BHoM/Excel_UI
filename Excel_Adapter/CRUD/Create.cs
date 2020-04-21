@@ -43,8 +43,9 @@ namespace BH.Adapter.ExcelAdapter
         protected override bool ICreate<T>(IEnumerable<T> objects, ActionConfig actionConfig = null)
         {
             string fileName = _fileSettings.GetFullFileName();
-            IXLWorkbook workbook = new XLWorkbook();
 
+            var style = XLWorkbook.DefaultStyle;
+            
             if (_excelSettings.NewFile)
                 workbook = new XLWorkbook();
             else
@@ -73,6 +74,8 @@ namespace BH.Adapter.ExcelAdapter
                 table.Data.TableName = table.Name;
             if (WorksheetExists(workbook, table.Name))
                 table.Data.TableName += sheetnum;
+            
+
             workbook.Worksheets.Add(table.Data);
             return true;
         }

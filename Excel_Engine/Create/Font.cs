@@ -22,20 +22,22 @@
 
 using BH.oM.Excel;
 using ClosedXML.Excel;
+using FastMember;
+using System.Drawing;
 
 namespace BH.Engine.Excel
 {
     public static partial class Create
     {
         /*******************************************/
-        /**** Methods                           ****/
+        /**** public Methods                    ****/
         /*******************************************/
-        public static Font Font(IXLFont xLFont)
+        public static BH.oM.Excel.Font Font(IXLFont xLFont)
         {
-            return new Font()
+            return new BH.oM.Excel.Font()
             {
                 Bold = xLFont.Bold,
-                FontColour = xLFont.FontColor.Color,
+                FontColour = xLFont.FontColor.ColorType == XLColorType.Theme ? Color.Black : xLFont.FontColor.Color,
                 FontName = xLFont.FontName,
                 FontSize = xLFont.FontSize,
                 Italic  = xLFont.Italic,
@@ -44,5 +46,15 @@ namespace BH.Engine.Excel
                 Underline = (UnderlineStyle)(int)xLFont.Underline
             };
         }
-    }
+
+        /*******************************************/
+        /**** private Methods                   ****/
+        /*******************************************/
+        private static Color ToColor(this XLThemeColor xLThemeColor, IXLWorkbook wb)
+        {
+            string themeColourName = xLThemeColor.ToString();
+            XLColor color = ObjectAccessor.Create(wb.Theme)[themeColourName] as XLColor;
+            return color.Color;
+        }
+     }
 }
