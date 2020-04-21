@@ -44,33 +44,50 @@ namespace BH.Adapter.ExcelAdapter
         {
             string fileName = _fileSettings.GetFullFileName();
             IXLWorkbook workbook = new XLWorkbook();
-            foreach(T obj in objects)
+
+            if (_excelSettings.NewFile)
+                workbook = new XLWorkbook();
+            else
+                workbook = new XLWorkbook(fileName);
+
+            foreach (T obj in objects)
             {
                 //add table to sheet
                 if(obj is Table)
-                {
                     AddTable(workbook, obj as Table);
-                }
-                
             }
             workbook.SaveAs(fileName); 
             return true;
         }
 
-
         /***************************************************/
         /**** Private Methods                           ****/
         /***************************************************/
 
-        private bool AddTable(IXLWorkbook workbook,Table table, string sheetname = "")
+        private bool AddTable(IXLWorkbook workbook,Table table)
         {
-            IXLWorksheet worksheet = workbook.Worksheets.Add(table.Name);
-            worksheet.Cell(1,1).InsertTable(table.Data.AsEnumerable());
+            int sheetnum = workbook.Worksheets.Count();
+            if (table.Name == null || table.Name == "")
+                table.Data.TableName = "sheet " + workbook.Worksheets.Count();
+            else
+                table.Data.TableName = table.Name;
+            if (WorksheetExists(workbook, table.Name))
+                table.Data.TableName += sheetnum;
+            workbook.Worksheets.Add(table.Data);
             return true;
         }
 
         /***************************************************/
 
+        private bool WorksheetExists(IXLWorkbook workbook, string name)
+        {
+            foreach(IXLWorksheet worksheet in workbook.Worksheets)
+            {
+                if (worksheet.Name == name)
+                    return true;
+            }
+            return false;
+        }
     }
 }
 

@@ -31,6 +31,7 @@ using ClosedXML.Excel;
 using BH.oM.Data.Collections;
 using System.Data;
 using BH.oM.Excel;
+using BH.Engine.Excel;
 
 namespace BH.Adapter.ExcelAdapter
 {
@@ -45,16 +46,18 @@ namespace BH.Adapter.ExcelAdapter
         {
             XLWorkbook workbook = new XLWorkbook(_fileSettings.GetFullFileName());
             if (type == typeof(ValuesRequest))
-                return ReadExcelFile(workbook);
+                return ReadExcel(workbook,true);
+            if (type == typeof(CellsRequest))
+                return ReadExcel(workbook,false);
             else
-                return ReadExcelFile(workbook);
+                return ReadExcel(workbook, true);
         }
 
         /***************************************************/
         /**** Private Methods                           ****/
         /***************************************************/
 
-        private List<IBHoMObject> ReadExcelFile(XLWorkbook workbook)
+        private List<IBHoMObject> ReadExcel(XLWorkbook workbook,bool valuesOnly)
         {
             List<IBHoMObject> objects = new List<IBHoMObject>();
             foreach (IXLWorksheet worksheet in Worksheets(workbook))
@@ -77,7 +80,13 @@ namespace BH.Adapter.ExcelAdapter
                 {
                     List<object> dataRow = new List<object>();
                     foreach (IXLRangeColumn column in range.Columns())
-                        dataRow.Add(worksheet.Cell(row.RowNumber(),column.ColumnNumber()).GetValue<object>());
+                    {
+                        if(valuesOnly)
+                            dataRow.Add(worksheet.Cell(row.RowNumber(), column.ColumnNumber()).GetValue<object>());
+                        else
+                            dataRow.Add(Create.Cell(worksheet.Cell(row.RowNumber(), column.ColumnNumber())));
+                    }
+                        
                     table.Rows.Add(dataRow.ToArray());
                 }
                 objects.Add(new Table { Data = table, Name = worksheet.Name });
@@ -101,7 +110,7 @@ namespace BH.Adapter.ExcelAdapter
 
         private List<IXLWorksheet> Worksheets(XLWorkbook workbook)
         {
-            if(_excelSettings.Worksheets != null)
+            if(_excelSettings.Worksheets.Count() != 0)
             {
                 List<IXLWorksheet> sheets = new List<IXLWorksheet>();
                 foreach(string wsName in _excelSettings.Worksheets)
@@ -113,6 +122,9 @@ namespace BH.Adapter.ExcelAdapter
             }
             return workbook.Worksheets.ToList();
         }
+
+        /***************************************************/
+
     }
 }
 
