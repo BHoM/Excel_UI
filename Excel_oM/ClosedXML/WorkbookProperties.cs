@@ -28,26 +28,21 @@ using System.ComponentModel;
 
 namespace BH.oM.Excel.Settings
 {
-    public class ExcelSettings : BHoMObject
+    public class WorkbookProperties : BHoMObject
     {
         /***************************************************/
         /**** Properties                                ****/
         /***************************************************/
-        [Description("Names of the worksheet(s) to read or write")]
-        public virtual List<string> Worksheets { get; set; } = null;
-
-        [Description("Range to read or write")]
-        public virtual string Range { get; set; } = null;
-
-        [Description("Set to false if you want to append to a file when pushing Excel. If set to true then a file will be created. If a file exists, it will be overwritten. Default true")]
-        public virtual bool NewFile { get; set; } = true;
-
-        [Description("Styling to apply to workbook and contents")]
-        public virtual Style Style { get; set; } = new Style();
-
-        [Description("Properties to apply to workbook and contents")]
-        public virtual WorkbookProperties WorkbookProperties { get; set; } = new WorkbookProperties();
-
+        public virtual string Author { get; set; } = "author";
+        public virtual string Title { get; set; } = "title";
+        public virtual string Subject { get; set; } = "subject";
+        public virtual string Category { get; set; } = "category";
+        public virtual string Keywords { get; set; } = "keywords";
+        public virtual string Comments{ get; set; } = "comments";
+        public virtual string Status { get; set; } = "status";
+        public virtual string LastModifiedBy { get; set; } = "lastModified";
+        public virtual string Company { get; set; } = "Buro Happold";
+        public virtual string Manager{ get; set; } = "manager";
         /***************************************************/
     }
 }

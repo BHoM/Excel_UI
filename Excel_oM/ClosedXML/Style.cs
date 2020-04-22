@@ -21,7 +21,7 @@
  */
 
 using BH.oM.Base;
-using System.Drawing;
+using System.Collections.Generic;
 
 namespace BH.oM.Excel
 {
@@ -30,12 +30,7 @@ namespace BH.oM.Excel
         /*******************************************/
         /**** Properties                        ****/
         /*******************************************/
-        public virtual Alignment Alignment { get; set; }
-        public virtual Border Border { get; set; }
-        public virtual string DateFormat { get; set; }
-        public virtual Color Fill { get; set; }
-        public virtual Font Font { get; set; }
-        public virtual string NumberFormat { get; set; }
+        public virtual List<RuleSet> RuleSets { get; set; } = new List<RuleSet>();
         /*******************************************/
     }
 }

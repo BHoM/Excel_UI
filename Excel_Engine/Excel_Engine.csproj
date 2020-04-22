@@ -83,11 +83,7 @@
   <ItemGroup>
     <Compile Include="Compute\Contents.cs" />
     <Compile Include="Compute\Note.cs" />
-    <Compile Include="Create\Alignment.cs" />
-    <Compile Include="Create\Border.cs" />
-    <Compile Include="Create\Cell.cs" />
-    <Compile Include="Create\Font.cs" />
-    <Compile Include="Create\Style.cs" />
+    <Compile Include="Create\CellContents.cs" />
     <Compile Include="Query\Filename.cs" />
     <Compile Include="Query\Formula.cs" />
     <Compile Include="Objects\Timer.cs" />

@@ -65,16 +65,10 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ClosedXML\Alignment.cs" />
-    <Compile Include="ClosedXML\Border.cs" />
-    <Compile Include="ClosedXML\Cell.cs" />
+    <Compile Include="ClosedXML\CellContents.cs" />
     <Compile Include="ClosedXML\CellsRequest.cs" />
-    <Compile Include="ClosedXML\Enums\BorderStyle.cs" />
-    <Compile Include="ClosedXML\Enums\UnderlineStyle.cs" />
-    <Compile Include="ClosedXML\Font.cs" />
-    <Compile Include="ClosedXML\Enums\HorizontalAlignment.cs" />
-    <Compile Include="ClosedXML\Enums\ReadingOrder.cs" />
-    <Compile Include="ClosedXML\Enums\VerticalAlignment.cs" />
+    <Compile Include="ClosedXML\WorkbookProperties.cs" />
+    <Compile Include="ClosedXML\RuleSet.cs" />
     <Compile Include="Rectangle.cs" />
     <Compile Include="Reference.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

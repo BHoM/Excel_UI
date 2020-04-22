@@ -43,20 +43,21 @@ namespace BH.Adapter.ExcelAdapter
         protected override bool ICreate<T>(IEnumerable<T> objects, ActionConfig actionConfig = null)
         {
             string fileName = _fileSettings.GetFullFileName();
-
-            var style = XLWorkbook.DefaultStyle;
+            XLWorkbook workbook = new XLWorkbook();
             
             if (_excelSettings.NewFile)
                 workbook = new XLWorkbook();
             else
                 workbook = new XLWorkbook(fileName);
-
+            
             foreach (T obj in objects)
             {
                 //add table to sheet
                 if(obj is Table)
                     AddTable(workbook, obj as Table);
             }
+            ApplyStyles(workbook);
+            ApplyProperties(workbook);
             workbook.SaveAs(fileName); 
             return true;
         }
@@ -67,6 +68,7 @@ namespace BH.Adapter.ExcelAdapter
 
         private bool AddTable(IXLWorkbook workbook,Table table)
         {
+
             int sheetnum = workbook.Worksheets.Count();
             if (table.Name == null || table.Name == "")
                 table.Data.TableName = "sheet " + workbook.Worksheets.Count();
@@ -74,9 +76,9 @@ namespace BH.Adapter.ExcelAdapter
                 table.Data.TableName = table.Name;
             if (WorksheetExists(workbook, table.Name))
                 table.Data.TableName += sheetnum;
-            
 
             workbook.Worksheets.Add(table.Data);
+            
             return true;
         }
 
@@ -90,6 +92,51 @@ namespace BH.Adapter.ExcelAdapter
                     return true;
             }
             return false;
+        }
+
+        /***************************************************/
+
+        private void ApplyStyles(XLWorkbook workbook)
+        {
+            ApplyWorkbookStyle(workbook);
+
+            foreach (IXLWorksheet sheet in workbook.Worksheets)
+            {
+                ApplyWorksheetStyle(sheet);
+
+                foreach (IXLTable table in sheet.Tables)
+                    ApplyTableStyle(table);  
+            }
+        }
+        /***************************************************/
+
+        private void ApplyProperties(IXLWorkbook workbook)
+        {
+            workbook.Properties.Author = _excelSettings.WorkbookProperties.Author;
+            workbook.Properties.Title = _excelSettings.WorkbookProperties.Title;
+            workbook.Properties.Subject = _excelSettings.WorkbookProperties.Subject;
+            workbook.Properties.Category = _excelSettings.WorkbookProperties.Category;
+            workbook.Properties.Keywords = _excelSettings.WorkbookProperties.Keywords;
+            workbook.Properties.Comments = _excelSettings.WorkbookProperties.Comments;
+            workbook.Properties.Status = _excelSettings.WorkbookProperties.Status;
+            workbook.Properties.LastModifiedBy = _excelSettings.WorkbookProperties.LastModifiedBy;
+            workbook.Properties.Company = _excelSettings.WorkbookProperties.Company;
+            workbook.Properties.Manager = _excelSettings.WorkbookProperties.Manager;
+        }
+        /***************************************************/
+        private void ApplyWorkbookStyle(XLWorkbook workbook)
+        {
+
+        }
+        /***************************************************/
+        private void ApplyWorksheetStyle(IXLWorksheet worksheet)
+        {
+
+        }
+        /***************************************************/
+        private void ApplyTableStyle(IXLTable table)
+        {
+            table.Theme = XLTableTheme.None;
         }
     }
 }

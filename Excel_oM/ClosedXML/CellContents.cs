@@ -20,12 +20,31 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
+using BH.oM.Base;
+using ClosedXML.Excel;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
 namespace BH.oM.Excel
 {
-    public enum ReadingOrder
+    public class CellContents : BHoMObject
     {
-        ContextDependent = 0,
-        LeftToRight = 1,
-        RightToLeft = 2
+        /*******************************************/
+        /**** Properties                        ****/
+        /*******************************************/
+        public virtual string Comment { get; set; }
+        public virtual object Value { get; set; }
+        public virtual string Address { get; set; }
+        public virtual Type DataType { get; set; }
+        public virtual string FormulaA1 { get; set; }
+        public virtual string FormulaR1C1 { get; set; }
+        public virtual string HyperLink { get; set; }
+        public virtual string RichText { get; set; }
+        public virtual Style Style { get; set; }
+
+        /*******************************************/
     }
 }

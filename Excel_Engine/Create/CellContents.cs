@@ -20,14 +20,29 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-namespace BH.oM.Excel
+using BH.oM.Excel;
+using ClosedXML.Excel;
+
+namespace BH.Engine.Excel
 {
-    public enum VerticalAlignment
+    public static partial class Create
     {
-        Bottom = 0,
-        Center = 1,
-        Distributed = 2,
-        Justify = 3,
-        Top = 4
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+        public static CellContents CellContents(IXLCell xLCell)
+        {
+            return new CellContents()
+            {
+                Comment = xLCell.HasComment ? xLCell.Comment.Text : "",
+                Value = xLCell.Value,
+                Address = xLCell.Address.ToString(),
+                DataType = xLCell.DataType.GetType(),
+                FormulaA1 = xLCell.FormulaA1,
+                FormulaR1C1 = xLCell.FormulaR1C1,
+                HyperLink = xLCell.HasHyperlink ? xLCell.Hyperlink.ExternalAddress.ToString() : "",
+                RichText = xLCell.HasRichText ? xLCell.RichText.Text : ""
+            };
+        }
     }
 }

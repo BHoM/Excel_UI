@@ -20,28 +20,18 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using BH.oM.Excel;
-using ClosedXML.Excel;
+using BH.oM.Base;
+using System.Collections.Generic;
 
-namespace BH.Engine.Excel
+namespace BH.oM.Excel
 {
-    public static partial class Create
+    public class RuleSet : BHoMObject
     {
         /*******************************************/
-        /**** Methods                           ****/
+        /**** Properties                        ****/
         /*******************************************/
-        public static Cell Cell(IXLCell xLCell)
-        {
-            return new Cell()
-            {
-                Value = xLCell.Value,
-                Address = xLCell.Address.ToString(),
-                DataType = xLCell.DataType.GetType(),
-                FormulaA1 = xLCell.FormulaA1,
-                FormulaR1C1 = xLCell.FormulaR1C1,
-                HyperLink = xLCell.Hyperlink.ExternalAddress == null ? "" : xLCell.Hyperlink.ExternalAddress.ToString(),
-                Style = Create.Style(xLCell.Style)
-            };
-        }
+        public virtual string Selector { get; set; } = "";
+        public virtual Dictionary<string, object> Declarations { get; set; } = new Dictionary<string, object>();
+        /*******************************************/
     }
 }
