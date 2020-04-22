@@ -81,7 +81,7 @@ namespace BH.UI.Excel
                 (caller.ColumnLast - caller.ColumnFirst + 1 == columns))
             {
                 // Size is already OK - just return result
-                //callback(target);
+                callback(target);
                 return array;
             }
 
