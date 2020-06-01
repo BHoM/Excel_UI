@@ -110,10 +110,6 @@
       <HintPath>C:\ProgramData\BHoM\Assemblies\UI_oM.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="VBIDEApi, Version=1.7.3.0, Culture=neutral, PublicKeyToken=a3637beacf571e8a, processorArchitecture=MSIL">
-      <HintPath>..\packages\NetOffice.Core.1.7.4.4\lib\net45\VBIDEApi.dll</HintPath>
-      <EmbedInteropTypes>False</EmbedInteropTypes>
-    </Reference>
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Addin\AddIn.cs" />
@@ -176,17 +172,6 @@
     </None>
   </ItemGroup>
   <ItemGroup>
-    <COMReference Include="VBIDE">
-      <Guid>{0002E157-0000-0000-C000-000000000046}</Guid>
-      <VersionMajor>5</VersionMajor>
-      <VersionMinor>3</VersionMinor>
-      <Lcid>0</Lcid>
-      <WrapperTool>primary</WrapperTool>
-      <Isolated>False</Isolated>
-      <EmbedInteropTypes>True</EmbedInteropTypes>
-    </COMReference>
-  </ItemGroup>
-  <ItemGroup>
     <ProjectReference Include="..\Excel_Engine\Excel_Engine.csproj">
       <Project>{a6884466-297e-4aaa-a232-abbec42168d3}</Project>
       <Name>Excel_Engine</Name>
@@ -235,7 +220,7 @@ xcopy "$(TargetDir)ExcelDna.IntelliSense.dll"  "C:\ProgramData\BHoM\Assemblies" 
 xcopy "$(TargetDir)ExcelDna.Registration.dll"  "C:\ProgramData\BHoM\Assemblies" /Y
 
 
-xcopy "$(TargetDir)VBIDEApi.dll"  "C:\ProgramData\BHoM\Assemblies" /Y</PostBuildEvent>
+</PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\ExcelDna.AddIn.0.34.6\tools\ExcelDna.AddIn.targets" Condition="Exists('..\packages\ExcelDna.AddIn.0.34.6\tools\ExcelDna.AddIn.targets')" />
   <Target Name="EnsureExcelDnaTargetsImported" BeforeTargets="BeforeBuild" Condition="'$(ExcelDnaTargetsImported)' == ''">
