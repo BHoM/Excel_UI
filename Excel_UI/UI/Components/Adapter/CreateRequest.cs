@@ -45,17 +45,7 @@ namespace BH.UI.Excel.Components
         /*******************************************/
 
         public CreateRequestFormula() : base() { }
-
-        /*******************************************/
-        /**** Methods                           ****/
-        /*******************************************/
-
-        public override string GetName()
-        {
-            return "Adapter.Request." + Caller.Name;
-        }
-
-        /*******************************************/
+    
     }
 }
 

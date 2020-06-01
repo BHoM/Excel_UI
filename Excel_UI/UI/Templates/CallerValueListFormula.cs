@@ -49,6 +49,14 @@ namespace BH.UI.Excel.Templates
             }
         }
 
+        public override string Function
+        {
+            get
+            {
+                return Caller.GetFullName();
+            }
+        }
+
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/

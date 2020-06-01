@@ -43,43 +43,11 @@ namespace BH.UI.Excel.Components
 
         public override string MenuRoot { get; } = "Create Object";
 
-        public override string Function
-        {
-            get
-            {
-                if (Caller.SelectedItem is Type)
-                    return $"{GetName()}?by_Properties";
-                return base.Function;
-            }
-        }
-
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/
 
-        public CreateObjectFormula() : base() { }
-
-        /*******************************************/
-        /**** Methods                           ****/
-        /*******************************************/
-
-        public override string GetName()
-        {
-            if (Caller is MethodCaller && Caller.SelectedItem != null)
-            {
-                Type decltype = (Caller as MethodCaller).OutputParams.First().DataType;
-                if (typeof(IObject).IsAssignableFrom(decltype))
-                {
-                    string ns = decltype.Namespace;
-                    if (ns.StartsWith("BH"))
-                        ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
-                    return "Create." + ns + "." + Caller.Name;
-                }
-                return base.GetName();
-
-            }
-            return Category + "." + Caller.Name;
-        }
+        public CreateObjectFormula() : base() { }       
 
         /*******************************************/
     }
