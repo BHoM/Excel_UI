@@ -49,7 +49,7 @@ namespace BH.UI.Excel.Components
         /**** Methods                           ****/
         /*******************************************/
 
-        public override string GetName()
+        public override string GetFormulaName()
         {
             return "Adapter." + Caller.Name;
         }

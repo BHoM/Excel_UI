@@ -47,26 +47,7 @@ namespace BH.UI.Excel.Components
         /*******************************************/
 
         public CreateTypeFormula() : base() { }
-
-        /*******************************************/
-        /**** Methods                           ****/
-        /*******************************************/
-
-        public override string GetName()
-        {
-            Type t = Caller.SelectedItem as Type;
-            if (t != null)
-            {
-
-                string ns = t.Namespace;
-                if (ns.StartsWith("BH"))
-                    ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
-                return "CreateType." + ns + "." + t.ToText(genericStart: "?", genericSeparator: "_", genericEnd: "");
-            }
-            return base.GetName();
-        }
-
-        /*******************************************/
+     
     }
 }
 
