@@ -25,7 +25,7 @@
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\Build\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -44,7 +44,7 @@
       <HintPath>..\..\BHoM_UI\Build\BHoM_UI.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Data_oM, Version=2.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Data_oM">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\..\BHoM\Build\Data_oM.dll</HintPath>
       <Private>False</Private>
@@ -206,13 +206,16 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetPath)"  "$(APPDATA)\BHoM\Assemblies" /C /Y
+    <PostBuildEvent>xcopy "$(TargetPath)"  "C:\ProgramData\BHoM\Assemblies" /C /Y
+xcopy "$(TargetDir)*.xll"  "C:\ProgramData\BHoM\Assemblies" /C /Y
+xcopy "$(TargetDir)*.dna"  "C:\ProgramData\BHoM\Assemblies" /C /Y
 
+xcopy "OfficeApi.dll"  "C:\ProgramData\BHoM\Assemblies" /C /Y
+xcopy "NetOffice.dll"  "C:\ProgramData\BHoM\Assemblies" /C /Y
+xcopy "ExcelApi.dll"  "C:\ProgramData\BHoM\Assemblies" /C /Y
 
-xcopy "$(TargetDir)*.xll"  "$(APPDATA)\BHoM\Assemblies" /C /Y
-
-
-xcopy "$(TargetDir)*.dna"  "$(APPDATA)\BHoM\Assemblies" /C /Y</PostBuildEvent>
+xcopy "ExcelDna.IntelliSense.dll"  "C:\ProgramData\BHoM\Assemblies" /C /Y
+xcopy "ExcelDna.Registration.dll"  "C:\ProgramData\BHoM\Assemblies" /C /Y</PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\ExcelDna.AddIn.0.34.6\tools\ExcelDna.AddIn.targets" Condition="Exists('..\packages\ExcelDna.AddIn.0.34.6\tools\ExcelDna.AddIn.targets')" />
   <Target Name="EnsureExcelDnaTargetsImported" BeforeTargets="BeforeBuild" Condition="'$(ExcelDnaTargetsImported)' == ''">
