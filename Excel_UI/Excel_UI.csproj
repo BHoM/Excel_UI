@@ -106,10 +106,6 @@
       <HintPath>C:\ProgramData\BHoM\Assemblies\UI_oM.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="UI_PostBuild">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\UI_PostBuild.exe</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="VBIDEApi, Version=1.7.3.0, Culture=neutral, PublicKeyToken=a3637beacf571e8a, processorArchitecture=MSIL">
       <HintPath>..\packages\NetOffice.Core.1.7.4.4\lib\net45\VBIDEApi.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
@@ -207,16 +203,33 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetPath)"  "C:\ProgramData\BHoM\Assemblies" /C /Y
-xcopy "$(TargetDir)*.xll"  "C:\ProgramData\BHoM\Assemblies" /C /Y
-xcopy "$(TargetDir)*.dna"  "C:\ProgramData\BHoM\Assemblies" /C /Y
+    <PostBuildEvent>xcopy "$(TargetPath)"  "C:\ProgramData\BHoM\Assemblies" /Y
 
-xcopy "OfficeApi.dll"  "C:\ProgramData\BHoM\Assemblies" /C /Y
-xcopy "NetOffice.dll"  "C:\ProgramData\BHoM\Assemblies" /C /Y
-xcopy "ExcelApi.dll"  "C:\ProgramData\BHoM\Assemblies" /C /Y
 
-xcopy "ExcelDna.IntelliSense.dll"  "C:\ProgramData\BHoM\Assemblies" /C /Y
-xcopy "ExcelDna.Registration.dll"  "C:\ProgramData\BHoM\Assemblies" /C /Y</PostBuildEvent>
+xcopy "$(TargetDir)*.xll"  "C:\ProgramData\BHoM\Assemblies" /Y
+
+
+xcopy "$(TargetDir)*.dna"  "C:\ProgramData\BHoM\Assemblies" /Y
+
+
+
+xcopy "$(TargetDir)OfficeApi.dll"  "C:\ProgramData\BHoM\Assemblies" /Y
+
+
+xcopy "$(TargetDir)NetOffice.dll"  "C:\ProgramData\BHoM\Assemblies" /Y
+
+
+xcopy "$(TargetDir)ExcelApi.dll"  "C:\ProgramData\BHoM\Assemblies" /Y
+
+
+
+xcopy "$(TargetDir)ExcelDna.IntelliSense.dll"  "C:\ProgramData\BHoM\Assemblies" /Y
+
+
+xcopy "$(TargetDir)ExcelDna.Registration.dll"  "C:\ProgramData\BHoM\Assemblies" /Y
+
+
+xcopy "$(TargetDir)VBIDEApi.dll"  "C:\ProgramData\BHoM\Assemblies" /Y</PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\ExcelDna.AddIn.0.34.6\tools\ExcelDna.AddIn.targets" Condition="Exists('..\packages\ExcelDna.AddIn.0.34.6\tools\ExcelDna.AddIn.targets')" />
   <Target Name="EnsureExcelDnaTargetsImported" BeforeTargets="BeforeBuild" Condition="'$(ExcelDnaTargetsImported)' == ''">
