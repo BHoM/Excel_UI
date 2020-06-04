@@ -85,6 +85,7 @@
     <ProjectReference Include="..\Excel_oM\Excel_oM.csproj">
       <Project>{79fac4b0-77ec-4257-bcbe-cff37fff537c}</Project>
       <Name>Excel_oM</Name>
+      <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
