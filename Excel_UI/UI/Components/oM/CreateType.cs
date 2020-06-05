@@ -42,6 +42,14 @@ namespace BH.UI.Excel.Components
 
         public override string MenuRoot { get; } = "Create Type";
 
+        public override string Function {
+            get
+            {
+                Type type = Caller.SelectedItem as Type;
+                return type.ToText(true) + "?type";
+            } 
+        }
+
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/
