@@ -69,18 +69,15 @@ namespace BH.UI.Excel
             m_Application = Application.GetActiveInstance();
 
             ComponentManager.ComponentRestored += ComponentManager_ComponentRestored;
-            using (Engine.Excel.Profiling.Timer timer = new Engine.Excel.Profiling.Timer("open"))
+            m_Menus = new List<CommandBar>();
+            foreach (CommandBar commandBar in m_Application.CommandBars)
             {
-                m_Menus = new List<CommandBar>();
-                foreach (CommandBar commandBar in m_Application.CommandBars)
-                {
-                    if (commandBar.Name == "Cell" || commandBar.Name.Contains("List Range"))
-                        m_Menus.Add(commandBar);
-                }
-
-                m_Application.NewWorkbookEvent += App_WorkbookNew;
-                m_Application.WorkbookOpenEvent += App_WorkbookOpen;
+                if (commandBar.Name == "Cell" || commandBar.Name.Contains("List Range"))
+                    m_Menus.Add(commandBar);
             }
+
+            m_Application.NewWorkbookEvent += App_WorkbookNew;
+            m_Application.WorkbookOpenEvent += App_WorkbookOpen;
 
             ExcelAsyncUtil.QueueAsMacro(() => InitBHoMAddin());
         }
@@ -112,7 +109,7 @@ namespace BH.UI.Excel
         {
             if (m_Initialised)
                 return true;
-            if(m_GlobalSearch == null)
+            if (m_GlobalSearch == null)
             {
                 try
                 {
@@ -194,7 +191,8 @@ namespace BH.UI.Excel
                     XmlDocument tmp = new XmlDocument();
                     tmp.LoadXml(caller.GetRibbonXml());
                     box.AppendChild(doc.ImportNode(tmp.DocumentElement, true));
-                } catch (Exception e)
+                }
+                catch (Exception e)
                 {
                     Console.WriteLine(e.Message);
                 }
@@ -353,7 +351,8 @@ namespace BH.UI.Excel
                                         sheet.Dispose();
                                     }
                                 }
-                            } finally
+                            }
+                            finally
                             {
                                 if (sheets != null)
                                     sheets.Dispose();
@@ -365,7 +364,8 @@ namespace BH.UI.Excel
                 try
                 {
                     newsheet = sheets["BHoM_DataHidden"] as Worksheet;
-                } catch
+                }
+                catch
                 {
                     // Backwards compatibility
                     newsheet = sheets["BHoM_Data"] as Worksheet;
@@ -434,7 +434,7 @@ namespace BH.UI.Excel
                     var caller = f.Caller;
                     string name = Engine.Excel.Query.Filename();
                     var manager = ComponentManager.GetManager(name);
-                    if(manager != null)
+                    if (manager != null)
                     {
                         manager.Store(caller, f.Function);
                     }
@@ -468,7 +468,8 @@ namespace BH.UI.Excel
                     sheet.Visible = XlSheetVisibility.xlSheetVeryHidden;
                     sheet.Name = "BHoM_Used";
                 }
-            } finally
+            }
+            finally
             {
                 if (sheet != null)
                     sheet.Dispose();
@@ -487,10 +488,11 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        private Dictionary<string, CallerFormula> Formulea {
+        private Dictionary<string, CallerFormula> Formulea
+        {
             get
             {
-                if(m_Formulea == null)
+                if (m_Formulea == null)
                     InitCallers();
                 return m_Formulea;
             }
