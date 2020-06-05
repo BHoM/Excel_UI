@@ -62,7 +62,7 @@ namespace BH.Engine.Excel
 
         private static IExpression ParseAddSubtract(string formula, ref int index)
         {
-            IExpression lhs = ParseConcatination(formula, ref index);
+            IExpression lhs = ParseComparitor(formula, ref index);
             while (index < formula.Length)
             {
                 char c = formula[index];
@@ -70,7 +70,7 @@ namespace BH.Engine.Excel
                 {
                     string op = c.ToString();
                     index++;
-                    IExpression rhs = ParseConcatination(formula, ref index);
+                    IExpression rhs = ParseComparitor(formula, ref index);
                     lhs = new BinaryExpression
                     {
                         Operator = op,
@@ -301,6 +301,45 @@ namespace BH.Engine.Excel
                     lhs = new BinaryExpression
                     {
                         Operator = "&",
+                        Left = lhs,
+                        Right = rhs
+                    };
+                }
+                else
+                {
+                    return lhs;
+                }
+            }
+            return lhs;
+        }
+
+        /*******************************************/
+
+        private static IExpression ParseComparitor(string formula, ref int index)
+        {
+            IExpression lhs = ParseConcatination(formula, ref index);
+            while (index < formula.Length)
+            {
+                char c = formula[index];
+                string op = "";
+                if (c == '=' || c == '<' || c == '>')
+                {
+                    op += c;
+                    index++;
+                    if (c != '=')
+                    {
+                        char first = c;
+                        c = formula[index];
+                        if ((first == '<' && c == '>') || (c == '='))
+                        {
+                            op += c;
+                            index++;
+                        }
+                    }
+                    IExpression rhs = ParseConcatination(formula, ref index);
+                    lhs = new BinaryExpression
+                    {
+                        Operator = op,
                         Left = lhs,
                         Right = rhs
                     };
