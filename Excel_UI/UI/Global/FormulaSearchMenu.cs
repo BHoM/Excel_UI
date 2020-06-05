@@ -81,17 +81,14 @@ namespace BH.UI.Excel.Global
             }
 
             foreach (var item in deduplicated.Values)
-            { 
-                using (Engine.Excel.Profiling.Timer timer = new Engine.Excel.Profiling.Timer("CreateDelegates"))
+            {
+                try
                 {
-                    try
-                    {
-                        RegisterDelegate(item);
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e.Message);
-                    }
+                    RegisterDelegate(item);
+                }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e.Message);
                 }
             }
             CallerFormula.RegisterQueue();

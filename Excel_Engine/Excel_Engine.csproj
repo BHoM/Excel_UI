@@ -69,15 +69,12 @@
     <Compile Include="Query\Selection.cs" />
     <Compile Include="Query\Filename.cs" />
     <Compile Include="Query\Formula.cs" />
-    <Compile Include="Objects\Timer.cs" />
     <Compile Include="Compute\NumberFormat.cs" />
     <Compile Include="Create\Reference.cs" />
     <Compile Include="Convert\FromExcel\Reference.cs" />
     <Compile Include="Convert\ToExcel\Reference.cs" />
     <Compile Include="Convert\ToExcel\DateTime.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Query\MeanTime.cs" />
-    <Compile Include="Query\TotalTime.cs" />
     <Compile Include="Query\CleanList.cs" />
     <Compile Include="Query\RefText.cs" />
     <Compile Include="Query\Caller.cs" />
