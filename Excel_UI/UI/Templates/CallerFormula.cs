@@ -69,7 +69,7 @@ namespace BH.UI.Excel.Templates
                 {
                     params_ = "?by_Properties";
                 }
-                return GetFormulaName() + params_;
+                return Caller.GetFullName() + params_;
             }
         }
 
@@ -82,41 +82,6 @@ namespace BH.UI.Excel.Templates
         public CallerFormula()
         {
             Caller.SetDataAccessor(new FormulaDataAccessor());
-        }
-
-        /*******************************************/
-        /**** Methods                           ****/
-        /*******************************************/
-
-        public virtual string GetFormulaName()
-        {
-            Type declaringType = null;
-            string nameSpace = "";
-            if (Caller is MethodCaller && Caller.SelectedItem != null)
-            {
-                if (Caller.SelectedItem is Type)
-                {
-                    declaringType = (Caller as MethodCaller).OutputParams.First().DataType;
-                    if (typeof(IObject).IsAssignableFrom(declaringType))
-                    {
-                        nameSpace = declaringType.Namespace;
-                    }
-                }
-                else
-                {
-                    declaringType = (Caller as MethodCaller).Method.DeclaringType;
-                }
-                if(declaringType != null) nameSpace = declaringType.Namespace;                
-            }
-            if (nameSpace.StartsWith("BH") && declaringType !=null)
-            {
-                nameSpace = nameSpace.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
-                return "BH." + Category + "." + declaringType.Name + "." + nameSpace + "." + Caller.Name;
-            }
-            else
-            {
-                return "BH." + Category + "." + Caller.Name;
-            }
         }
 
         /*******************************************/
