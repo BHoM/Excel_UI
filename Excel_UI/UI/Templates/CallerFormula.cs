@@ -20,17 +20,18 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using BH.Engine.Excel;
 using BH.Engine.Reflection;
-using BH.oM.Base;
+using BH.Engine.Excel;
 using BH.oM.UI;
 using BH.UI.Templates;
 using ExcelDna.Integration;
-using NetOffice.ExcelApi;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
+using NetOffice.ExcelApi;
 using System.Xml;
+using BH.Engine.Serialiser;
 
 namespace BH.UI.Excel.Templates
 {
@@ -65,11 +66,8 @@ namespace BH.UI.Excel.Templates
                         .Select(p => p.Replace("`", "_"))
                         .Aggregate((a, b) => $"{a}_{b}");
                 }
-                if (Caller.SelectedItem is Type)
-                {
-                    params_ = "?by_Properties";
-                }
-                return GetFormulaName() + params_;
+
+                return GetName() + params_;
             }
         }
 
@@ -88,35 +86,17 @@ namespace BH.UI.Excel.Templates
         /**** Methods                           ****/
         /*******************************************/
 
-        public virtual string GetFormulaName()
+        public virtual string GetName()
         {
-            Type declaringType = null;
-            string nameSpace = "";
             if (Caller is MethodCaller && Caller.SelectedItem != null)
             {
-                if (Caller.SelectedItem is Type)
-                {
-                    declaringType = (Caller as MethodCaller).OutputParams.First().DataType;
-                    if (typeof(IObject).IsAssignableFrom(declaringType))
-                    {
-                        nameSpace = declaringType.Namespace;
-                    }
-                }
-                else
-                {
-                    declaringType = (Caller as MethodCaller).Method.DeclaringType;
-                }
-                if(declaringType != null) nameSpace = declaringType.Namespace;                
+                Type decltype = (Caller as MethodCaller).Method.DeclaringType;
+                string ns = decltype.Namespace;
+                if (ns.StartsWith("BH"))
+                    ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
+                return decltype.Name + "." + ns + "." + Caller.Name;
             }
-            if (nameSpace.StartsWith("BH") && declaringType !=null)
-            {
-                nameSpace = nameSpace.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
-                return "BH." + Category + "." + declaringType.Name + "." + nameSpace + "." + Caller.Name;
-            }
-            else
-            {
-                return "BH." + Category + "." + Caller.Name;
-            }
+            return Category + "." + Caller.Name;
         }
 
         /*******************************************/

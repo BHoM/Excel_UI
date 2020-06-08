@@ -47,7 +47,17 @@ namespace BH.UI.Excel.Components
         /*******************************************/
 
         public CreateAdapterFormula() : base() { }
-       
+
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
+        public override string GetName()
+        {
+            return "Adapter.Create." + Caller.Name;
+        }
+
+        /*******************************************/
     }
 }
 

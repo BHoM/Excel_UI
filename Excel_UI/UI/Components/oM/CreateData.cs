@@ -48,7 +48,7 @@ namespace BH.UI.Excel.Components
         {
             get
             {
-                return Caller.GetFullName();
+                return GetName();
             }
         }
 
@@ -82,10 +82,10 @@ namespace BH.UI.Excel.Components
 
         /*******************************************/
 
-        //public override string GetName()
-        //{
-        //    return "CreateData." + m_Valid.Replace(Caller.Name, "_");
-        //}
+        public override string GetName()
+        {
+            return "CreateData." + m_Valid.Replace(Caller.Name, "_");
+        }
 
         /*******************************************/
         /**** Private Fields                    ****/

@@ -44,14 +44,6 @@ namespace BH.UI.Excel.Templates
 
         public override string MenuRoot { get; } = "";
 
-        public override string Function
-        {
-            get
-            {
-                return Caller.GetFullName();
-            }
-        }
-
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/

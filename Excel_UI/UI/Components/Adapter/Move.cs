@@ -48,7 +48,17 @@ namespace BH.UI.Excel.Components
         {
             Caller.SetDataAccessor(new CacheingDataAccessor());
         }
-      
+
+        /*******************************************/
+        /**** Methods                           ****/
+        /*******************************************/
+
+        public override string GetName()
+        {
+            return "Adapter." + Caller.Name;
+        }
+
+        /*******************************************/
     }
 }
 
