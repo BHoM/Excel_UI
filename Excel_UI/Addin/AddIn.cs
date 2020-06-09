@@ -87,6 +87,8 @@ namespace BH.UI.Excel
         public void AutoClose()
         {
             ExcelDna.IntelliSense.IntelliSenseServer.Uninstall();
+            m_Application.NewWorkbookEvent -= App_WorkbookNew;
+            m_Application.WorkbookOpenEvent -= App_WorkbookOpen;
         }
 
         /*******************************************/
@@ -271,8 +273,6 @@ namespace BH.UI.Excel
             Range selected = null;
             CancelDefault = true;
 
-            try
-            {
                 selected = m_Application.Selection as Range;
 
                 foreach (Range objcell in selected)
@@ -293,14 +293,7 @@ namespace BH.UI.Excel
                     proj.SaveData(m_Application.ActiveWorkbook);
 
                     objcell.Value = value;
-                    objcell.Dispose();
                 }
-            }
-            finally
-            {
-                if (selected != null)
-                    selected.Dispose();
-            }
         }
 
         /*******************************************/
@@ -313,8 +306,6 @@ namespace BH.UI.Excel
             Range used = null;
             Range cell = null;
             Range next = null;
-            try
-            {
                 sheets = workbook.Sheets;
 
                 bool bhomUsed = sheets.OfType<Worksheet>().FirstOrDefault(s => s.Name == "BHoM_Used") != null;
@@ -335,28 +326,13 @@ namespace BH.UI.Excel
                         }
                         ExcelAsyncUtil.QueueAsMacro(() =>
                         {
-                            try
-                            {
                                 foreach (Worksheet sheet in sheets.OfType<Worksheet>())
                                 {
-                                    try
-                                    {
                                         bool before = sheet.EnableCalculation;
                                         sheet.EnableCalculation = false;
                                         sheet.Calculate();
                                         sheet.EnableCalculation = before;
-                                    }
-                                    finally
-                                    {
-                                        sheet.Dispose();
-                                    }
                                 }
-                            }
-                            finally
-                            {
-                                if (sheets != null)
-                                    sheets.Dispose();
-                            }
                         });
                     });
                 }
@@ -381,7 +357,6 @@ namespace BH.UI.Excel
                         {
                             str += cell.Value;
                             next = cell.Next;
-                            cell.Dispose();
                             cell = next;
                         }
                     }
@@ -392,22 +367,8 @@ namespace BH.UI.Excel
                         json.Add(str);
                     }
 
-                    row.Dispose();
                 }
                 Project.ActiveProject.Deserialize(json);
-
-            }
-            finally
-            {
-                if (cell != null)
-                    cell.Dispose();
-                if (next != null)
-                    next.Dispose();
-                if (used != null)
-                    used.Dispose();
-                if (newsheet != null)
-                    newsheet.Dispose();
-            }
         }
 
         /*******************************************/
@@ -457,8 +418,6 @@ namespace BH.UI.Excel
             Workbook workbook = null;
             Sheets sheets = null;
             Worksheet sheet = null;
-            try
-            {
                 workbook = m_Application.ActiveWorkbook;
                 sheets = workbook.Worksheets;
                 if (sheets.OfType<Worksheet>()
@@ -468,16 +427,6 @@ namespace BH.UI.Excel
                     sheet.Visible = XlSheetVisibility.xlSheetVeryHidden;
                     sheet.Name = "BHoM_Used";
                 }
-            }
-            finally
-            {
-                if (sheet != null)
-                    sheet.Dispose();
-                if (sheets != null)
-                    sheets.Dispose();
-                if (workbook != null)
-                    workbook.Dispose();
-            }
         }
 
         /*******************************************/

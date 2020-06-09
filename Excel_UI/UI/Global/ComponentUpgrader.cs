@@ -34,12 +34,12 @@ namespace BH.UI.Excel.UI.Global
 
         private void Register()
         {
-            lock(m_Mutex)
+            lock (m_Mutex)
             {
-                if(m_Registered.Contains(m_OldName))
+                if (m_Registered.Contains(m_OldName))
                     return;
                 ExcelIntegration.RegisterDelegates(
-                    new List<Delegate> { new Func<object,object,object,object,object,object,object,object,object,object,object,object,object,object,object>((a,b,c,d,e,f,g,h,i,j,k,l,m,n)=>Upgrade()) },
+                    new List<Delegate> { new Func<object, object, object, object, object, object, object, object, object, object, object, object, object, object, object>((a, b, c, d, e, f, g, h, i, j, k, l, m, n) => Upgrade()) },
                     new List<object> { new ExcelFunctionAttribute { Name = m_OldName } },
                     new List<List<object>> { new List<object> { } }
                 );
@@ -100,18 +100,18 @@ namespace BH.UI.Excel.UI.Global
 
                 // Remove trailing empty expressions
                 int lastNonEmpty = newExpr.Arguments.FindLastIndex(e => !(e is EmptyExpression)) + 1;
-                if(lastNonEmpty < newExpr.Arguments.Count)
+                if (lastNonEmpty < newExpr.Arguments.Count)
                     newExpr.Arguments.RemoveRange(lastNonEmpty, newExpr.Arguments.Count - lastNonEmpty);
                 return newExpr;
             }
-           return new FunctionExpression { Name = expression.Name, Arguments = expression.Arguments.Select(IRemap).ToList() };
+            return new FunctionExpression { Name = expression.Name, Arguments = expression.Arguments.Select(IRemap).ToList() };
         }
 
         /*************************************/
 
         private IExpression Remap(ArrayExpression expression)
         {
-           return new ArrayExpression { Expressions = expression.Expressions.Select(IRemap).ToList() };
+            return new ArrayExpression { Expressions = expression.Expressions.Select(IRemap).ToList() };
         }
 
         /*************************************/
