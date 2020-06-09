@@ -112,8 +112,6 @@ namespace BH.UI.Excel.Templates
                         {
                             ExcelAsyncUtil.QueueAsMacro(() =>
                             {
-                                try
-                                {
                                     string prefix = reftext.Substring(0, reftext.LastIndexOf('!') + 1);
                                     var nameDef = XlCall.Excel(XlCall.xlfGetName, prefix + name);
                                     if (nameDef.Equals(ExcelError.ExcelErrorName))
@@ -142,8 +140,6 @@ namespace BH.UI.Excel.Templates
                                     ExcelAsyncUtil.QueueAsMacro(() =>
                                     {
                                         Validation validation = null;
-                                        try
-                                        {
                                             app = Application.GetActiveInstance();
                                             cell = app.Range(reftext);
                                             cell.Value = options.FirstOrDefault();
@@ -151,29 +147,7 @@ namespace BH.UI.Excel.Templates
                                             validation.Delete();
                                             validation.Add(XlDVType.xlValidateList, null, null, $"={name}");
                                             validation.IgnoreBlank = true;
-                                        }
-                                        finally
-                                        {
-                                            if (validation != null)
-                                                validation.Dispose();
-                                            if (cell != null)
-                                                cell.Dispose();
-                                        }
                                     });
-                                }
-                                finally
-                                {
-                                    if (cell != null)
-                                        cell.Dispose();
-                                    if (validation_ws != null)
-                                        validation_ws.Dispose();
-                                    if (worksheet != null)
-                                        worksheet.Dispose();
-                                    if (sheets != null)
-                                        sheets.Dispose();
-                                    if (workbook != null)
-                                        workbook.Dispose();
-                                }
                             });
 
                             Caller.DataAccessor.SetDataItem(0, "");

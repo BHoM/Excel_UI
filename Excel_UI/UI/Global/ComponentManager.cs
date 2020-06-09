@@ -11,7 +11,7 @@ using ExcelDna.Integration;
 
 namespace BH.UI.Excel.Global
 {
-    class ComponentManager : IDisposable
+    class ComponentManager
     {
         /*************************************/
         /**** Methods                     ****/
@@ -19,7 +19,7 @@ namespace BH.UI.Excel.Global
 
         public static ComponentManager GetManager(Workbook workbook)
         {
-            if(!m_Managers.ContainsKey(workbook.Name))
+            if (!m_Managers.ContainsKey(workbook.Name))
             {
                 m_Managers.Add(workbook.Name, new ComponentManager(workbook));
             }
@@ -55,42 +55,34 @@ namespace BH.UI.Excel.Global
                         Workbook workbook = m_Workbook;
                         Worksheet sheet = m_Sheet;
                         Range cell = null;
-                        try
+                        if (sheet == null)
                         {
-                            if (sheet == null)
-                            {
-                                sheet = workbook.Sheets.Add() as Worksheet;
-                                sheet.Name = "BHoM_ComponetRequests";
-                                m_Sheet = sheet;
-                            }
-                            sheet.Visible = NetOffice.ExcelApi.Enums.XlSheetVisibility.xlSheetHidden;
-                            int row = 0;
-                            string contents = "";
-                            do
-                            {
-                                row++;
-                                cell = sheet.Cells[row, 3];
-                                try
-                                {
-                                    contents = cell.Value as string;
-                                }
-                                catch { }
-                            } while (contents != null && contents.Length > 0);
-
-                            int c = 0;
-                            while (c < json.Length)
-                            {
-                                sheet.Cells[row, 1].Value = formula;
-                                sheet.Cells[row, 2].Value = req.GetType().Name;
-                                cell.Value = json.Substring(c);
-                                c += (cell.Value as string).Length;
-                                cell = cell.Next;
-                            }
+                            sheet = workbook.Sheets.Add() as Worksheet;
+                            sheet.Name = "BHoM_ComponetRequests";
+                            m_Sheet = sheet;
                         }
-                        finally
+                        sheet.Visible = NetOffice.ExcelApi.Enums.XlSheetVisibility.xlSheetHidden;
+                        int row = 0;
+                        string contents = "";
+                        do
                         {
-                            if (cell != null)
-                                cell.Dispose();
+                            row++;
+                            cell = sheet.Cells[row, 3];
+                            try
+                            {
+                                contents = cell.Value as string;
+                            }
+                            catch { }
+                        } while (contents != null && contents.Length > 0);
+
+                        int c = 0;
+                        while (c < json.Length)
+                        {
+                            sheet.Cells[row, 1].Value = formula;
+                            sheet.Cells[row, 2].Value = req.GetType().Name;
+                            cell.Value = json.Substring(c);
+                            c += (cell.Value as string).Length;
+                            cell = cell.Next;
                         }
 
                         m_Stored.Add(formula);
@@ -116,33 +108,12 @@ namespace BH.UI.Excel.Global
             Range used = null;
             try
             {
-                try
-                {
-                    used = m_Sheet.UsedRange;
-                    used.Clear();
-                }
-                catch { }
+                used = m_Sheet.UsedRange;
+                used.Clear();
             }
-            finally
-            {
-                if (used != null)
-                    used.Dispose();
-            }
+            catch { }
         }
 
-        /*************************************/
-
-        public void Dispose()
-        {
-            if(m_Sheet != null)
-                m_Sheet.Dispose();
-            m_Workbook.BeforeCloseEvent -= OnWorkbookClosed;
-            m_Workbook.AfterSaveEvent -= OnWorkbookSaved;
-            m_Managers.Remove(m_Name);
-            m_Sheets.Dispose();
-            m_Workbook.Dispose();
-        }
-        
         /*************************************/
         /**** Events                      ****/
         /*************************************/
@@ -159,53 +130,38 @@ namespace BH.UI.Excel.Global
 
             Worksheet sheet = m_Sheet;
             Range cell = null;
-            Range next = null;
             Range used = null;
-            try
+            if (sheet != null)
             {
-                if(sheet != null)
+                used = sheet.UsedRange;
+                foreach (Range row in used.Rows)
                 {
-                    used = sheet.UsedRange;
-                    foreach (Range row in used.Rows)
+                    string str = "";
+                    string key = "";
+                    string callerType = "";
+                    try
                     {
-                        string str = "";
-                        string key = "";
-                        string callerType = "";
-                        try
-                        {
-                            cell = row.Cells[1, 1];
-                            key = cell.Value.ToString();
-                            cell = row.Cells[1, 2];
-                            callerType = cell.Value.ToString();
+                        cell = row.Cells[1, 1];
+                        key = cell.Value.ToString();
+                        cell = row.Cells[1, 2];
+                        callerType = cell.Value.ToString();
 
-                            int col = 3;
+                        int col = 3;
+                        cell = row.Cells[1, col++];
+                        while (cell.Value != null && cell.Value is string && (cell.Value as string).Length > 0)
+                        {
+                            str += cell.Value;
                             cell = row.Cells[1, col++];
-                            while (cell.Value != null && cell.Value is string && (cell.Value as string).Length > 0)
-                            {
-                                str += cell.Value;
-                                cell.Dispose();
-                                cell = row.Cells[1, col++];
-                            }
                         }
-                        catch { }
-
-                        if (str.Length > 0)
-                        {
-                            components.Add(key,new Tuple<string, string>(callerType, str));
-                        }
-
-                        row.Dispose();
                     }
+                    catch { }
+
+                    if (str.Length > 0)
+                    {
+                        components.Add(key, new Tuple<string, string>(callerType, str));
+                    }
+
                 }
-            }
-            finally
-            {
-                if (next != null)
-                    next.Dispose();
-                if (cell != null)
-                    cell.Dispose();
-                if (used != null)
-                    used.Dispose();
             }
 
             return components;
@@ -215,21 +171,13 @@ namespace BH.UI.Excel.Global
 
         private void OnWorkbookSaved(bool Success)
         {
-            if(m_Workbook.Name != m_Name)
+            if (m_Workbook.Name != m_Name)
             {
                 m_Managers.Add(m_Workbook.Name, this);
                 m_Managers.Remove(m_Name);
                 m_Name = m_Workbook.Name;
             }
         }
-
-        /*************************************/
-
-        private void OnWorkbookClosed(ref bool Cancel)
-        {
-            Dispose();
-        }
-
 
         /*************************************/
         /**** Private Constructors        ****/
@@ -248,7 +196,6 @@ namespace BH.UI.Excel.Global
             {
                 m_Sheet = null;
             }
-            m_Workbook.BeforeCloseEvent += OnWorkbookClosed;
             m_Workbook.AfterSaveEvent += OnWorkbookSaved;
         }
 
