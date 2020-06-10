@@ -38,6 +38,8 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new GetPropertyCaller();
 
+        public override string Function { get; } = "Engine.GetProperty";
+
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/
