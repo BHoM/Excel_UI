@@ -76,8 +76,8 @@ namespace BH.UI.Excel
                     m_Menus.Add(commandBar);
             }
 
-            m_Application.NewWorkbookEvent += App_WorkbookNew;
             m_Application.WorkbookOpenEvent += App_WorkbookOpen;
+            m_Application.WorkbookBeforeCloseEvent += App_WorkbookClosed;
 
             ExcelAsyncUtil.QueueAsMacro(() => InitBHoMAddin());
         }
@@ -87,7 +87,6 @@ namespace BH.UI.Excel
         public void AutoClose()
         {
             ExcelDna.IntelliSense.IntelliSenseServer.Uninstall();
-            m_Application.NewWorkbookEvent -= App_WorkbookNew;
             m_Application.WorkbookOpenEvent -= App_WorkbookOpen;
         }
 
@@ -232,13 +231,6 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        private void App_WorkbookNew(Workbook workbook)
-        {
-            InitBHoMAddin();
-            var manager = ComponentManager.GetManager(workbook);
-        }
-
-        /*******************************************/
 
         private void ComponentManager_ComponentRestored(object sender, KeyValuePair<string, Tuple<string, string>> restored)
         {
@@ -369,6 +361,13 @@ namespace BH.UI.Excel
 
                 }
                 Project.ActiveProject.Deserialize(json);
+        }
+
+        /*******************************************/
+
+        private void App_WorkbookClosed(Workbook workbook, ref bool Cancel)
+        {
+            ComponentManager.RemoveManager(workbook);
         }
 
         /*******************************************/

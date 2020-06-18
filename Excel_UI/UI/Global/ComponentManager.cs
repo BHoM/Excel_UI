@@ -11,7 +11,7 @@ using ExcelDna.Integration;
 
 namespace BH.UI.Excel.Global
 {
-    class ComponentManager
+    class ComponentManager : IDisposable
     {
         /*************************************/
         /**** Methods                     ****/
@@ -30,7 +30,23 @@ namespace BH.UI.Excel.Global
 
         public static ComponentManager GetManager(string name)
         {
-            return m_Managers.ContainsKey(name) ? m_Managers[name] : null;
+            if (!m_Managers.ContainsKey(name))
+            {
+                var workbook = Application.GetActiveInstance().Workbooks[name];
+                m_Managers.Add(workbook.Name, new ComponentManager(workbook));
+            }
+            return m_Managers[name];
+        }
+
+        /*************************************/
+        public static bool RemoveManager(Workbook workbook)
+        {
+            if (m_Managers.ContainsKey(workbook.Name))
+            {
+                m_Managers[workbook.Name].Dispose();
+                return true;
+            }
+            return false;
         }
 
         /*************************************/
@@ -112,6 +128,14 @@ namespace BH.UI.Excel.Global
                 used.Clear();
             }
             catch { }
+        }
+
+        /*************************************/
+
+        public void Dispose()
+        {
+            m_Workbook.AfterSaveEvent -= OnWorkbookSaved;
+            m_Managers.Remove(m_Name);
         }
 
         /*************************************/
