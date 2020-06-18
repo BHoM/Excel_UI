@@ -86,8 +86,11 @@ namespace BH.UI.Excel
 
         public void AutoClose()
         {
+            // note: This method only runs if the Addin gets disabled during
+            // execution, it does not run when excel closes.
             ExcelDna.IntelliSense.IntelliSenseServer.Uninstall();
             m_Application.WorkbookOpenEvent -= App_WorkbookOpen;
+            m_Application.WorkbookBeforeCloseEvent -= App_WorkbookClosed;
         }
 
         /*******************************************/
@@ -365,7 +368,7 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        private void App_WorkbookClosed(Workbook workbook, ref bool Cancel)
+        private void App_WorkbookClosed(Workbook workbook, ref bool cancel)
         {
             ComponentManager.RemoveManager(workbook);
         }
