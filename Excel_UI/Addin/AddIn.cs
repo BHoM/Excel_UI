@@ -69,12 +69,6 @@ namespace BH.UI.Excel
             m_Application = Application.GetActiveInstance();
 
             ComponentManager.ComponentRestored += ComponentManager_ComponentRestored;
-            m_Menus = new List<CommandBar>();
-            foreach (CommandBar commandBar in m_Application.CommandBars)
-            {
-                if (commandBar.Name == "Cell" || commandBar.Name.Contains("List Range"))
-                    m_Menus.Add(commandBar);
-            }
 
             m_Application.WorkbookOpenEvent += App_WorkbookOpen;
             m_Application.WorkbookBeforeCloseEvent += App_WorkbookClosed;
@@ -91,20 +85,6 @@ namespace BH.UI.Excel
             ExcelDna.IntelliSense.IntelliSenseServer.Uninstall();
             m_Application.WorkbookOpenEvent -= App_WorkbookOpen;
             m_Application.WorkbookBeforeCloseEvent -= App_WorkbookClosed;
-        }
-
-        /*******************************************/
-
-        private void AddInternalise()
-        {
-            m_Btns = m_Menus.Select((menu, i) =>
-            {
-                var btn = menu.Controls.Add(MsoControlType.msoControlButton, null, null, null, true) as CommandBarButton;
-                btn.Tag = "Internalise_Data" + i;
-                btn.Caption = "Internalise Data";
-                btn.ClickEvent += Internalise_Click;
-                return btn;
-            }).ToList();
         }
 
         /*******************************************/
@@ -126,7 +106,6 @@ namespace BH.UI.Excel
                 }
             }
             ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
-            AddInternalise();
             ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
             m_Initialised = true;
             ExcelDna.Logging.LogDisplay.Clear();
@@ -454,7 +433,6 @@ namespace BH.UI.Excel
         /*******************************************/
 
         private Dictionary<string, CallerFormula> m_Formulea;
-        private List<CommandBar> m_Menus;
         private Application m_Application;
         private static SearchMenu m_GlobalSearch = null;
         private bool m_Initialised = false;
