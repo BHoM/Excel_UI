@@ -68,12 +68,7 @@ namespace BH.UI.Excel
 
             m_Application = Application.GetActiveInstance();
 
-            ComponentManager.ComponentRestored += ComponentManager_ComponentRestored;
-
             m_Application.WorkbookOpenEvent += App_WorkbookOpen;
-            m_Application.WorkbookBeforeCloseEvent += App_WorkbookClosed;
-
-            ExcelAsyncUtil.QueueAsMacro(() => InitBHoMAddin());
         }
 
         /*******************************************/
@@ -105,6 +100,9 @@ namespace BH.UI.Excel
                     Engine.Reflection.Compute.RecordError(e.Message);
                 }
             }
+            ComponentManager.ComponentRestored += ComponentManager_ComponentRestored;
+            m_Application.WorkbookBeforeCloseEvent += App_WorkbookClosed;
+
             ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
             ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
             m_Initialised = true;
