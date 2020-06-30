@@ -286,7 +286,10 @@ namespace BH.UI.Excel.Templates
             {
                 callback = () =>
                 {
+                    bool isNumlock = System.Windows.Forms.Control.IsKeyLocked(System.Windows.Forms.Keys.NumLock);
                     Application.GetActiveInstance().SendKeys("{F2}{(}", true);
+                    if (isNumlock)
+                        Application.GetActiveInstance().SendKeys("{NUMLOCK}", true);
                 };
             }
 
