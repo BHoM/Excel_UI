@@ -1,13 +1,15 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27130.2024
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29613.14
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Excel_UI", "Excel_UI\Excel_UI.csproj", "{0FAF6FEB-80C3-474A-92BB-C886424CCBC8}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Excel_Engine", "Excel_Engine\Excel_Engine.csproj", "{A6884466-297E-4AAA-A232-ABBEC42168D3}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Excel_oM", "Excel_oM\Excel_oM.csproj", "{79FAC4B0-77EC-4257-BCBE-CFF37FFF537C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Excel_Adapter", "Excel_Adapter\Excel_Adapter.csproj", "{22E74CD3-B19C-4617-9142-F5B349F007DA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{79FAC4B0-77EC-4257-BCBE-CFF37FFF537C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{79FAC4B0-77EC-4257-BCBE-CFF37FFF537C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{79FAC4B0-77EC-4257-BCBE-CFF37FFF537C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{22E74CD3-B19C-4617-9142-F5B349F007DA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{22E74CD3-B19C-4617-9142-F5B349F007DA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{22E74CD3-B19C-4617-9142-F5B349F007DA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{22E74CD3-B19C-4617-9142-F5B349F007DA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
