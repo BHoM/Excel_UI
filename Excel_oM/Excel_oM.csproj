@@ -62,8 +62,6 @@
     <Compile Include="ClosedXML\CellContents.cs" />
     <Compile Include="ClosedXML\CellsRequest.cs" />
     <Compile Include="ClosedXML\ExcelSettings.cs" />
-    <Compile Include="ClosedXML\Rectangle.cs" />
-    <Compile Include="ClosedXML\Reference.cs" />
     <Compile Include="ClosedXML\RuleSet.cs" />
     <Compile Include="ClosedXML\Style.cs" />
     <Compile Include="ClosedXML\ValuesRequest.cs" />

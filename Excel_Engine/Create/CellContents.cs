@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of the Buildings and Habitats object Model (BHoM)
  * Copyright (c) 2015 - 2020, the respective contributors. All rights reserved.
  *
@@ -20,24 +20,29 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using BH.oM.Base;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using BH.oM.Excel;
+using ClosedXML.Excel;
 
-namespace BH.oM.Excel
+namespace BH.Engine.Excel
 {
-    public class Reference : BHoMObject
+    public static partial class Create
     {
         /*******************************************/
-        /**** Properties                        ****/
+        /**** Methods                           ****/
         /*******************************************/
-
-        public virtual List<Rectangle> Rectangles { get; set; }
-        public virtual IntPtr Sheet { get; set; }
-
-        /*******************************************/
+        public static CellContents CellContents(IXLCell xLCell)
+        {
+            return new CellContents()
+            {
+                Comment = xLCell.HasComment ? xLCell.Comment.Text : "",
+                Value = xLCell.Value,
+                Address = xLCell.Address.ToString(),
+                DataType = xLCell.DataType.GetType(),
+                FormulaA1 = xLCell.FormulaA1,
+                FormulaR1C1 = xLCell.FormulaR1C1,
+                HyperLink = xLCell.HasHyperlink ? xLCell.Hyperlink.ExternalAddress.ToString() : "",
+                RichText = xLCell.HasRichText ? xLCell.RichText.Text : ""
+            };
+        }
     }
 }

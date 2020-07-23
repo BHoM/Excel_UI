@@ -90,10 +90,11 @@ namespace BH.Adapter.ExcelAdapter
                     table.Rows.Add(dataRow.ToArray());
                 }
                 objects.Add(new Table { Data = table, Name = worksheet.Name });
+                
             }
             return objects;
         }
-
+       
         /***************************************************/
 
         private IXLRange Range(IXLWorksheet worksheet)

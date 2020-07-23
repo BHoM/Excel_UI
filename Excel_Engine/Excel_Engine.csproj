@@ -39,6 +39,9 @@
       <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM_Engine.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="ClosedXML">
+      <HintPath>..\packages\ClosedXML.0.95.0\lib\net40\ClosedXML.dll</HintPath>
+    </Reference>
     <Reference Include="ExcelDna.Integration, Version=0.34.6373.42344, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ExcelDna.Integration.0.34.6\lib\ExcelDna.Integration.dll</HintPath>
       <Private>False</Private>
@@ -66,6 +69,7 @@
     <Compile Include="Compute\Note.cs" />
     <Compile Include="Convert\FromExcel\Expression.cs" />
     <Compile Include="Convert\ToExcel\Formula.cs" />
+    <Compile Include="Create\CellContents.cs" />
     <Compile Include="Query\Selection.cs" />
     <Compile Include="Query\Filename.cs" />
     <Compile Include="Query\Formula.cs" />

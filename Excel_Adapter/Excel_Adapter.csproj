@@ -33,26 +33,26 @@
   <ItemGroup>
     <Reference Include="Adapter_Engine, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\ProgramData\BHoM\Assemblies\Adapter_Engine.dll</HintPath>
+      <HintPath>C:\ProgramData\BHoM\Assemblies\Adapter_Engine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Adapter_oM, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\ProgramData\BHoM\Assemblies\Adapter_oM.dll</HintPath>
+      <HintPath>C:\ProgramData\BHoM\Assemblies\Adapter_oM.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="BHoM, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\ProgramData\BHoM\Assemblies\BHoM.dll</HintPath>
+      <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="BHoM_Adapter, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\ProgramData\BHoM\Assemblies\BHoM_Adapter.dll</HintPath>
+      <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM_Adapter.dll</HintPath>
     </Reference>
     <Reference Include="BHoM_Engine, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\ProgramData\BHoM\Assemblies\BHoM_Engine.dll</HintPath>
+      <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM_Engine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ClosedXML, Version=0.95.0.0, Culture=neutral, processorArchitecture=MSIL">
@@ -60,7 +60,7 @@
     </Reference>
     <Reference Include="Data_oM, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\ProgramData\BHoM\Assemblies\Data_oM.dll</HintPath>
+      <HintPath>C:\ProgramData\BHoM\Assemblies\Data_oM.dll</HintPath>
     </Reference>
     <Reference Include="DocumentFormat.OpenXml, Version=2.7.2.0, Culture=neutral, PublicKeyToken=8fb06cb64d019a17, processorArchitecture=MSIL">
       <HintPath>..\packages\DocumentFormat.OpenXml.2.7.2\lib\net46\DocumentFormat.OpenXml.dll</HintPath>
@@ -70,11 +70,11 @@
     </Reference>
     <Reference Include="Reflection_Engine, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\ProgramData\BHoM\Assemblies\Reflection_Engine.dll</HintPath>
+      <HintPath>C:\ProgramData\BHoM\Assemblies\Reflection_Engine.dll</HintPath>
     </Reference>
     <Reference Include="Reflection_oM, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>..\..\..\..\..\..\..\ProgramData\BHoM\Assemblies\Reflection_oM.dll</HintPath>
+      <HintPath>C:\ProgramData\BHoM\Assemblies\Reflection_oM.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -114,4 +114,13 @@
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>
+      xcopy "$(TargetPath)"  "C:\ProgramData\BHoM\Assemblies" /C /Y
+      xcopy "$(TargetDir)ClosedXML.dll"  "C:\ProgramData\BHoM\Assemblies" /Y
+      xcopy "$(TargetDir)ExcelNumberFormat.dll"  "C:\ProgramData\BHoM\Assemblies" /Y
+      xcopy "$(TargetDir)DocumentFormat.OpenXml.dll"  "C:\ProgramData\BHoM\Assemblies" /Y
+      
+    </PostBuildEvent>
+  </PropertyGroup>
 </Project>
