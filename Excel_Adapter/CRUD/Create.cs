@@ -31,6 +31,7 @@ using BH.Engine.Adapter;
 using ClosedXML.Excel;
 using BH.oM.Data.Collections;
 using System.Data;
+using System.Threading;
 
 namespace BH.Adapter.ExcelAdapter
 {
@@ -58,7 +59,8 @@ namespace BH.Adapter.ExcelAdapter
             }
             ApplyStyles(workbook);
             ApplyProperties(workbook);
-            workbook.SaveAs(fileName); 
+            workbook.SaveAs(fileName);
+            Thread.Sleep(1000);
             return true;
         }
 
