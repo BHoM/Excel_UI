@@ -38,7 +38,7 @@ using System.Text.RegularExpressions;
 
 namespace BH.UI.Excel.Templates
 {
-    public class FormulaDataAccessor : DataAccessor
+    public class FormulaDataAccessor : IDataAccessor
     {
         /*******************************************/
         /**** Constructors                      ****/
@@ -52,7 +52,7 @@ namespace BH.UI.Excel.Templates
         /**** Methods                           ****/
         /*******************************************/
 
-        public override T GetDataItem<T>(int index)
+        public virtual T GetDataItem<T>(int index)
         {
             Type type = typeof(T);
             object item = m_Inputs[index];
@@ -89,7 +89,7 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
-        public override List<T> GetDataList<T>(int index)
+        public virtual List<T> GetDataList<T>(int index)
         {
             object item = m_Inputs[index];
             if (IsBlankOrError<T>(item))
@@ -122,7 +122,7 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
-        public override List<List<T>> GetDataTree<T>(int index)
+        public virtual List<List<T>> GetDataTree<T>(int index)
         {
             object item = m_Inputs[index];
             if (IsBlankOrError<T>(item))
@@ -225,7 +225,7 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
-        public override bool SetDataItem<T>(int index, T data)
+        public virtual bool SetDataItem<T>(int index, T data)
         {
             if (m_Output.Length <= index)
             {
@@ -237,7 +237,7 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
-        public override bool SetDataList<T>(int index, IEnumerable<T> data)
+        public virtual bool SetDataList<T>(int index, IEnumerable<T> data)
         {
             if (data is ICollection)
             {
@@ -248,7 +248,7 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
-        public override bool SetDataTree<T>(int index,
+        public virtual bool SetDataTree<T>(int index,
             IEnumerable<IEnumerable<T>> data)
         {
             if (data is ICollection && data.All(sub => sub is ICollection))
