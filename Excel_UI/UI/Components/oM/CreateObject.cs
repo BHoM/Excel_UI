@@ -28,6 +28,7 @@ using Microsoft.Office.Core;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -65,9 +66,9 @@ namespace BH.UI.Excel.Components
 
         public override string GetName()
         {
-            if (Caller is MethodCaller && Caller.SelectedItem != null)
+            if (Caller.SelectedItem != null && Caller.SelectedItem is MethodBase)
             {
-                Type decltype = (Caller as MethodCaller).OutputParams.First().DataType;
+                Type decltype = Caller.OutputParams.First().DataType;
                 if (typeof(IObject).IsAssignableFrom(decltype))
                 {
                     string ns = decltype.Namespace;

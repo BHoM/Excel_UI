@@ -29,7 +29,7 @@ using System.Threading.Tasks;
 
 namespace BH.UI.Excel.Callers
 {
-    class ExplodeCaller : BH.UI.Templates.MethodCaller
+    class ExplodeCaller : BH.UI.Templates.Caller
     {
         /*******************************************/
         /**** Properties                        ****/
