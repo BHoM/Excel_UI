@@ -64,10 +64,9 @@ namespace BH.UI.Excel.Callers
 
         /*******************************************/
 
-        public override bool SetItem(object item)
+        public override void SetItem(object item)
         {
             SelectedItem = item;
-            return true;
         }
 
         /*******************************************/

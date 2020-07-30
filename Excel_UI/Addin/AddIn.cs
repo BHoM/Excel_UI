@@ -434,7 +434,6 @@ namespace BH.UI.Excel
         private Application m_Application;
         private static SearchMenu m_GlobalSearch = null;
         private bool m_Initialised = false;
-        private IEnumerable<CommandBarButton> m_Btns;
         private oM.Excel.Reference m_CurrentSelection;
 
         /*******************************************/

@@ -32,6 +32,7 @@ using System.Runtime.InteropServices;
 using NetOffice.ExcelApi;
 using System.Xml;
 using BH.Engine.Serialiser;
+using System.Reflection;
 
 namespace BH.UI.Excel.Templates
 {
@@ -88,9 +89,9 @@ namespace BH.UI.Excel.Templates
 
         public virtual string GetName()
         {
-            if (Caller is MethodCaller && Caller.SelectedItem != null)
+            if (Caller.SelectedItem != null && Caller.SelectedItem is MethodBase)
             {
-                Type decltype = (Caller as MethodCaller).Method.DeclaringType;
+                Type decltype = ((MethodBase)Caller.SelectedItem).DeclaringType;
                 string ns = decltype.Namespace;
                 if (ns.StartsWith("BH"))
                     ns = ns.Split('.').Skip(2).Aggregate((a, b) => $"{a}.{b}");
