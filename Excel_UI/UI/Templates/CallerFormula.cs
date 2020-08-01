@@ -80,7 +80,8 @@ namespace BH.UI.Excel.Templates
 
         public CallerFormula()
         {
-            Caller.SetDataAccessor(new FormulaDataAccessor());
+            m_DataAccessor = new FormulaDataAccessor();
+            Caller.SetDataAccessor(m_DataAccessor);
         }
 
         /*******************************************/
@@ -136,7 +137,7 @@ namespace BH.UI.Excel.Templates
         public virtual string GetInnerRibbonXml()
         {
             Caller.SelectedItem = null;
-            m_Menu = SelectorMenuUtil.ISetExcelSelectorMenu(Caller.Selector);
+            m_Menu = SelectorMenuUtil.ISetExcelSelectorMenu(Caller.GetItemSelectorMenu());
             m_Menu.RootName = Caller.GetType().Name;
             XmlDocument doc = new XmlDocument();
             XmlElement root = doc.CreateElement("root");
@@ -164,7 +165,7 @@ namespace BH.UI.Excel.Templates
 
         public Tuple<Delegate, ExcelFunctionAttribute, List<object>> GetExcelDelegate()
         {
-            var accessor = Caller.DataAccessor as FormulaDataAccessor;
+            var accessor = m_DataAccessor as FormulaDataAccessor;
             object item = Caller.SelectedItem;
             return accessor.Wrap(this, () => RunItem(item));
         }
@@ -322,8 +323,9 @@ namespace BH.UI.Excel.Templates
         /*******************************************/
 
         private IExcelSelectorMenu m_Menu;
-        private static Queue<Tuple<Delegate, ExcelFunctionAttribute, List<object>>> m_RegistrationQueue =
-            new Queue<Tuple<Delegate, ExcelFunctionAttribute, List<object>>>();
+        protected IDataAccessor m_DataAccessor = null;
+
+        private static Queue<Tuple<Delegate, ExcelFunctionAttribute, List<object>>> m_RegistrationQueue = new Queue<Tuple<Delegate, ExcelFunctionAttribute, List<object>>>();
         private static HashSet<string> m_Registered = new HashSet<string>();
         private static object m_Mutex = new object();
 
