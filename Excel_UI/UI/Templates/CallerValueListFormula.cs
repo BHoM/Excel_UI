@@ -96,7 +96,7 @@ namespace BH.UI.Excel.Templates
                         worksheet = cell.Worksheet;
                         if (worksheet.Name == "BHoM_ValidationHidden")
                         {
-                            Caller.DataAccessor.SetDataItem(0,
+                            m_DataAccessor.SetDataItem(0,
                                 ArrayResizer.Resize(options, (target) =>
                                 {
                                     try
@@ -150,7 +150,7 @@ namespace BH.UI.Excel.Templates
                                     });
                             });
 
-                            Caller.DataAccessor.SetDataItem(0, "");
+                            m_DataAccessor.SetDataItem(0, "");
 
                             success = true;
                         }

@@ -33,6 +33,7 @@ using BH.oM.Data.Collections;
 using NetOffice.OfficeApi;
 using NetOffice.OfficeApi.Enums;
 using System.Xml;
+using BH.UI.Menus;
 
 namespace BH.UI.Excel.Templates
 {

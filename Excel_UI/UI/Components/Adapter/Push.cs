@@ -42,7 +42,8 @@ namespace BH.UI.Excel.Components
 
         public PushFormula() : base()
         {
-            Caller.SetDataAccessor(new CacheingDataAccessor());
+            m_DataAccessor = new CacheingDataAccessor();
+            Caller.SetDataAccessor(m_DataAccessor);
         }
 
         /*******************************************/

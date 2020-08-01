@@ -44,7 +44,8 @@ namespace BH.UI.Excel.Components
 
         public RemoveFormula() : base()
         {
-            Caller.SetDataAccessor(new CacheingDataAccessor());
+            m_DataAccessor = new CacheingDataAccessor();
+            Caller.SetDataAccessor(m_DataAccessor);
         }
 
         /*******************************************/
