@@ -31,7 +31,7 @@ using BH.oM.Base;
 using BH.Engine.Reflection;
 using System.Collections;
 using BH.Engine.Excel;
-using BH.UI.Global;
+using BH.UI.Base.Global;
 
 namespace BH.UI.Excel.Methods
 {

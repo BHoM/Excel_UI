@@ -20,9 +20,9 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using BH.UI.Components;
+using BH.UI.Base.Components;
 using BH.UI.Excel.Templates;
-using BH.UI.Templates;
+using BH.UI.Base;
 using Microsoft.Office.Core;
 using System;
 using System.Collections.Generic;
