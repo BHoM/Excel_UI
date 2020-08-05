@@ -21,7 +21,7 @@
  */
 
 using BH.oM.UI;
-using BH.UI.Templates;
+using BH.UI.Base;
 using Microsoft.Office.Core;
 using System;
 using System.Collections.Generic;
@@ -30,7 +30,7 @@ using System.Text;
 using System.Threading.Tasks;
 using BH.oM.Data;
 using BH.Engine.Reflection;
-using BH.UI.Menus;
+using BH.UI.Base.Menus;
 
 namespace BH.UI.Excel.Templates
 {

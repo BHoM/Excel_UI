@@ -23,8 +23,8 @@
 using System;
 using BH.oM.Base;
 using BH.UI.Excel.Templates;
-using BH.UI.Templates;
-using BH.UI.Components;
+using BH.UI.Base;
+using BH.UI.Base.Components;
 using BH.Engine.Reflection;
 using System.Linq;
 using System.Collections.Generic;

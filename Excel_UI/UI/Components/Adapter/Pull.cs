@@ -22,8 +22,8 @@
 
 using System;
 using BH.UI.Excel.Templates;
-using BH.UI.Templates;
-using BH.UI.Components;
+using BH.UI.Base;
+using BH.UI.Base.Components;
 using ExcelDna.Integration;
 using System.Collections.Generic;
 using Microsoft.Office.Core;

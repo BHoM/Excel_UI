@@ -29,7 +29,7 @@ using System.Threading.Tasks;
 
 namespace BH.UI.Excel.Callers
 {
-    class ExplodeCaller : BH.UI.Templates.Caller
+    class ExplodeCaller : BH.UI.Base.Caller
     {
         /*******************************************/
         /**** Properties                        ****/
@@ -87,7 +87,7 @@ namespace BH.UI.Excel.Callers
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private BH.UI.Components.ExplodeCaller m_Native = new BH.UI.Components.ExplodeCaller();
+        private BH.UI.Base.Components.ExplodeCaller m_Native = new BH.UI.Base.Components.ExplodeCaller();
 
         /*******************************************/
     }

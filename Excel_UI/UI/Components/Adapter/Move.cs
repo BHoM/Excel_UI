@@ -25,8 +25,8 @@ using System;
 using BH.oM.Base;
 
 using BH.UI.Excel.Templates;
-using BH.UI.Templates;
-using BH.UI.Components;
+using BH.UI.Base;
+using BH.UI.Base.Components;
 using Microsoft.Office.Core;
 using System.Collections.Generic;
 
