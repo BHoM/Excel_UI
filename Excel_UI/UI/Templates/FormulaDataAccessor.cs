@@ -182,6 +182,13 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
+        public virtual List<object> GetAllData(int index)
+        {
+            return GetDataList<object>(index);
+        }
+
+        /*******************************************/
+
         public static object ToExcel(object data)
         {
             try
