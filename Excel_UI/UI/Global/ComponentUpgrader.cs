@@ -24,7 +24,7 @@ namespace BH.UI.Excel.UI.Global
             m_NewName = caller.Function;
             m_NewParams = caller.Caller.InputParams.ToList();
             m_OldName = oldFormula;
-            m_Upgraded = caller.Caller.WasUpgraded;
+            //m_Upgraded = caller.Caller.WasUpgraded;
             Register();
         }
 
@@ -75,12 +75,12 @@ namespace BH.UI.Excel.UI.Global
             if (expression.Name == m_OldName)
             {
                 var newExpr = new FunctionExpression { Name = m_NewName };
-                if (!m_Upgraded) // If just renamed
+                /*if (!m_Upgraded) // If just renamed
                 {
                     newExpr.Arguments = expression.Arguments.Select(IRemap).ToList();
                 }
                 else
-                {
+                {*/ //TODO: Need to realign with teh new upgrade evetns from BHoM_UI
                     foreach (var param in m_NewParams)
                     {
                         IExpression newParam = new EmptyExpression();
@@ -96,7 +96,7 @@ namespace BH.UI.Excel.UI.Global
                         }
                         newExpr.Arguments.Add(newParam);
                     }
-                }
+                //}
 
                 // Remove trailing empty expressions
                 int lastNonEmpty = newExpr.Arguments.FindLastIndex(e => !(e is EmptyExpression)) + 1;
