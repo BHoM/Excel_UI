@@ -128,7 +128,6 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="UI\Callers\Explode.cs" />
-    <Compile Include="UI\Callers\CreateCustom.cs" />
     <Compile Include="UI\Components\Adapter\CreateAdapter.cs" />
     <Compile Include="UI\Components\Adapter\CreateRequest.cs" />
     <Compile Include="UI\Components\Adapter\Remove.cs" />
@@ -234,7 +233,7 @@ xcopy "$(TargetDir)ExcelDna.Registration.dll"  "C:\ProgramData\BHoM\Assemblies" 
   <Target Name="AfterBuild">
   </Target>
   -->
-    <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <StartArguments>
     </StartArguments>
     <StartAction>Program</StartAction>

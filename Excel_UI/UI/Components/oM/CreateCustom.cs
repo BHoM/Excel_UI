@@ -29,6 +29,7 @@ using BH.Engine.Reflection;
 using BH.UI.Excel.Callers;
 using Microsoft.Office.Core;
 using System.Collections.Generic;
+using BH.UI.Base.Components;
 
 namespace BH.UI.Excel.Components
 {
@@ -38,7 +39,7 @@ namespace BH.UI.Excel.Components
         /**** Properties                        ****/
         /*******************************************/
 
-        public override Caller Caller { get; } = new CreateCustomCaller();
+        public override Caller Caller { get; } = new CreateCustomCaller(false);
 
         public override string MenuRoot { get; } = "Create Custom";
 
