@@ -149,7 +149,6 @@ namespace BH.UI.Excel.UI.Global
         private string m_NewName;
         private List<ParamInfo> m_NewParams;
         private string m_OldName;
-        private bool m_Upgraded;
         private static HashSet<string> m_Registered = new HashSet<string>();
         private static object m_Mutex = new object();
 
