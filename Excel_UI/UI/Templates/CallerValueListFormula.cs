@@ -145,7 +145,7 @@ namespace BH.UI.Excel.Templates
                                             cell.Value = options.FirstOrDefault();
                                             validation = cell.Validation;
                                             validation.Delete();
-                                            validation.Add(XlDVType.xlValidateList, null, null, $"={name}");
+                                            validation.Add(XlDVType.xlValidateList, null, null, string.Join(",", options));
                                             validation.IgnoreBlank = true;
                                     });
                             });
