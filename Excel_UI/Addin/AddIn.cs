@@ -75,39 +75,15 @@ namespace BH.UI.Excel
 
         public void AutoClose()
         {
-            // note: This method only runs if the Addin gets disabled during
-            // execution, it does not run when excel closes.
-            ExcelDna.IntelliSense.IntelliSenseServer.Uninstall();
-            m_Application.WorkbookOpenEvent -= App_WorkbookOpen;
-            m_Application.WorkbookBeforeCloseEvent -= App_WorkbookClosed;
-        }
-
-        /*******************************************/
-
-        public bool InitBHoMAddin()
-        {
-            if (m_Initialised)
-                return true;
-            if (m_GlobalSearch == null)
+            try
             {
-                try
-                {
-                    m_GlobalSearch = new SearchMenu_WinForm();
-                    m_GlobalSearch.ItemSelected += GlobalSearch_ItemSelected;
-                }
-                catch (Exception e)
-                {
-                    Engine.Reflection.Compute.RecordError(e.Message);
-                }
+                // note: This method only runs if the Addin gets disabled during
+                // execution, it does not run when excel closes.
+                ExcelDna.IntelliSense.IntelliSenseServer.Uninstall();
+                m_Application.WorkbookOpenEvent -= App_WorkbookOpen;
+                m_Application.WorkbookBeforeCloseEvent -= App_WorkbookClosed;
             }
-            ComponentManager.ComponentRestored += ComponentManager_ComponentRestored;
-            m_Application.WorkbookBeforeCloseEvent += App_WorkbookClosed;
-
-            ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
-            ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
-            m_Initialised = true;
-            ExcelDna.Logging.LogDisplay.Clear();
-            return true;
+            catch { }
         }
 
         /*******************************************/
@@ -352,6 +328,34 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
+        private bool InitBHoMAddin()
+        {
+            if (m_Initialised)
+                return true;
+            if (m_GlobalSearch == null)
+            {
+                try
+                {
+                    m_GlobalSearch = new SearchMenu_WinForm();
+                    m_GlobalSearch.ItemSelected += GlobalSearch_ItemSelected;
+                }
+                catch (Exception e)
+                {
+                    Engine.Reflection.Compute.RecordError(e.Message);
+                }
+            }
+            ComponentManager.ComponentRestored += ComponentManager_ComponentRestored;
+            m_Application.WorkbookBeforeCloseEvent += App_WorkbookClosed;
+
+            ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
+            ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
+            m_Initialised = true;
+            ExcelDna.Logging.LogDisplay.Clear();
+            return true;
+        }
+
+        /*******************************************/
+
         private void InitCallers()
         {
             Type callform = typeof(CallerFormula);
@@ -392,6 +396,7 @@ namespace BH.UI.Excel
 
 
         /*******************************************/
+
         private void FlagUsed()
         {
             Workbook workbook = null;

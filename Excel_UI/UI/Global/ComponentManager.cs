@@ -41,11 +41,16 @@ namespace BH.UI.Excel.Global
         /*************************************/
         public static bool RemoveManager(Workbook workbook)
         {
-            if (m_Managers.ContainsKey(workbook.Name))
+            try
             {
-                m_Managers[workbook.Name].Dispose();
-                return true;
+                if (m_Managers.ContainsKey(workbook.Name))
+                {
+                    m_Managers[workbook.Name].Dispose();
+                    return true;
+                }
             }
+            catch { }
+
             return false;
         }
 
