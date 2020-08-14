@@ -42,11 +42,6 @@ namespace BH.UI.Excel.Components
 
         public override string MenuRoot { get; } = "Create Type";
 
-        /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public CreateTypeFormula() : base() { }
 
         /*******************************************/
         /**** Methods                           ****/

@@ -44,19 +44,8 @@ namespace BH.UI.Excel.Components
 
         public override string MenuRoot { get; } = "Create Data";
 
-        public override string Function
-        {
-            get
-            {
-                return GetName();
-            }
-        }
+        public override string Function { get { return GetName(); } }
 
-        /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public CreateDataFormula() : base() { }
 
         /*******************************************/
         /**** Methods                           ****/

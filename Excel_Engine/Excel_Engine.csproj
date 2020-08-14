@@ -64,16 +64,15 @@
   <ItemGroup>
     <Compile Include="Compute\Contents.cs" />
     <Compile Include="Compute\Note.cs" />
-    <Compile Include="Convert\FromExcel\Expression.cs" />
-    <Compile Include="Convert\ToExcel\Formula.cs" />
+    <Compile Include="Convert\FromExcel\FromExcelFormula.cs" />
+    <Compile Include="Convert\ToExcel\ToExcelFormula.cs" />
     <Compile Include="Query\Selection.cs" />
     <Compile Include="Query\Filename.cs" />
     <Compile Include="Query\Formula.cs" />
     <Compile Include="Compute\NumberFormat.cs" />
     <Compile Include="Create\Reference.cs" />
-    <Compile Include="Convert\FromExcel\Reference.cs" />
-    <Compile Include="Convert\ToExcel\Reference.cs" />
-    <Compile Include="Convert\ToExcel\DateTime.cs" />
+    <Compile Include="Convert\FromExcel\FromExcel.cs" />
+    <Compile Include="Convert\ToExcel\ToExcel.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Query\CleanList.cs" />
     <Compile Include="Query\RefText.cs" />

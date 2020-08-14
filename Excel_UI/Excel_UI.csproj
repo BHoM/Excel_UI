@@ -118,7 +118,6 @@
     <Compile Include="Helpers\ExcelCalculationManualHelper.cs" />
     <Compile Include="Helpers\ExcelEchoOffHelper.cs" />
     <Compile Include="Helpers\ArrayResizer.cs" />
-    <Compile Include="IO\InOutHelp.cs" />
     <Compile Include="Methods\Properties.cs" />
     <Compile Include="Project\Project.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -155,7 +154,6 @@
     <Compile Include="UI\Components\oM\CreateObject.cs" />
     <Compile Include="UI\Components\oM\CreateType.cs" />
     <Compile Include="UI\Global\FormulaSearchMenu.cs" />
-    <Compile Include="UI\Templates\CachingDataAccessor.cs" />
     <Compile Include="UI\Templates\SelectorMenu_RibbonXml.cs" />
     <Compile Include="UI\Templates\SingleOptionCallerFormula.cs" />
     <Compile Include="UI\Templates\IExcelSelectorMenu.cs" />
@@ -191,6 +189,7 @@
   <ItemGroup>
     <None Include="Properties\Resources\BHoM_Logo-48x48.png" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(TargetPath)"  "C:\ProgramData\BHoM\Assemblies" /Y

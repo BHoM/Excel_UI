@@ -40,15 +40,6 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new MoveCaller();
 
-        /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public MoveFormula() : base()
-        {
-            m_DataAccessor = new CacheingDataAccessor();
-            Caller.SetDataAccessor(m_DataAccessor);
-        }
 
         /*******************************************/
         /**** Methods                           ****/

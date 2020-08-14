@@ -26,7 +26,6 @@ using BH.UI.Excel.Templates;
 using BH.UI.Base;
 using System.Linq;
 using BH.Engine.Reflection;
-using BH.UI.Excel.Callers;
 using Microsoft.Office.Core;
 using System.Collections.Generic;
 using BH.UI.Base.Components;
@@ -45,11 +44,6 @@ namespace BH.UI.Excel.Components
 
         public override string Function => GetName();
 
-        /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public CreateCustomFormula() : base() { }
 
         /*******************************************/
         /**** Methods                           ****/

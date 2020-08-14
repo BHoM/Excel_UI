@@ -38,15 +38,6 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new ExecuteCaller();
 
-        /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public ExecuteFormula() : base()
-        {
-            m_DataAccessor = new CacheingDataAccessor();
-            Caller.SetDataAccessor(m_DataAccessor);
-        }
 
         /*******************************************/
         /**** Methods                           ****/

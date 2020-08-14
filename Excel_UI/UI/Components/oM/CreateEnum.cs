@@ -43,19 +43,8 @@ namespace BH.UI.Excel.Components
 
         public override string MenuRoot { get; } = "Create Enum";
 
-        public override string Function
-        {
-            get
-            {
-                return GetName();
-            }
-        }
+        public override string Function { get { return GetName(); } }
 
-        /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public CreateEnumFormula() : base() { }
 
         /*******************************************/
         /**** Methods                           ****/

@@ -38,11 +38,6 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new GetInfoCaller();
 
-        /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public GetInfoFormula() : base() { }
 
         /*******************************************/
     }

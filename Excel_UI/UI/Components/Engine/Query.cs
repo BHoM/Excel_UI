@@ -40,11 +40,6 @@ namespace BH.UI.Excel.Components
 
         public override string MenuRoot { get; } = "Query";
 
-        /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public QueryFormula() : base() { }
 
         /*******************************************/
     }
