@@ -23,70 +23,63 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.CompilerServices;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ExcelDna.Integration;
-using System.Reflection;
-using BH.oM.Base;
 using BH.Engine.Reflection;
+using BH.oM.Reflection.Attributes;
+using ExcelDna.Integration;
 
-namespace BH.UI.Excel
+namespace BH.Engine.Excel
 {
-    public static class InOutHelp
+    public static partial class Convert
     {
+        /*******************************************/
+        /**** Interface Methods                 ****/
+        /*******************************************/
+
+        public static object IToExcel(this object item)
+        {
+            return ToExcel(item as dynamic);
+        }
+
+
         /*******************************************/
         /**** Methods                           ****/
         /*******************************************/
 
-        public static object ReturnTypeHelper(this object obj)
+        [Description("A DateTime object to an OADate number for MS Office.")]
+        [Input("dateTime", "The Date and Time to convert.")]
+        [Output("An OADate number.")]
+        public static double ToExcel(this DateTime dateTime)
         {
-            return Templates.FormulaDataAccessor.ToExcel(obj);
+            return dateTime.ToOADate();
         }
 
         /*******************************************/
 
-        public static bool IsNumeric(this object obj)
+        [Description("Converts a BHoM Reference to an ExcelReference object.")]
+        [Input("omRef", "The reference to convert.")]
+        [Output("An ExcelDNA ExcelReference.")]
+        public static ExcelReference ToExcel(this oM.Excel.Reference omRef)
         {
-            if (obj is double)
-                return true;
-            if (obj is int)
-                return true;
-            if (obj is float)
-                return true;
-            if (obj is decimal)
-                return true;
-            if (obj is byte)
-                return true;
-
-            return false;
+            var rects = omRef.Rectangles.Select((rect) =>
+                new int[] { rect.RowFirst, rect.RowLast, rect.ColumnFirst, rect.ColumnLast }).ToArray();
+            return new ExcelReference(rects, omRef.Sheet);
         }
 
-        /*******************************************/
 
-        public static bool IsValidArray(object[] arr)
-        {
-            if (arr == null)
-                return false;
-
-            if (arr.Length < 1)
-                return false;
-
-            if (arr.Length == 1 && arr[0] == ExcelMissing.Value)
-                return false;
-
-            return true;
-        }
 
         /*******************************************/
+        /**** Fallback Methods                  ****/
+        /*******************************************/
 
-        public static object[] CleanArray(this object[] arr)
+        private static object ToExcel(object data)
         {
-            return arr.Where(x => x != null && x != ExcelMissing.Value && x != ExcelEmpty.Value).ToArray();
+            return data;
         }
 
         /*******************************************/
     }
 }
-

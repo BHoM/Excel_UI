@@ -71,7 +71,7 @@ namespace BH.UI.Excel.Methods
                 foreach (KeyValuePair<string, object> kvp in props[0])
                 {
                     outArr[0, counter] = kvp.Key;
-                    outArr[1, counter] = kvp.Value.ReturnTypeHelper();
+                    outArr[1, counter] = Project.ActiveProject.ToExcel(kvp.Value);
                     counter++;
                 }
 
@@ -80,7 +80,7 @@ namespace BH.UI.Excel.Methods
                     counter = 0;
                     foreach (KeyValuePair<string, object> kvp in props[i])
                     {
-                        outArr[i + 1, counter] = kvp.Value.ReturnTypeHelper();
+                        outArr[i + 1, counter] = Project.ActiveProject.ToExcel(kvp.Value);
                         counter++;
                     }
                 }
@@ -97,7 +97,7 @@ namespace BH.UI.Excel.Methods
                     int counter = 0;
                     foreach (KeyValuePair<string, object> kvp in props[i])
                     {
-                        outArr[i, counter] = kvp.Value.ReturnTypeHelper();
+                        outArr[i, counter] = Project.ActiveProject.ToExcel(kvp.Value);
                         counter++;
                     }
                 }
@@ -177,7 +177,7 @@ namespace BH.UI.Excel.Methods
 
                 foreach (KeyValuePair<string, object> kvp in baseDict)
                 {
-                    object value = kvp.Value.ReturnTypeHelper();
+                    object value = Project.ActiveProject.ToExcel(kvp.Value);
                     object innerObj = Project.ActiveProject.GetAny(value.ToString());
 
                     if (innerObj == null || kvp.Key == "BHoM_Guid")
@@ -191,7 +191,6 @@ namespace BH.UI.Excel.Methods
         }
 
         /*******************************************/
-
     }
 }
 

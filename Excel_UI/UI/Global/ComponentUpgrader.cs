@@ -54,9 +54,9 @@ namespace BH.UI.Excel.UI.Global
             ExcelAsyncUtil.QueueAsMacro(() =>
             {
                 string formula = XlCall.Excel(XlCall.xlfGetFormula, xlref).ToString();
-                var expr = formula.ToExpression();
+                var expr = Engine.Excel.Convert.FromExcelFormula(formula);
                 var newExpr = IRemap(expr);
-                xlref.ToReference().Contents("=" + newExpr.IToFormula());
+                Engine.Excel.Convert.FromExcel(xlref).Contents("=" + newExpr.IToExcelFormula());
             });
             return ExcelError.ExcelErrorName;
         }

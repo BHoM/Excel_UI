@@ -41,7 +41,7 @@ namespace BH.Engine.Excel
         [Description("Converts an Excel formula to a BHoM expression object.")]
         [Input("formula", "The formula to convert.")]
         [Output("A BHoM Expression.")]
-        public static IExpression ToExpression(this string formula)
+        public static IExpression FromExcelFormula(this string formula)
         {
             if (string.IsNullOrEmpty(formula))
             {
@@ -49,7 +49,7 @@ namespace BH.Engine.Excel
             }
             if (formula[0] == '=')
             {
-                return formula.Substring(1).ToExpression();
+                return formula.Substring(1).FromExcelFormula();
             }
 
             int index = 0;

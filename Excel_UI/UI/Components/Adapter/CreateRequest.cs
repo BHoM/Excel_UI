@@ -40,11 +40,6 @@ namespace BH.UI.Excel.Components
 
         public override string MenuRoot { get; } = "Create Request";
 
-        /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public CreateRequestFormula() : base() { }
 
         /*******************************************/
         /**** Methods                           ****/

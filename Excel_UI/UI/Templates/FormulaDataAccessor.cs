@@ -41,15 +41,50 @@ namespace BH.UI.Excel.Templates
     public class FormulaDataAccessor : IDataAccessor
     {
         /*******************************************/
+        /**** Properties                        ****/
+        /*******************************************/
+
+        public List<object> Outputs { get; private set; } = new List<object> { ExcelError.ExcelErrorNull };
+
+
+        /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/
 
         public FormulaDataAccessor()
         {
+
         }
 
         /*******************************************/
-        /**** Methods                           ****/
+        /**** Public Methods                    ****/
+        /*******************************************/
+
+        public virtual void SetInputs(List<object> inputs, List<object> defaultValues)
+        {
+            m_Inputs = inputs.Select(x => Evaluate(x)).ToList();
+            m_Defaults = defaultValues.Select(x => Evaluate(x)).ToList();
+
+            Engine.Excel.Query.Caller().Note("");
+            Outputs = new List<object> { ExcelError.ExcelErrorNull };
+        }
+
+        /*******************************************/
+
+        public virtual object GetOutputs()
+        {
+            // Retrieve the output from this DataAccessor
+            if (Outputs.Count == 0)
+                return ExcelError.ExcelErrorNull;
+            if (Outputs.Count == 1)
+                return Outputs[0];
+            else
+                return Project.ActiveProject.ToExcel(Outputs.ToList());
+        }
+
+
+        /*******************************************/
+        /**** IDataAccessor Methods             ****/
         /*******************************************/
 
         public virtual T GetDataItem<T>(int index)
@@ -57,7 +92,7 @@ namespace BH.UI.Excel.Templates
             Type type = typeof(T);
             object item = m_Inputs[index];
 
-            if (item is ExcelEmpty || item is ExcelMissing) {
+            if (IsBlankOrError<T>(item)) {
                 object def = m_Defaults[index];
                 return def == null ? default(T) : (T)(def as dynamic);
             }
@@ -189,56 +224,12 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
-        public static object ToExcel(object data)
-        {
-            try
-            {
-                if(data == null)
-                {
-                    return ExcelError.ExcelErrorNull;
-                }
-                if (data.GetType().IsPrimitive || data is string || data is object[,])
-                {
-                    return data;
-                }
-                if (data is Guid)
-                {
-                    return data.ToString();
-                }
-                if (data is IEnumerable && !(data is ICollection))
-                {
-                    return ToExcel((data as IEnumerable).Cast<object>().ToList());
-                }
-                if (data.GetType().IsEnum)
-                {
-                    return Enum.GetName(data.GetType(), data);
-                }
-                if (data is DateTime)
-                {
-                    DateTime? date = data as DateTime?;
-                    if (date.HasValue)
-                    {
-                        return date.Value.ToOADate();
-                    }
-                }
-                return data.GetType().ToText() + " [" + Project.ActiveProject.IAdd(data) + "]";
-
-            }
-            catch
-            {
-                return ExcelError.ExcelErrorValue;
-            }
-        }
-
-        /*******************************************/
-
         public virtual bool SetDataItem<T>(int index, T data)
         {
-            if (m_Output.Length <= index)
-            {
-                Array.Resize(ref m_Output, index + 1);
-            }
-            m_Output[index] = ToExcel(data);
+            while (Outputs.Count <= index)
+                Outputs.Add(null);
+
+            Outputs[index] = Project.ActiveProject.ToExcel(data);
             return true;
         }
 
@@ -255,8 +246,7 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
-        public virtual bool SetDataTree<T>(int index,
-            IEnumerable<IEnumerable<T>> data)
+        public virtual bool SetDataTree<T>(int index, IEnumerable<IEnumerable<T>> data)
         {
             if (data is ICollection && data.All(sub => sub is ICollection))
             {
@@ -265,187 +255,6 @@ namespace BH.UI.Excel.Templates
             return SetDataItem(index, data.Select(sub => sub.ToList()).ToList());
         }
 
-        /*******************************************/
-
-        public void StoreDefaults(object[] params_)
-        {
-            // Collect default values from ParamInfo so defaultable
-            // arguments can be ommited in excel
-            m_Defaults = params_;
-        }
-
-        /*******************************************/
-
-        public virtual bool Store(string function, params object[] in_)
-        {
-            // Store some inputs in this DataAccessor
-            // convert Guid strings to objects
-            m_Inputs = new object[in_.Length];
-            for (int i = 0; i < in_.Length; i++)
-            {
-                m_Inputs[i] = Evaluate(in_[i]);
-            }
-            ResetOutput();
-            return true;
-        }
-
-        /*******************************************/
-
-        public virtual object GetOutput()
-        {
-            // Retrieve the output from this DataAccessor
-            var errors = Engine.Reflection.Query.CurrentEvents()
-                .Where(e => e.Type == oM.Reflection.Debugging.EventType.Error);
-            if (errors.Count() > 0)
-            {
-                string msg = errors
-                    .Select(e => e.Message)
-                    .Aggregate((a, b) => a + "\n" + b);
-                Engine.Excel.Query.Caller().Note(msg);
-            }
-            else
-            {
-                Engine.Excel.Query.Caller().Note("");
-            }
-
-            if(m_Output.Length == 0)
-            {
-                return ExcelError.ExcelErrorNull;
-            }
-            if (m_Output.Length == 1)
-            {
-                return m_Output[0];
-            }
-            return ToExcel(m_Output.ToList());
-        }
-
-        /*******************************************/
-
-        public virtual void ResetOutput()
-        {
-            Engine.Excel.Query.Caller().Note("");
-            m_Output = new object[] { ExcelError.ExcelErrorNull };
-        }
-
-        /*******************************************/
-
-        public Tuple<Delegate, ExcelFunctionAttribute, List<object>>
-            Wrap(CallerFormula caller, Expression<Action> action)
-        {
-            // Create a Delegate that looks like:
-            //
-            // (a, b, c, ...) => {
-            //     accessor.ResetOutput();
-            //     accessor.StoreDefaults(defaults);
-            //     accessor.Store( new [] {a, b, c, ...} );
-            //     action();
-            //     return ToExcel(accessor.GetOutput());
-            // }
-
-
-            // Create an array of [n] parameters
-            string fn = caller.Function;
-
-            var rawParams = caller.Caller.InputParams;
-            ParameterExpression[] lambdaParams = rawParams
-                .Select(p => Expression.Parameter(typeof(object)))
-                .ToArray();
-            Expression newArr = Expression.NewArrayInit(
-                typeof(object),
-                lambdaParams
-            );
-
-            Expression defs = Expression.Constant(rawParams.Select(p => p.DefaultValue).ToArray());
-
-            Expression accessorInstance = Expression.Constant(this);
-            Type accessorType = GetType();
-
-            // Invoke action
-            Expression actionCall = Expression.Invoke(action);
-
-            MethodInfo storeDefMethod = accessorType.GetMethod("StoreDefaults");
-            Expression storeDefCall = Expression.Call(
-                accessorInstance, // FormulaDataAccessor
-                storeDefMethod,   // void StoreDefaults(...)
-                defs
-            );
-
-            // Call FormulaDataAccessor.Store with array
-            MethodInfo storeMethod = accessorType.GetMethod("Store");
-            Expression storeCall = Expression.Call(
-                accessorInstance, // (FormulaDataAccessor)DataAccessor
-                storeMethod,      // void Store(string, object[])
-                Expression.Constant(fn), // fn
-                newArr            // new [] { ... }
-            );
-
-            // Return call FormulaDataAccessor.GetOutput()
-            MethodInfo returnMethod = accessorType.GetMethod("GetOutput");
-            Expression returnCall = Expression.Call(
-                accessorInstance, // (FormulaDataAccessor)DataAccessor
-                returnMethod      // object GetOutput()
-            );
-
-            // Chain them together
-            Expression tree = Expression.Block(
-                storeDefCall,
-                Expression.Condition(
-                    storeCall,
-                    actionCall,
-                    Expression.Empty()
-                ),
-                returnCall
-            );
-            LambdaExpression lambda = Expression.Lambda(tree, lambdaParams);
-
-            // Compile
-            var argAttrs = rawParams
-                        .Select(p =>
-                        {
-                            string name = p.HasDefaultValue ? $"[{p.Name}]" : p.Name;
-                            string postfix = string.Empty;
-                            if (p.HasDefaultValue)
-                            {
-                                postfix += " [default: " +
-                                (p.DefaultValue is string
-                                    ? $"\"{p.DefaultValue}\""
-                                    : p.DefaultValue == null
-                                        ? "null"
-                                        : p.DefaultValue.ToString()
-                                ) + "]";
-                            }
-
-                            int limit = 253 - name.Length;
-                            string desc = p.Description + postfix;
-
-                            if (desc.Length >= limit)
-                                desc = p.Description.Substring(limit - postfix.Length) + postfix;
-
-                            return new ExcelArgumentAttribute()
-                            {
-                                Name = name,
-                                Description = desc
-                            };
-                        });
-            if (argAttrs.Count() > 0)
-            {
-                string argstring = argAttrs.Select(item => item.Name).Aggregate((a, b) => $"{a}, {b}");
-                if (argstring.Length >= 254)
-                {
-                    int i = 0;
-                    argAttrs = argAttrs.Select(attr => new ExcelArgumentAttribute
-                    {
-                        Description = attr.Description,
-                        Name = "arg" + i++
-                    });
-                }
-            }
-            return new Tuple<Delegate, ExcelFunctionAttribute, List<object>>(
-                lambda.Compile(),
-                GetFunctionAttribute(caller),
-                argAttrs.ToList<object>()
-            );
-        }
 
         /*******************************************/
         /**** Private Methods                   ****/
@@ -493,37 +302,18 @@ namespace BH.UI.Excel.Templates
 
         private bool IsBlankOrError<T>(object obj)
         {
-            bool isString = typeof(T) == typeof(string);
-
             // This will evaluate to true for "" unless T is a string
             return obj is ExcelMissing || obj is ExcelEmpty || obj is ExcelError
-                || (obj is string && !isString && string.IsNullOrEmpty(obj as string));
+                || (obj is string && typeof(T) != typeof(string) && string.IsNullOrEmpty(obj as string));
         }
 
-        /*******************************************/
-
-        private ExcelFunctionAttribute GetFunctionAttribute(CallerFormula caller)
-        {
-            int limit = 254;
-            string description = caller.Caller.Description;
-            if (description.Length >= limit)
-                description = description.Substring(0, limit-1);
-            return new ExcelFunctionAttribute()
-            {
-                Name = caller.Function,
-                Description = description,
-                Category = "BHoM." + caller.Caller.Category,
-                IsMacroType = true
-            };
-        }
 
         /*******************************************/
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private object[] m_Output = new object[] { ExcelError.ExcelErrorNull };
-        private object[] m_Inputs;
-        private object[] m_Defaults;
+        private List<object> m_Inputs { get; set; } = new List<object> { };
+        private List<object> m_Defaults { get; set; } = new List<object> { };
 
         /*******************************************/
     }

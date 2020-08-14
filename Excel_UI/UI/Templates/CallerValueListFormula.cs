@@ -62,10 +62,7 @@ namespace BH.UI.Excel.Templates
         /**** Methods                           ****/
         /*******************************************/
 
-        /*******************************************/
-        /**** Private Methods                   ****/
-        /*******************************************/
-        protected override bool Excecute()
+        public override object Run(object[] inputs)
         {
             var options = GetChoices().ToArray();
 
@@ -163,6 +160,11 @@ namespace BH.UI.Excel.Templates
             }
             return success;
         }
+
+
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
 
         protected override void Fill(oM.Excel.Reference cell)
         {

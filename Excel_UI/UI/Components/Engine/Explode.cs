@@ -30,24 +30,29 @@ using BH.UI.Excel.Callers;
 
 namespace BH.UI.Excel.Components
 {
+    // Bespoke Excel explode method
     public class ExplodeFormula : SingleOptionCallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/
         /*******************************************/
 
-        // Bespoke Excel explode method
         public override Caller Caller { get; } = new ExplodeCaller();
 
         public override string Function { get; } = "BHoM.Explode";
 
         public override string Category { get; } = "Engine";
 
+
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/
 
-        public ExplodeFormula() : base() { }
+        public ExplodeFormula() : base()
+        {
+            //Caller.SetItem(typeof(Methods.Properties).GetMethod("Explode"));
+        }
+
 
         /*******************************************/
     }

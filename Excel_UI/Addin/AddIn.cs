@@ -365,8 +365,7 @@ namespace BH.UI.Excel
 
             m_Formulea = ExcelIntegration.GetExportedAssemblies()
                 .SelectMany(a => a.GetTypes())
-                .Where(t => t.Namespace == "BH.UI.Excel.Components"
-                            && callform.IsAssignableFrom(t))
+                .Where(t => t.Namespace == "BH.UI.Excel.Components" && callform.IsAssignableFrom(t))
                 .Select(t => t.GetConstructor(constrtypes).Invoke(args) as CallerFormula)
                 .ToDictionary(o => o.Caller.GetType().Name);
             foreach (var formula in m_Formulea.Values)

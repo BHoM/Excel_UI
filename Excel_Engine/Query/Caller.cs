@@ -40,7 +40,7 @@ namespace BH.Engine.Excel
         public static oM.Excel.Reference Caller()
         {
             ExcelReference xlref = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
-            return xlref.ToReference();
+            return Engine.Excel.Convert.FromExcel(xlref);
         }
 
         /*******************************************/

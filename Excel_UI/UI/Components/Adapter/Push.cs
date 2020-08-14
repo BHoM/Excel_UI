@@ -36,15 +36,6 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new PushCaller();
 
-        /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public PushFormula() : base()
-        {
-            m_DataAccessor = new CacheingDataAccessor();
-            Caller.SetDataAccessor(m_DataAccessor);
-        }
 
         /*******************************************/
         /**** Methods                           ****/

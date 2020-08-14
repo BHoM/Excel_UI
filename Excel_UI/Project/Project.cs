@@ -31,6 +31,8 @@ using BH.Engine.Serialiser;
 using BH.Adapter;
 using NetOffice.ExcelApi;
 using NetOffice.ExcelApi.Enums;
+using ExcelDna.Integration;
+using System.Collections;
 
 namespace BH.UI.Excel
 {
@@ -303,6 +305,49 @@ namespace BH.UI.Excel
                     c += (cell.Value as string).Length;
                     cell = cell.Next;
                 }
+            }
+        }
+
+        /*******************************************/
+
+        public object ToExcel(object data)
+        {
+            try
+            {
+                if (data == null)
+                {
+                    return ExcelError.ExcelErrorNull;
+                }
+                if (data.GetType().IsPrimitive || data is string || data is object[,])
+                {
+                    return data;
+                }
+                if (data is Guid)
+                {
+                    return data.ToString();
+                }
+                if (data is IEnumerable && !(data is ICollection))
+                {
+                    return ToExcel((data as IEnumerable).Cast<object>().ToList());
+                }
+                if (data.GetType().IsEnum)
+                {
+                    return Enum.GetName(data.GetType(), data);
+                }
+                if (data is DateTime)
+                {
+                    DateTime? date = data as DateTime?;
+                    if (date.HasValue)
+                    {
+                        return date.Value.ToOADate();
+                    }
+                }
+                return data.GetType().ToText() + " [" + IAdd(data) + "]";
+
+            }
+            catch
+            {
+                return ExcelError.ExcelErrorValue;
             }
         }
 

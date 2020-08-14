@@ -40,11 +40,6 @@ namespace BH.UI.Excel.Components
 
         public override string MenuRoot { get; } = "Compute";
 
-        /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public ComputeFormula() : base() { }
 
         /*******************************************/
     }

@@ -38,11 +38,6 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new ToJsonCaller();
 
-        /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public ToJsonFormula() : base() { }
 
         /*******************************************/
     }

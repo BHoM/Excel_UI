@@ -41,39 +41,39 @@ namespace BH.Engine.Excel
         [Description("Converts an BHoM expression to an Excel Formula.")]
         [Input("expression", "The expression to convert.")]
         [Output("A Formula string.")]
-        public static string IToFormula(this IExpression expression)
+        public static string IToExcelFormula(this IExpression expression)
         {
-            return ToFormula(expression as dynamic);
+            return ToExcelFormula(expression as dynamic);
         }
 
         /*******************************************/
         
-        public static string ToFormula(this NumberExpression expression)
+        public static string ToExcelFormula(this NumberExpression expression)
         {
             return expression.Value;
         }
 
         /*******************************************/
 
-        public static string ToFormula(this ReferenceExpression expression)
+        public static string ToExcelFormula(this ReferenceExpression expression)
         {
             return expression.Value;
         }
 
         /*******************************************/
 
-        public static string ToFormula(this StringExpression expression)
+        public static string ToExcelFormula(this StringExpression expression)
         {
             return $"\"{expression.Value}\"";
         }
 
         /*******************************************/
 
-        public static string ToFormula(this FunctionExpression expression)
+        public static string ToExcelFormula(this FunctionExpression expression)
         {
             string inner = "";
             bool first = true;
-            foreach (string expr in expression.Arguments.Select(e=>e.IToFormula()))
+            foreach (string expr in expression.Arguments.Select(e=>e.IToExcelFormula()))
             {
                 if (!first)
                     inner += ",";
@@ -85,11 +85,11 @@ namespace BH.Engine.Excel
 
         /*******************************************/
 
-        public static string ToFormula(this ArrayExpression expression)
+        public static string ToExcelFormula(this ArrayExpression expression)
         {
             string inner = "";
             bool first = true;
-            foreach (string expr in expression.Expressions.Select(e=>e.IToFormula()))
+            foreach (string expr in expression.Expressions.Select(e=>e.IToExcelFormula()))
             {
                 if (!first)
                     inner += ",";
@@ -101,28 +101,28 @@ namespace BH.Engine.Excel
 
         /*******************************************/
 
-        public static string ToFormula(this BinaryExpression expression)
+        public static string ToExcelFormula(this BinaryExpression expression)
         {
-            return expression.Left.IToFormula() + expression.Operator + expression.Right.IToFormula();
+            return expression.Left.IToExcelFormula() + expression.Operator + expression.Right.IToExcelFormula();
         }
 
         /*******************************************/
 
-        public static string ToFormula(this ExpressionGroup expression)
+        public static string ToExcelFormula(this ExpressionGroup expression)
         {
-            return $"({expression.Expression.IToFormula()})";
+            return $"({expression.Expression.IToExcelFormula()})";
         }
 
         /*******************************************/
 
-        public static string ToFormula(this UnaryExpression expression)
+        public static string ToExcelFormula(this UnaryExpression expression)
         {
-            return $"{expression.Operator}{expression.Expression.IToFormula()}";
+            return $"{expression.Operator}{expression.Expression.IToExcelFormula()}";
         }
 
         /*******************************************/
 
-        public static string ToFormula(this EmptyExpression expression)
+        public static string ToExcelFormula(this EmptyExpression expression)
         {
             return "";
         }

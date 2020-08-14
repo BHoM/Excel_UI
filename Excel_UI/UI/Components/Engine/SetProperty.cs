@@ -40,11 +40,6 @@ namespace BH.UI.Excel.Components
 
         public override string Function { get; } = "Engine.SetProperty";
 
-        /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public SetPropertyFormula() : base() { }
 
         /*******************************************/
     }

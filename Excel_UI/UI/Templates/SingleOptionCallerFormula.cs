@@ -44,13 +44,6 @@ namespace BH.UI.Excel.Templates
 
         public override string MenuRoot { get; } = "";
 
-        /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public SingleOptionCallerFormula() : base()
-        {
-        }
 
         /*******************************************/
         /**** Methods                           ****/
