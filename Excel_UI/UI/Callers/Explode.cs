@@ -35,53 +35,23 @@ namespace BH.UI.Excel.Callers
         /**** Properties                        ****/
         /*******************************************/
 
-        public override System.Drawing.Bitmap Icon_24x24
-        {
-            get
-            {
-                return m_Native.Icon_24x24;
-            }
-        }
+        public override System.Drawing.Bitmap Icon_24x24 { get { return m_Native.Icon_24x24; } }
 
-        public override string Name
-        {
-            get
-            {
-                return m_Native.Name;
-            }
-        }
+        public override string Name { get { return m_Native.Name; } }
 
-        public override string Category
-        {
-            get
-            {
-                return m_Native.Category;
-            }
-        }
+        public override string Category { get { return m_Native.Category; } }
 
-        public override string Description
-        {
-            get
-            {
-                return m_Native.Description;
-            }
-        }
+        public override string Description { get { return m_Native.Description; } }
 
-        public override int GroupIndex
-        {
-            get
-            {
-                return m_Native.GroupIndex;
-            }
-        }
+        public override int GroupIndex { get { return m_Native.GroupIndex; } }
+
 
         /*******************************************/
         /**** Constructors                      ****/
         /*******************************************/
 
-        public ExplodeCaller() : base(typeof(Methods.Properties).GetMethod("Explode"))
-        {
-        }
+        public ExplodeCaller() : base(typeof(Methods.Properties).GetMethod("Explode")) {}
+
 
         /*******************************************/
         /**** Private Fields                    ****/

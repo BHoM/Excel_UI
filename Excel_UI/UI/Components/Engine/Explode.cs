@@ -45,16 +45,6 @@ namespace BH.UI.Excel.Components
 
 
         /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public ExplodeFormula() : base()
-        {
-            //Caller.SetItem(typeof(Methods.Properties).GetMethod("Explode"));
-        }
-
-
-        /*******************************************/
     }
 }
 
