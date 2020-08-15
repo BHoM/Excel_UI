@@ -51,62 +51,38 @@ namespace BH.UI.Excel
     public partial class AddIn : IExcelAddIn
     {
         /*******************************************/
-        /**** Properties                        ****/
+        /**** Methods                           ****/
         /*******************************************/
 
-        public static Dictionary<string, CallerFormula> Callers
+        public void AutoClose()
         {
-            get
+            try
             {
-                if (m_Instance.m_Callers == null)
-                    m_Instance.InitCallers();
-                return m_Instance.m_Callers;
+                // note: This method only runs if the Addin gets disabled during
+                // execution, it does not run when excel closes.
+                ExcelDna.IntelliSense.IntelliSenseServer.Uninstall();
+                m_Application.WorkbookOpenEvent -= App_WorkbookOpen;
+                m_Application.WorkbookBeforeCloseEvent -= App_WorkbookClosed;
             }
+            catch { }
         }
+
 
         /*******************************************/
         /**** Private Methods                   ****/
         /*******************************************/
 
-        private void InitCallers()
+        private void App_WorkbookClosed(Workbook workbook, ref bool cancel)
         {
-            Type callform = typeof(CallerFormula);
-
-            Type[] constrtypes = new Type[] { };
-            object[] args = new object[] { };
-
-            m_Callers = ExcelIntegration.GetExportedAssemblies()
-                .SelectMany(a => a.GetTypes())
-                .Where(t => t.Namespace == "BH.UI.Excel.Components" && callform.IsAssignableFrom(t))
-                .Select(t => t.GetConstructor(constrtypes).Invoke(args) as CallerFormula)
-                .ToDictionary(o => o.Caller.GetType().Name);
-            foreach (var formula in m_Callers.Values)
-            {
-                formula.OnRun += (s, e) =>
-                {
-                    var f = (s as CallerFormula);
-                    var caller = f.Caller;
-                    string name = Engine.Excel.Query.Filename();
-                    var manager = ComponentManager.GetManager(name);
-                    if (manager != null)
-                    {
-                        manager.Store(caller, f.Function);
-                    }
-                };
-            }
+            ComponentManager.RemoveManager(workbook);
         }
-
 
         /*******************************************/
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private Application m_Application;
-        private Dictionary<string, CallerFormula> m_Callers;
 
-        private static AddIn m_Instance = null;
-        private static SearchMenu m_GlobalSearch = null;
-        
+
         /*******************************************/
     }
 }
