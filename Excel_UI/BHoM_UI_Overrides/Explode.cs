@@ -20,23 +20,43 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
+using BH.Engine.Excel;
+using BH.Engine.Reflection;
+using BH.oM.Base;
+using ExcelDna.Integration;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ExcelDna.Integration;
-using System.Reflection;
-using BH.oM.Base;
-using BH.Engine.Reflection;
-using System.Collections;
-using BH.Engine.Excel;
-using BH.UI.Base.Global;
 
-namespace BH.UI.Excel.Methods
+namespace BH.UI.Excel.Callers
 {
-    public static class Properties
+    class ExplodeCaller : BH.UI.Base.Caller
     {
+        /*******************************************/
+        /**** Properties                        ****/
+        /*******************************************/
+
+        public override System.Drawing.Bitmap Icon_24x24 { get { return m_Native.Icon_24x24; } }
+
+        public override string Name { get { return m_Native.Name; } }
+
+        public override string Category { get { return m_Native.Category; } }
+
+        public override string Description { get { return m_Native.Description; } }
+
+        public override int GroupIndex { get { return m_Native.GroupIndex; } }
+
+
+        /*******************************************/
+        /**** Constructors                      ****/
+        /*******************************************/
+
+        public ExplodeCaller() : base(typeof(ExplodeCaller).GetMethod("Explode")) {}
+
+
         /*******************************************/
         /**** Methods                           ****/
         /*******************************************/
@@ -84,13 +104,11 @@ namespace BH.UI.Excel.Methods
                         counter++;
                     }
                 }
-
             }
             else
             {
                 //Create an object array to contain the property values
                 outArr = new object[props.Count, props[0].Count];
-
 
                 for (int i = 0; i < props.Count; i++)
                 {
@@ -101,16 +119,15 @@ namespace BH.UI.Excel.Methods
                         counter++;
                     }
                 }
-
             }
 
             if (transpose)
-            {
                 outArr = Transpose(outArr);
-            }
+
             //Output the values as an array
             return ArrayResizer.Resize(outArr);
         }
+
 
         /*******************************************/
         /**** Private Methods                   ****/
@@ -190,7 +207,13 @@ namespace BH.UI.Excel.Methods
             }
         }
 
+
+        /*******************************************/
+        /**** Private Fields                    ****/
+        /*******************************************/
+
+        private BH.UI.Base.Components.ExplodeCaller m_Native = new BH.UI.Base.Components.ExplodeCaller();
+
         /*******************************************/
     }
 }
-
