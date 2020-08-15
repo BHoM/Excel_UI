@@ -65,9 +65,9 @@ namespace BH.UI.Excel
             Instance = this;
 
             ExcelDna.IntelliSense.IntelliSenseServer.Install();
+            ExcelAsyncUtil.QueueAsMacro(() => InitBHoMAddin());
 
             m_Application = Application.GetActiveInstance();
-
             m_Application.WorkbookOpenEvent += App_WorkbookOpen;
         }
 
@@ -84,13 +84,6 @@ namespace BH.UI.Excel
                 m_Application.WorkbookBeforeCloseEvent -= App_WorkbookClosed;
             }
             catch { }
-        }
-
-        /*******************************************/
-
-        public static void EnableBHoM(Action<bool> callback)
-        {
-            ExcelAsyncUtil.QueueAsMacro(() => callback(Instance.InitBHoMAddin()));
         }
 
         /*******************************************/
@@ -134,7 +127,6 @@ namespace BH.UI.Excel
                         group = (XmlElement)root.AppendChild(doc.CreateElement("group"));
                         group.SetAttribute("id", caller.Category);
                         group.SetAttribute("label", caller.Category);
-                        group.SetAttribute("getVisible", "GetVisible");
                         groups.Add(caller.Category, group);
                         boxes.Add(caller.Category, new Dictionary<int, XmlElement>());
                     }
@@ -248,75 +240,60 @@ namespace BH.UI.Excel
 
         private void App_WorkbookOpen(Workbook workbook)
         {
-            List<string> json = new List<string>();
-            Sheets sheets = null;
-            Worksheet newsheet = null;
-            Range used = null;
-            Range cell = null;
-            Range next = null;
-                sheets = workbook.Sheets;
+            // Try to recover the sheet where data was saved if it exists
+            Sheets sheets = workbook.Sheets;
+            Worksheet dataSheet = null;
+            if (sheets.Contains("BHoM_DataHidden"))
+                dataSheet = sheets["BHoM_DataHidden"] as Worksheet;
+            else if (sheets.Contains("BHoM_DataHidden"))
+                dataSheet = sheets["BHoM_Data"] as Worksheet; // Backwards compatibility
+            else
+                return;
 
-                bool bhomUsed = sheets.OfType<Worksheet>().FirstOrDefault(s => s.Name == "BHoM_Used") != null;
+            // Initialise the BHoM Addin and run first calculation
+            
+            ExcelAsyncUtil.QueueAsMacro(() =>
+            {
                 bool hasComponents = sheets.OfType<Worksheet>().FirstOrDefault(s => s.Name == "BHoM_ComponetRequests") != null;
-                if (bhomUsed)
-                {
-                    ExcelAsyncUtil.QueueAsMacro(() =>
-                    {
-                        InitBHoMAddin();
-                        var manager = ComponentManager.GetManager(workbook);
-                        if (!hasComponents)
-                        {
-                            RegisterAllBHoMMethods();
-                        }
-                        else
-                        {
-                            manager.Restore();
-                        }
-                        ExcelAsyncUtil.QueueAsMacro(() =>
-                        {
-                                foreach (Worksheet sheet in sheets.OfType<Worksheet>())
-                                {
-                                        bool before = sheet.EnableCalculation;
-                                        sheet.EnableCalculation = false;
-                                        sheet.Calculate();
-                                        sheet.EnableCalculation = before;
-                                }
-                        });
-                    });
-                }
+                if (!hasComponents)
+                    RegisterAllBHoMMethods();
+                else
+                    ComponentManager.GetManager(workbook).Restore();
 
+                ExcelAsyncUtil.QueueAsMacro(() =>
+                {
+                        foreach (Worksheet sheet in sheets.OfType<Worksheet>())
+                        {
+                                bool before = sheet.EnableCalculation;
+                                sheet.EnableCalculation = false;
+                                sheet.Calculate();
+                                sheet.EnableCalculation = before;
+                        }
+                });
+            });
+
+            // Collect all the saved json strings
+            List<string> json = new List<string>();
+            foreach (Range row in dataSheet.UsedRange.Rows)
+            {
+                string str = "";
                 try
                 {
-                    newsheet = sheets["BHoM_DataHidden"] as Worksheet;
-                }
-                catch
-                {
-                    // Backwards compatibility
-                    newsheet = sheets["BHoM_Data"] as Worksheet;
-                }
-                used = newsheet.UsedRange;
-                foreach (Range row in used.Rows)
-                {
-                    string str = "";
-                    try
+                    Range cell = row.Cells[1, 1];
+                    while (cell.Value != null && cell.Value is string && (cell.Value as string).Length > 0)
                     {
-                        cell = row.Cells[1, 1];
-                        while (cell.Value != null && cell.Value is string && (cell.Value as string).Length > 0)
-                        {
-                            str += cell.Value;
-                            next = cell.Next;
-                            cell = next;
-                        }
+                        str += cell.Value;
+                        cell = cell.Next;
                     }
-                    catch { }
-
-                    if (str.Length > 0)
-                    {
-                        json.Add(str);
-                    }
-
                 }
-                Project.ActiveProject.Deserialize(json);
+                catch { }
+
+                if (str.Length > 0)
+                    json.Add(str);
+            }
+
+            // Restore project state
+            Project.ActiveProject.Deserialize(json);
         }
 
         /*******************************************/
@@ -373,7 +350,6 @@ namespace BH.UI.Excel
                 formula.OnRun += (s, e) =>
                 {
                     var f = (s as CallerFormula);
-                    FlagUsed();
                     var caller = f.Caller;
                     string name = Engine.Excel.Query.Filename();
                     var manager = ComponentManager.GetManager(name);
@@ -393,24 +369,6 @@ namespace BH.UI.Excel
             searcher.SetParent(null);
         }
 
-
-        /*******************************************/
-
-        private void FlagUsed()
-        {
-            Workbook workbook = null;
-            Sheets sheets = null;
-            Worksheet sheet = null;
-                workbook = m_Application.ActiveWorkbook;
-                sheets = workbook.Worksheets;
-                if (sheets.OfType<Worksheet>()
-                    .FirstOrDefault(s => s.Name == "BHoM_Used") == null)
-                {
-                    sheet = sheets.Add() as Worksheet;
-                    sheet.Visible = XlSheetVisibility.xlSheetVeryHidden;
-                    sheet.Name = "BHoM_Used";
-                }
-        }
 
         /*******************************************/
         /**** Private properties                ****/
