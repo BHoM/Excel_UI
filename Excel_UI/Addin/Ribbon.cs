@@ -45,10 +45,6 @@ namespace BH.UI.Excel.Addin
       <ribbon>
         <tabs>
           <tab id='bhomTab' label='BHoM'>
-            <group id='uninitialised' label='BHoM' getVisible='GetVisible'>
-              <button id='enableBtn' label='Enable BHoM' onAction='EnableBHom' getImage='GetImage' size='large'
-                   supertip='Turn on the Buildings and Habitats Object Model for this session.'/>
-            </group>
             {AddIn.GetRibbonXml()}
             <group id='help' label='Help'>
                 <button id='xlwiki' onAction='OpenLink' size='large' label='BHoM Excel Wiki' imageMso='Help' tag='https://github.com/BHoM/Excel_Toolkit/wiki' supertip='Go to the BHoM Excel plugin wiki to view help documentation relating to this plugin' />
@@ -60,18 +56,6 @@ namespace BH.UI.Excel.Addin
       </ribbon>
     </customUI>";
             return ribbonxml;
-        }
-
-        /*******************************************/
-
-        public void EnableBHoM(IRibbonControl control)
-        {
-            AddIn.EnableBHoM((success) => {
-                if(m_Ribbon != null)
-                {
-                    m_Ribbon.Invalidate();
-                }
-            });
         }
 
         /*******************************************/
@@ -95,15 +79,6 @@ namespace BH.UI.Excel.Addin
             if (caller != null)
                 return caller.GetInnerRibbonXml();
             return null;
-        }
-
-        /*******************************************/
-
-        public bool GetVisible(IRibbonControl control)
-        {
-            if(control.Id == "uninitialised")
-                return !AddIn.Enabled;
-            return AddIn.Enabled;
         }
 
         /*******************************************/
