@@ -51,62 +51,38 @@ namespace BH.UI.Excel
     public partial class AddIn : IExcelAddIn
     {
         /*******************************************/
-        /**** Properties                        ****/
+        /**** Methods                           ****/
         /*******************************************/
 
-        public static Dictionary<string, CallerFormula> Callers
+        [ExcelCommand(ShortCut = "^B")]
+        public static void InitGlobalSearch()
         {
-            get
-            {
-                if (m_Instance.m_Callers == null)
-                    m_Instance.InitCallers();
-                return m_Instance.m_Callers;
-            }
+            m_Instance.m_CurrentSelection = Engine.Excel.Query.Selection();
+            var control = new System.Windows.Forms.ContainerControl();
+            m_GlobalSearch.SetParent(control);
         }
+
 
         /*******************************************/
         /**** Private Methods                   ****/
         /*******************************************/
 
-        private void InitCallers()
+        private void GlobalSearch_ItemSelected(object sender, oM.UI.ComponentRequest e)
         {
-            Type callform = typeof(CallerFormula);
-
-            Type[] constrtypes = new Type[] { };
-            object[] args = new object[] { };
-
-            m_Callers = ExcelIntegration.GetExportedAssemblies()
-                .SelectMany(a => a.GetTypes())
-                .Where(t => t.Namespace == "BH.UI.Excel.Components" && callform.IsAssignableFrom(t))
-                .Select(t => t.GetConstructor(constrtypes).Invoke(args) as CallerFormula)
-                .ToDictionary(o => o.Caller.GetType().Name);
-            foreach (var formula in m_Callers.Values)
+            if (e != null && e.CallerType != null && Callers.ContainsKey(e.CallerType.Name))
             {
-                formula.OnRun += (s, e) =>
-                {
-                    var f = (s as CallerFormula);
-                    var caller = f.Caller;
-                    string name = Engine.Excel.Query.Filename();
-                    var manager = ComponentManager.GetManager(name);
-                    if (manager != null)
-                    {
-                        manager.Store(caller, f.Function);
-                    }
-                };
+                CallerFormula formula = Callers[e.CallerType.Name];
+                formula.Caller.SetItem(e.SelectedItem);
+                formula.FillFormula(m_CurrentSelection);
             }
         }
-
 
         /*******************************************/
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private Application m_Application;
-        private Dictionary<string, CallerFormula> m_Callers;
+        private oM.Excel.Reference m_CurrentSelection;
 
-        private static AddIn m_Instance = null;
-        private static SearchMenu m_GlobalSearch = null;
-        
         /*******************************************/
     }
 }
