@@ -61,12 +61,16 @@ namespace BH.UI.Excel.Templates
 
         public virtual string GetInnerRibbonXml()
         {
-            Caller.SelectedItem = null;
-            m_Menu = SelectorMenuUtil.ISetExcelSelectorMenu(Caller.GetItemSelectorMenu());
+            m_Menu = new SelectorMenu_RibbonXml();
             m_Menu.RootName = Caller.GetType().Name;
+
+            Caller.SetSelectorMenu(m_Menu);
+            Caller.SelectedItem = null;
+            
             XmlDocument doc = new XmlDocument();
             XmlElement root = doc.CreateElement("root");
             Caller.AddToMenu(root);
+
             XmlElement menu = root.FirstChild as XmlElement;
             if (menu == null)
                 return "";
@@ -97,7 +101,7 @@ namespace BH.UI.Excel.Templates
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private IExcelSelectorMenu m_Menu;
+        private SelectorMenu_RibbonXml m_Menu;
 
         /*******************************************/
     }
