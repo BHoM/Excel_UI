@@ -55,9 +55,9 @@ namespace BH.UI.Excel
         /*******************************************/
 
         [ExcelCommand(ShortCut = "^B")]
-        public static void InitGlobalSearch()
+        public static void OpenGlobalSearch()
         {
-            m_Instance.m_CurrentSelection = Engine.Excel.Query.Selection();
+            m_CurrentSelection = Engine.Excel.Query.Selection();
             var control = new System.Windows.Forms.ContainerControl();
             m_GlobalSearch.SetParent(control);
         }
@@ -67,7 +67,25 @@ namespace BH.UI.Excel
         /**** Private Methods                   ****/
         /*******************************************/
 
-        private void GlobalSearch_ItemSelected(object sender, oM.UI.ComponentRequest e)
+        protected void InitGlobalSearch()
+        {
+            if (m_GlobalSearch == null)
+            {
+                try
+                {
+                    m_GlobalSearch = new SearchMenu_WinForm();
+                    m_GlobalSearch.ItemSelected += GlobalSearch_ItemSelected;
+                }
+                catch (Exception e)
+                {
+                    Engine.Reflection.Compute.RecordError(e.Message);
+                }
+            }
+        }
+
+        /*******************************************/
+
+        protected void GlobalSearch_ItemSelected(object sender, oM.UI.ComponentRequest e)
         {
             if (e != null && e.CallerType != null && Callers.ContainsKey(e.CallerType.Name))
             {
@@ -81,7 +99,8 @@ namespace BH.UI.Excel
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private oM.Excel.Reference m_CurrentSelection;
+        private static SearchMenu m_GlobalSearch = null;
+        private static oM.Excel.Reference m_CurrentSelection = null;
 
         /*******************************************/
     }

@@ -54,33 +54,24 @@ namespace BH.UI.Excel
         /**** Properties                        ****/
         /*******************************************/
 
-        public static Dictionary<string, CallerFormula> Callers
-        {
-            get
-            {
-                if (m_Instance.m_Callers == null)
-                    m_Instance.InitCallers();
-                return m_Instance.m_Callers;
-            }
-        }
+        public static Dictionary<string, CallerFormula> Callers { get; private set; }
+
 
         /*******************************************/
-        /**** Private Methods                   ****/
+        /**** Constructors                      ****/
         /*******************************************/
 
-        private void InitCallers()
+        static AddIn()
         {
-            Type callform = typeof(CallerFormula);
-
-            Type[] constrtypes = new Type[] { };
-            object[] args = new object[] { };
-
-            m_Callers = ExcelIntegration.GetExportedAssemblies()
+            // Collect the callers from assemblies
+            Callers = ExcelIntegration.GetExportedAssemblies()
                 .SelectMany(a => a.GetTypes())
-                .Where(t => t.Namespace == "BH.UI.Excel.Components" && callform.IsAssignableFrom(t))
-                .Select(t => t.GetConstructor(constrtypes).Invoke(args) as CallerFormula)
+                .Where(t => t.Namespace == "BH.UI.Excel.Components" && typeof(CallerFormula).IsAssignableFrom(t))
+                .Select(t => t.GetConstructor(new Type[] { }).Invoke(new object[] { }) as CallerFormula)
                 .ToDictionary(o => o.Caller.GetType().Name);
-            foreach (var formula in m_Callers.Values)
+
+            // Add the event listeners
+            foreach (var formula in Callers.Values)
             {
                 formula.OnRun += (s, e) =>
                 {
@@ -96,17 +87,6 @@ namespace BH.UI.Excel
             }
         }
 
-
-        /*******************************************/
-        /**** Private Fields                    ****/
-        /*******************************************/
-
-        private Application m_Application;
-        private Dictionary<string, CallerFormula> m_Callers;
-
-        private static AddIn m_Instance = null;
-        private static SearchMenu m_GlobalSearch = null;
-        
         /*******************************************/
     }
 }

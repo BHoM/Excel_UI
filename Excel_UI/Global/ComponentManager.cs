@@ -14,6 +14,13 @@ namespace BH.UI.Excel.Global
     class ComponentManager : IDisposable
     {
         /*************************************/
+        /**** Events                      ****/
+        /*************************************/
+
+        public static event EventHandler<KeyValuePair<string, Tuple<string, string>>> ComponentRestored;
+
+
+        /*************************************/
         /**** Methods                     ****/
         /*************************************/
 
@@ -39,6 +46,7 @@ namespace BH.UI.Excel.Global
         }
 
         /*************************************/
+
         public static bool RemoveManager(Workbook workbook)
         {
             try
@@ -117,9 +125,26 @@ namespace BH.UI.Excel.Global
 
         public void Restore()
         {
-            foreach (var req in GetComponents())
+            foreach (var restored in GetComponents())
             {
-                ComponentRestored?.Invoke(this, req);
+                string key = restored.Key;
+                string json = restored.Value.Item2;
+                string callerType = restored.Value.Item1;
+                if (AddIn.Callers.ContainsKey(callerType))
+                {
+                    var formula = AddIn.Callers[callerType];
+                    if (formula.Caller.Read(json))
+                    {
+                        if (formula.Function != key)
+                        {
+                            if (formula.Caller.SelectedItem != null)
+                                new UI.Global.ComponentUpgrader(key, formula); // TODO: Look into this, seems weird
+                            else
+                                return;
+                        }
+                        formula.Register();
+                    }
+                }
             }
 
             if (m_Sheet == null)
@@ -143,11 +168,6 @@ namespace BH.UI.Excel.Global
             m_Managers.Remove(m_Name);
         }
 
-        /*************************************/
-        /**** Events                      ****/
-        /*************************************/
-
-        public static event EventHandler<KeyValuePair<string, Tuple<string, string>>> ComponentRestored;
 
         /*************************************/
         /**** Private Methods             ****/

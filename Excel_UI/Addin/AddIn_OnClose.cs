@@ -61,8 +61,13 @@ namespace BH.UI.Excel
                 // note: This method only runs if the Addin gets disabled during
                 // execution, it does not run when excel closes.
                 ExcelDna.IntelliSense.IntelliSenseServer.Uninstall();
-                m_Application.WorkbookOpenEvent -= App_WorkbookOpen;
-                m_Application.WorkbookBeforeCloseEvent -= App_WorkbookClosed;
+
+                Application app = Application.GetActiveInstance();
+                if (app != null)
+                {
+                    app.WorkbookOpenEvent -= App_WorkbookOpen;
+                    app.WorkbookBeforeCloseEvent -= App_WorkbookClosed;
+                }   
             }
             catch { }
         }
@@ -76,12 +81,6 @@ namespace BH.UI.Excel
         {
             ComponentManager.RemoveManager(workbook);
         }
-
-        /*******************************************/
-        /**** Private Fields                    ****/
-        /*******************************************/
-
-
 
         /*******************************************/
     }
