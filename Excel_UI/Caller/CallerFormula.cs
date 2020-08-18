@@ -61,13 +61,10 @@ namespace BH.UI.Excel.Templates
                 if (hasParams)
                 {
                     params_ = "?by_" + paramList
-                        .Select(p => p.DataType.ToText())
+                        .Select(p => p.DataType.ToText(false, false, "Of", "_", ""))
                         .Select(p => p.Replace("[]", "s"))
                         .Select(p => p.Replace("[,]", "Matrix"))
                         .Select(p => p.Replace("&", ""))
-                        .Select(p => p.Replace("<", "Of"))
-                        .Select(p => p.Replace(">", ""))
-                        .Select(p => p.Replace(", ", "_"))
                         .Select(p => p.Replace("`", "_"))
                         .Aggregate((a, b) => $"{a}_{b}");
                 }

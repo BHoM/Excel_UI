@@ -58,13 +58,19 @@ namespace BH.UI.Excel
 
         public void AutoOpen()
         {
-            m_Instance = this;
-
+            // Install Excel DNA intelisense
             ExcelDna.IntelliSense.IntelliSenseServer.Install();
+
+            // Initialise the BHoM
             ExcelAsyncUtil.QueueAsMacro(() => InitBHoMAddin());
 
-            m_Application = Application.GetActiveInstance();
-            m_Application.WorkbookOpenEvent += App_WorkbookOpen;
+            // Events on Excel itself
+            Application app = Application.GetActiveInstance();
+            if (app != null)
+            {
+                app.WorkbookOpenEvent += App_WorkbookOpen;
+                app.WorkbookBeforeCloseEvent += App_WorkbookClosed;
+            }
         }
 
 
@@ -72,54 +78,20 @@ namespace BH.UI.Excel
         /**** Private Methods                   ****/
         /*******************************************/
 
-        private bool InitBHoMAddin()
+        private void InitBHoMAddin()
         {
+            // Make sure we initialise only once
             if (m_Initialised)
-                return true;
-            if (m_GlobalSearch == null)
-            {
-                try
-                {
-                    m_GlobalSearch = new SearchMenu_WinForm();
-                    m_GlobalSearch.ItemSelected += GlobalSearch_ItemSelected;
-                }
-                catch (Exception e)
-                {
-                    Engine.Reflection.Compute.RecordError(e.Message);
-                }
-            }
-            ComponentManager.ComponentRestored += ComponentManager_ComponentRestored;
-            m_Application.WorkbookBeforeCloseEvent += App_WorkbookClosed;
+                return;
+            m_Initialised = true;
 
+            // Set up Excel DNA
             ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
             ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
-            m_Initialised = true;
+            
+            // Initialise global search
+            InitGlobalSearch();
             ExcelDna.Logging.LogDisplay.Clear();
-            return true;
-        }
-
-        /*******************************************/
-
-        private void ComponentManager_ComponentRestored(object sender, KeyValuePair<string, Tuple<string, string>> restored)
-        {
-            string key = restored.Key;
-            string json = restored.Value.Item2;
-            string callerType = restored.Value.Item1;
-            if (Callers.ContainsKey(callerType))
-            {
-                var formula = Callers[callerType];
-                if (formula.Caller.Read(json))
-                {
-                    if (formula.Function != key)
-                    {
-                        if (formula.Caller.SelectedItem != null)
-                            new UI.Global.ComponentUpgrader(key, formula); // TODO: Look into this, seems weird
-                        else
-                            return;
-                    }
-                    formula.Register();
-                }
-            }
         }
 
         /*******************************************/
@@ -137,7 +109,6 @@ namespace BH.UI.Excel
                 return;
 
             // Initialise the BHoM Addin and run first calculation
-
             ExcelAsyncUtil.QueueAsMacro(() =>
             {
                 bool hasComponents = sheets.OfType<Worksheet>().FirstOrDefault(s => s.Name == "BHoM_ComponetRequests") != null;
