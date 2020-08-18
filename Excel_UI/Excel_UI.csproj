@@ -163,8 +163,6 @@
     <Compile Include="Components\oM\CreateType.cs" />
     <Compile Include="Global\FormulaSearchMenu.cs" />
     <Compile Include="BHoM_UI_Overrides\SelectorMenu_RibbonXml.cs" />
-    <Compile Include="BHoM_UI_Overrides\IExcelSelectorMenu.cs" />
-    <Compile Include="BHoM_UI_Overrides\SelectorMenuUtil.cs" />
     <Compile Include="Caller\CallerFormula.cs" />
   </ItemGroup>
   <ItemGroup>

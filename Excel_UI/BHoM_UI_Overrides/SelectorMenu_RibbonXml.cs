@@ -37,7 +37,7 @@ using BH.UI.Base.Menus;
 
 namespace BH.UI.Excel.Templates
 {
-    public class SelectorMenu_RibbonXml<T> : ItemSelectorMenu<T, XmlElement>, IExcelSelectorMenu
+    public class SelectorMenu_RibbonXml : ItemSelectorMenu<XmlElement>
     {
         /*******************************************/
         /**** Properties                        ****/
@@ -74,14 +74,14 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
-        protected override void AddTree(XmlElement menu, Tree<T> itemTree)
+        protected override void AddTree(XmlElement menu, Tree<object> itemTree)
         {
             AppendMenuTree(itemTree, menu);
         }
 
         /*******************************************/
 
-        private void AppendMenuTree(Tree<T> tree, XmlElement menu)
+        private void AppendMenuTree(Tree<object> tree, XmlElement menu)
         {
             XmlDocument document = menu.OwnerDocument;
             XmlElement element;
@@ -89,12 +89,12 @@ namespace BH.UI.Excel.Templates
             if (tree.Children.Count > 0)
             {
                 element = document.CreateElement("menu");
-                foreach (Tree<T> childTree in tree.Children.Values.OrderBy(x => x.Name))
+                foreach (Tree<object> childTree in tree.Children.Values.OrderBy(x => x.Name))
                     AppendMenuTree(childTree, element);
             }
             else
             {
-                T method = tree.Value;
+                object method = tree.Value;
                 element = document.CreateElement("button");
                 element.SetAttribute("onAction", "FillFormula");
                 string description = method.IDescription();
@@ -117,7 +117,7 @@ namespace BH.UI.Excel.Templates
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private Dictionary<string, T> m_ItemLinks = new Dictionary<string, T>();
+        private Dictionary<string, object> m_ItemLinks = new Dictionary<string, object>();
 
         /*******************************************/
     }
