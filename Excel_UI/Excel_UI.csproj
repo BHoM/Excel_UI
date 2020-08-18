@@ -161,7 +161,6 @@
     <Compile Include="Components\oM\CreateEnum.cs" />
     <Compile Include="Components\oM\CreateObject.cs" />
     <Compile Include="Components\oM\CreateType.cs" />
-    <Compile Include="Global\FormulaSearchMenu.cs" />
     <Compile Include="BHoM_UI_Overrides\SelectorMenu_RibbonXml.cs" />
     <Compile Include="Caller\CallerFormula.cs" />
   </ItemGroup>
