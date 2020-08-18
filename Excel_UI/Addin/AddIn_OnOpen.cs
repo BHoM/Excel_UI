@@ -112,12 +112,7 @@ namespace BH.UI.Excel
             ExcelAsyncUtil.QueueAsMacro(() =>
             {
                 bool hasComponents = sheets.OfType<Worksheet>().FirstOrDefault(s => s.Name == "BHoM_ComponetRequests") != null;
-                if (!hasComponents)
-                {
-                    var searcher = new FormulaSearchMenu(Callers); //TODO: Look into this, seems weird
-                    searcher.SetParent(null);
-                }
-                else
+                if (hasComponents)
                     ComponentManager.GetManager(workbook).Restore();
 
                 ExcelAsyncUtil.QueueAsMacro(() =>

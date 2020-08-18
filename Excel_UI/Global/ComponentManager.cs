@@ -14,13 +14,6 @@ namespace BH.UI.Excel.Global
     class ComponentManager : IDisposable
     {
         /*************************************/
-        /**** Events                      ****/
-        /*************************************/
-
-        public static event EventHandler<KeyValuePair<string, Tuple<string, string>>> ComponentRestored;
-
-
-        /*************************************/
         /**** Methods                     ****/
         /*************************************/
 
