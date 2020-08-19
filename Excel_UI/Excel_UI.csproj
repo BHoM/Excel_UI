@@ -116,6 +116,7 @@
     <Compile Include="Addin\AddIn_OnClose.cs" />
     <Compile Include="Addin\AddIn_OnOpen.cs" />
     <Compile Include="Addin\AddIn.cs" />
+    <Compile Include="Addin\Ribbon_UICommands.cs" />
     <Compile Include="Addin\Ribbon.cs" />
     <Compile Include="Caller\CallerFormula_Run.cs" />
     <Compile Include="Caller\CallerFormula_SetItem.cs" />
