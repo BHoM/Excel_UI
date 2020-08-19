@@ -34,7 +34,7 @@ using System.Xml;
 namespace BH.UI.Excel.Addin
 {
     [ComVisible(true)]
-    public class Ribbon : ExcelRibbon
+    public partial class Ribbon : ExcelRibbon
     {
         /*******************************************/
         /**** Override Methods                  ****/
@@ -48,10 +48,13 @@ namespace BH.UI.Excel.Addin
         <tabs>
           <tab id='bhomTab' label='BHoM'>
             {GetRibbonXml()}
+            <group id='ui' label='UI'>
+                <button id='internalise' onAction='Internalise' label='Internalise data' imageMso='RecordsSaveRecord' supertip='Save the value of the selected cells so it will stil lbe available when the file is reopened.' />
+            </group>
             <group id='help' label='Help'>
-                <button id='xlwiki' onAction='OpenLink' size='large' label='BHoM Excel Wiki' imageMso='Help' tag='https://github.com/BHoM/Excel_Toolkit/wiki' supertip='Go to the BHoM Excel plugin wiki to view help documentation relating to this plugin' />
-                <button id='mainwiki' onAction='OpenLink' label='BHoM Wiki' imageMso='Help' tag='https://github.com/BHoM/documentation/wiki' supertip='Go to the core BHoM wiki to view documentation relating the BHoM' />
-                <button id='bhomxyz' onAction='OpenLink' imageMso='GetExternalDataFromWeb' label='bhom.xyz' tag='https://bhom.xyz' supertip='Visit the BHoM website' />
+                <button id='xlwiki' onAction='OpenLink' size='large' label='BHoM Excel Wiki' imageMso='Help' tag='https://github.com/BHoM/Excel_Toolkit/wiki' supertip='Go to the BHoM Excel plugin wiki to view help documentation relating to this plugin.' />
+                <button id='mainwiki' onAction='OpenLink' label='BHoM Wiki' imageMso='Help' tag='https://github.com/BHoM/documentation/wiki' supertip='Go to the core BHoM wiki to view documentation relating the BHoM.' />
+                <button id='bhomxyz' onAction='OpenLink' imageMso='GetExternalDataFromWeb' label='bhom.xyz' tag='https://bhom.xyz' supertip='Visit the BHoM website.' />
             </group>
           </tab>
         </tabs>
