@@ -29,14 +29,8 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq.Expressions;
 using NetOffice.ExcelApi;
-using System.Drawing;
-using System.Xml;
 using BH.oM.UI;
-using BH.Engine.Base;
-using BH.Engine.Serialiser;
-using NetOffice.ExcelApi.Enums;
 using BH.UI.Base;
-using BH.oM.Base;
 using BH.UI.Excel.Templates;
 
 namespace BH.UI.Excel
@@ -86,13 +80,17 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        public static void RestoreCallers()
+        public static void RestoreFormulas()
         {
             // Get the hidden worksheet
-            Worksheet sheet = Sheet("BHoM_CallersHidden");
+            Worksheet sheet = Sheet("BHoM_CallersHidden", false);
             if (sheet == null)
+            {
+                Old_Restore(); // is it an old version of an Excel file ?
                 return;
+            }
 
+            // Get all the formulas stored in teh BHoM_CallersHidden sheet
             for (int i = 1; i < 10000; i++)
             {
                 // Recover the information about the formula
@@ -201,7 +199,7 @@ namespace BH.UI.Excel
         private static void SaveCallerToHiddenSheet(Caller caller)
         {
             // Get the hidden worksheet
-            Worksheet sheet = Sheet("BHoM_CallersHidden");
+            Worksheet sheet = Sheet("BHoM_CallersHidden", true, true);
             if (sheet == null)
                 return;
 

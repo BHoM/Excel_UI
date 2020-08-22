@@ -27,24 +27,8 @@ using System.Linq;
 using ExcelDna.Integration;
 using System.Collections.Generic;
 using System.Collections;
-using BH.Engine.Reflection;
-using BH.oM.Base;
-using System.Linq.Expressions;
-using BH.UI.Base;
-using BH.UI.Excel.Templates;
-using BH.UI.Excel.Components;
-using BH.UI.Excel.Global;
-using BH.UI.Base.Global;
-using BH.UI.Base.Components;
-using System.Runtime.InteropServices;
 using NetOffice.ExcelApi;
-using NetOffice.OfficeApi;
-using NetOffice.OfficeApi.Enums;
-using NetOffice.ExcelApi.Enums;
-using System.Drawing;
-using System.Xml;
-using BH.oM.UI;
-using BH.Engine.Base;
+
 
 namespace BH.UI.Excel
 {
@@ -120,7 +104,7 @@ namespace BH.UI.Excel
         {
             // Restore internalised data and callers
             RestoreData();
-            RestoreCallers();
+            RestoreFormulas();
 
             // Initialise the BHoM Addin and run first calculation
             ExcelAsyncUtil.QueueAsMacro(() =>
