@@ -54,7 +54,9 @@ namespace BH.UI.Excel
         /**** Properties                        ****/
         /*******************************************/
 
-        public static Dictionary<string, CallerFormula> Callers { get; private set; }
+        public static Dictionary<string, CallerFormula> CallerShells { get; private set; } = new Dictionary<string, CallerFormula>();
+
+        //public static Dictionary<string, CallerFormula> CallerInstances { get; private set; } = new Dictionary<string, CallerFormula>();
 
 
         /*******************************************/
@@ -64,27 +66,34 @@ namespace BH.UI.Excel
         static AddIn()
         {
             // Collect the callers from assemblies
-            Callers = ExcelIntegration.GetExportedAssemblies()
+            CallerShells = ExcelIntegration.GetExportedAssemblies()
                 .SelectMany(a => a.GetTypes())
                 .Where(t => t.Namespace == "BH.UI.Excel.Components" && typeof(CallerFormula).IsAssignableFrom(t))
-                .Select(t => t.GetConstructor(new Type[] { }).Invoke(new object[] { }) as CallerFormula)
+                .Select(t => InstantiateCaller(t))
                 .ToDictionary(o => o.Caller.GetType().Name);
+        }
 
-            // Add the event listeners
-            foreach (var formula in Callers.Values)
-            {
-                formula.OnRun += (s, e) =>
-                {
-                    var f = (s as CallerFormula);
-                    var caller = f.Caller;
-                    string name = Engine.Excel.Query.Filename();
-                    var manager = ComponentManager.GetManager(name);
-                    if (manager != null)
-                    {
-                        manager.Store(caller, f.Function);
-                    }
-                };
-            }
+        /*******************************************/
+
+        public static CallerFormula InstantiateCaller(Type formulaType, object selectedItem = null)
+        {
+            CallerFormula instance = formulaType.GetConstructor(new Type[] { }).Invoke(new object[] { }) as CallerFormula;
+
+            if (selectedItem != null)
+                instance.Caller.SetItem(selectedItem);
+            //CallerInstances[instance.Function] = instance;
+
+            return instance;
+        }
+
+        /*******************************************/
+
+        public static CallerFormula InstantiateCaller(string callerName, object selectedItem = null)
+        {
+            if (CallerShells.ContainsKey(callerName))
+                return InstantiateCaller(CallerShells[callerName].GetType(), selectedItem);
+            else
+                return null;
         }
 
         /*******************************************/

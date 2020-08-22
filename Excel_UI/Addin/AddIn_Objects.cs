@@ -54,53 +54,89 @@ namespace BH.UI.Excel
         /**** Methods                           ****/
         /*******************************************/
 
-        [ExcelCommand(ShortCut = "^B")]
-        public static void OpenGlobalSearch()
+        public static string IAddObject(object item)
         {
-            m_CurrentSelection = Engine.Excel.Query.Selection();
-            var control = new System.Windows.Forms.ContainerControl();
-            m_GlobalSearch.SetParent(control);
+            return AddObject(item as dynamic);
         }
 
+        /*******************************************/
+
+        public static void IAddObject(object item, string id)
+        {
+            m_Objects[id] = item;
+        }
+
+        /*******************************************/
+
+        public static object GetObject(string key)
+        {
+            // Make sure the key is an id
+            string id = GetId(key);
+            if (id.Length > 0)
+                key = id;
+
+            // Return the object if in dictionary, return null otherwise
+            if (m_Objects.ContainsKey(key))
+                return m_Objects[key];
+            else
+                return null;
+        }
+
+        /*******************************************/
+
+        public static string GetId(string key)
+        {
+            // Make sure the key is an id
+            int start = key.LastIndexOf("[");
+            int end = key.LastIndexOf("]");
+            if (start != -1 && end != -1 && end > start)
+                return key.Substring(++start, end - start);
+            else
+                return "";
+        }
+
+        /*******************************************/
+
+        public static void ClearObjects()
+        {
+            m_Objects.Clear();
+        }
 
         /*******************************************/
         /**** Private Methods                   ****/
         /*******************************************/
 
-        protected void InitGlobalSearch()
+        private static string AddObject(object item)
         {
-            if (m_GlobalSearch == null)
-            {
-                try
-                {
-                    m_GlobalSearch = new SearchMenu_WinForm();
-                    m_GlobalSearch.ItemSelected += GlobalSearch_ItemSelected;
-                }
-                catch (Exception e)
-                {
-                    Engine.Reflection.Compute.RecordError(e.Message);
-                }
-            }
+            string id = ToString(Guid.NewGuid());
+            m_Objects[id] = item;
+
+            return id;
         }
 
         /*******************************************/
 
-        protected void GlobalSearch_ItemSelected(object sender, oM.UI.ComponentRequest e)
+        private static string AddObject(IBHoMObject item)
         {
-            if (e != null && e.CallerType != null)
-            {
-                CallerFormula formula = InstantiateCaller(e.CallerType.Name, e.SelectedItem);
-                if (formula != null)
-                    formula.FillFormula(m_CurrentSelection);
-            }
+            string id = ToString(item.BHoM_Guid);
+            m_Objects[id] = item;
+
+            return id;
         }
+
+        /*****************************************/
+
+        private static string ToString(Guid id)
+        {
+            return System.Convert.ToBase64String(id.ToByteArray()).Remove(8);
+        }
+
 
         /*******************************************/
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private static SearchMenu m_GlobalSearch = null;
-        private static oM.Excel.Reference m_CurrentSelection = null;
+        private static Dictionary<string, object> m_Objects = new Dictionary<string, object>(); //TODO: This grows very quickly -> need to find a way to remove old objects too
 
         /*******************************************/
     }

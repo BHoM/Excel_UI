@@ -79,7 +79,7 @@ namespace BH.UI.Excel.Templates
             if (Outputs.Count == 1)
                 return Outputs[0];
             else
-                return Project.ActiveProject.ToExcel(Outputs.ToList());
+                return ToExcel(Outputs.ToList());
         }
 
 
@@ -229,7 +229,7 @@ namespace BH.UI.Excel.Templates
             while (Outputs.Count <= index)
                 Outputs.Add(null);
 
-            Outputs[index] = Project.ActiveProject.ToExcel(data);
+            Outputs[index] = ToExcel(data);
             return true;
         }
 
@@ -268,7 +268,7 @@ namespace BH.UI.Excel.Templates
             }
             if (input is string)
             {
-                object obj = Project.ActiveProject.GetAny(input as string);
+                object obj = AddIn.GetObject(input as string);  
                 return obj == null ? input : obj;
             }
             if (input is object[,])
@@ -296,6 +296,49 @@ namespace BH.UI.Excel.Templates
                 }
             }
             return evaluated;
+        }
+
+        /*******************************************/
+
+        public static object ToExcel(object data) // TODO: make it private once fixed Explode
+        {
+            try
+            {
+                if (data == null)
+                {
+                    return ExcelError.ExcelErrorNull;
+                }
+                if (data.GetType().IsPrimitive || data is string || data is object[,])
+                {
+                    return data;
+                }
+                if (data is Guid)
+                {
+                    return data.ToString();
+                }
+                if (data is IEnumerable && !(data is ICollection))
+                {
+                    return ToExcel((data as IEnumerable).Cast<object>().ToList());
+                }
+                if (data.GetType().IsEnum)
+                {
+                    return Enum.GetName(data.GetType(), data);
+                }
+                if (data is DateTime)
+                {
+                    DateTime? date = data as DateTime?;
+                    if (date.HasValue)
+                    {
+                        return date.Value.ToOADate();
+                    }
+                }
+                return data.GetType().ToText() + " [" + AddIn.IAddObject(data) + "]";
+
+            }
+            catch
+            {
+                return ExcelError.ExcelErrorValue;
+            }
         }
 
         /*******************************************/

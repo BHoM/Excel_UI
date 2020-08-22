@@ -56,15 +56,7 @@ namespace BH.UI.Excel.Components
             var names = MultiChoiceCaller.GetChoiceNames();
             return MultiChoiceCaller.Choices.Select((o, i) =>
             {
-                string id;
-                if (o is IBHoMObject)
-                {
-                    id = Project.ActiveProject.IAdd(o, ((IBHoMObject)o).BHoM_Guid);
-                }
-                else
-                {
-                    id = Project.ActiveProject.IAdd(o);
-                }
+                string id = AddIn.IAddObject(o);
                 return $"{names[i]} [{id}]";
             }).ToList();
         }

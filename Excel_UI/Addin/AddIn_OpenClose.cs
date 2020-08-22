@@ -50,8 +50,29 @@ namespace BH.UI.Excel
 {
     public partial class AddIn : IExcelAddIn
     {
+
+
         /*******************************************/
         /**** Methods                           ****/
+        /*******************************************/
+
+        public void AutoOpen()
+        {
+            // Install Excel DNA intelisense
+            ExcelDna.IntelliSense.IntelliSenseServer.Install();
+
+            // Initialise the BHoM
+            ExcelAsyncUtil.QueueAsMacro(() => InitBHoMAddin());
+
+            // Events on Excel itself
+            Application app = Application.GetActiveInstance();
+            if (app != null)
+            {
+                app.WorkbookOpenEvent += App_WorkbookOpen;
+                app.WorkbookBeforeCloseEvent += App_WorkbookClosed;
+            }
+        }
+
         /*******************************************/
 
         public void AutoClose()
@@ -67,7 +88,7 @@ namespace BH.UI.Excel
                 {
                     app.WorkbookOpenEvent -= App_WorkbookOpen;
                     app.WorkbookBeforeCloseEvent -= App_WorkbookClosed;
-                }   
+                }
             }
             catch { }
         }
@@ -77,10 +98,56 @@ namespace BH.UI.Excel
         /**** Private Methods                   ****/
         /*******************************************/
 
+        private void InitBHoMAddin()
+        {
+            // Make sure we initialise only once
+            if (m_Initialised)
+                return;
+            m_Initialised = true;
+
+            // Set up Excel DNA
+            ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
+            ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
+            
+            // Initialise global search
+            InitGlobalSearch();
+            ExcelDna.Logging.LogDisplay.Clear();
+        }
+
+        /*******************************************/
+
+        private void App_WorkbookOpen(Workbook workbook)
+        {
+            // Restore internalised data and callers
+            RestoreData();
+            RestoreCallers();
+
+            // Initialise the BHoM Addin and run first calculation
+            ExcelAsyncUtil.QueueAsMacro(() =>
+            {
+                foreach (Worksheet sheet in workbook.Sheets.OfType<Worksheet>())
+                {
+                    bool before = sheet.EnableCalculation;
+                    sheet.EnableCalculation = false;
+                    sheet.Calculate();
+                    sheet.EnableCalculation = before;
+                }
+            });
+        }
+
+        /*******************************************/
+
         private void App_WorkbookClosed(Workbook workbook, ref bool cancel)
         {
-            ComponentManager.RemoveManager(workbook);
+            ClearObjects();
         }
+
+
+        /*******************************************/
+        /**** Private Fields                    ****/
+        /*******************************************/
+
+        private bool m_Initialised = false;
 
         /*******************************************/
     }
