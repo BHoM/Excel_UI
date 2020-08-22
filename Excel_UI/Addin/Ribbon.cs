@@ -75,7 +75,7 @@ namespace BH.UI.Excel.Addin
             XmlDocument doc = new XmlDocument();
             XmlElement root = doc.CreateElement("root");
             doc.AppendChild(root);
-            foreach (CallerFormula caller in AddIn.Callers.Values)
+            foreach (CallerFormula caller in AddIn.CallerShells.Values)
             {
                 try
                 {
@@ -149,9 +149,9 @@ namespace BH.UI.Excel.Addin
 
         public static CallerFormula GetCaller(string caller)
         {
-            if (AddIn.Callers.ContainsKey(caller))
+            if (AddIn.CallerShells.ContainsKey(caller))
             {
-                return AddIn.Callers[caller];
+                return AddIn.CallerShells[caller];
             }
             return null;
         }

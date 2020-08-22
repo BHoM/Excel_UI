@@ -27,24 +27,14 @@ using System.Linq;
 using ExcelDna.Integration;
 using System.Collections.Generic;
 using System.Collections;
-using BH.Engine.Reflection;
-using BH.oM.Base;
 using System.Linq.Expressions;
-using BH.UI.Base;
-using BH.UI.Excel.Templates;
-using BH.UI.Excel.Components;
-using BH.UI.Excel.Global;
-using BH.UI.Base.Global;
-using BH.UI.Base.Components;
-using System.Runtime.InteropServices;
 using NetOffice.ExcelApi;
-using NetOffice.OfficeApi;
-using NetOffice.OfficeApi.Enums;
-using NetOffice.ExcelApi.Enums;
 using System.Drawing;
 using System.Xml;
 using BH.oM.UI;
 using BH.Engine.Base;
+using BH.Engine.Serialiser;
+using NetOffice.ExcelApi.Enums;
 
 namespace BH.UI.Excel
 {
@@ -54,53 +44,53 @@ namespace BH.UI.Excel
         /**** Methods                           ****/
         /*******************************************/
 
-        [ExcelCommand(ShortCut = "^B")]
-        public static void OpenGlobalSearch()
+        public static Worksheet Sheet(string name, bool addIfMissing = true, bool isHidden = false)
         {
-            m_CurrentSelection = Engine.Excel.Query.Selection();
-            var control = new System.Windows.Forms.ContainerControl();
-            m_GlobalSearch.SetParent(control);
+            // Look for the sheet in the dictionary first
+            if (m_SheetReferences.ContainsKey(name) && !m_SheetReferences[name].IsDisposed)
+                return m_SheetReferences[name];
+
+            // Look for the sheet in the active workbook
+            Application app = Application.GetActiveInstance();
+            Workbook workbook = app.ActiveWorkbook;
+            Worksheet sheet = null;
+            if (workbook.Sheets.OfType<Worksheet>().Any(x => x.Name == name))
+                sheet = workbook.Sheets[name] as Worksheet;
+
+            // If sheet doesn't exist, create it if requested
+            if (sheet == null && addIfMissing)
+            {
+                sheet = workbook.Sheets.Add() as Worksheet;
+                sheet.Name = name;
+
+                if (isHidden)
+                    sheet.Visible = XlSheetVisibility.xlSheetHidden;
+            }
+
+            // Return the sheet
+            return sheet;
         }
 
-
-        /*******************************************/
-        /**** Private Methods                   ****/
         /*******************************************/
 
-        protected void InitGlobalSearch()
+        public static object FromExcel(object item)
         {
-            if (m_GlobalSearch == null)
-            {
-                try
-                {
-                    m_GlobalSearch = new SearchMenu_WinForm();
-                    m_GlobalSearch.ItemSelected += GlobalSearch_ItemSelected;
-                }
-                catch (Exception e)
-                {
-                    Engine.Reflection.Compute.RecordError(e.Message);
-                }
-            }
+            return item;
         }
 
         /*******************************************/
 
-        protected void GlobalSearch_ItemSelected(object sender, oM.UI.ComponentRequest e)
+        public static object ToExcel(object item)
         {
-            if (e != null && e.CallerType != null)
-            {
-                CallerFormula formula = InstantiateCaller(e.CallerType.Name, e.SelectedItem);
-                if (formula != null)
-                    formula.FillFormula(m_CurrentSelection);
-            }
+            return item;
         }
 
         /*******************************************/
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private static SearchMenu m_GlobalSearch = null;
-        private static oM.Excel.Reference m_CurrentSelection = null;
+        private static Dictionary<string, Worksheet> m_SheetReferences = new Dictionary<string, Worksheet>();
+
 
         /*******************************************/
     }

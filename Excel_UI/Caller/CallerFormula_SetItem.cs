@@ -46,7 +46,7 @@ namespace BH.UI.Excel.Templates
 
         public void FillFormula(oM.Excel.Reference cell)
         {
-            Register(() => Fill(cell));
+            AddIn.Register(this, () => Fill(cell));
         }
 
 

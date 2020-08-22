@@ -23,6 +23,7 @@
 using BH.Engine.Excel;
 using BH.Engine.Reflection;
 using BH.oM.Base;
+using BH.UI.Excel.Templates;
 using ExcelDna.Integration;
 using System;
 using System.Collections;
@@ -91,7 +92,7 @@ namespace BH.UI.Excel.Callers
                 foreach (KeyValuePair<string, object> kvp in props[0])
                 {
                     outArr[0, counter] = kvp.Key;
-                    outArr[1, counter] = Project.ActiveProject.ToExcel(kvp.Value);
+                    outArr[1, counter] = FormulaDataAccessor.ToExcel(kvp.Value);
                     counter++;
                 }
 
@@ -100,7 +101,7 @@ namespace BH.UI.Excel.Callers
                     counter = 0;
                     foreach (KeyValuePair<string, object> kvp in props[i])
                     {
-                        outArr[i + 1, counter] = Project.ActiveProject.ToExcel(kvp.Value);
+                        outArr[i + 1, counter] = FormulaDataAccessor.ToExcel(kvp.Value);
                         counter++;
                     }
                 }
@@ -115,7 +116,7 @@ namespace BH.UI.Excel.Callers
                     int counter = 0;
                     foreach (KeyValuePair<string, object> kvp in props[i])
                     {
-                        outArr[i, counter] = Project.ActiveProject.ToExcel(kvp.Value);
+                        outArr[i, counter] = FormulaDataAccessor.ToExcel(kvp.Value);
                         counter++;
                     }
                 }
@@ -194,8 +195,8 @@ namespace BH.UI.Excel.Callers
 
                 foreach (KeyValuePair<string, object> kvp in baseDict)
                 {
-                    object value = Project.ActiveProject.ToExcel(kvp.Value);
-                    object innerObj = Project.ActiveProject.GetAny(value.ToString());
+                    object value = FormulaDataAccessor.ToExcel(kvp.Value);
+                    object innerObj = AddIn.GetObject(value.ToString());
 
                     if (innerObj == null || kvp.Key == "BHoM_Guid")
                         dict[parentType + kvp.Key] = value;

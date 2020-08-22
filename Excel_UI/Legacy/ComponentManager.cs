@@ -14,7 +14,7 @@ namespace BH.UI.Excel.Global
     class ComponentManager : IDisposable
     {
         /*************************************/
-        /**** Methods                     ****/
+        /**** Static Methods              ****/
         /*************************************/
 
         public static ComponentManager GetManager(Workbook workbook)
@@ -55,6 +55,8 @@ namespace BH.UI.Excel.Global
             return false;
         }
 
+        /*************************************/
+        /**** Methods                     ****/
         /*************************************/
 
         public void Store(Caller req, string formula)
@@ -123,9 +125,9 @@ namespace BH.UI.Excel.Global
                 string key = restored.Key;
                 string json = restored.Value.Item2;
                 string callerType = restored.Value.Item1;
-                if (AddIn.Callers.ContainsKey(callerType))
+                if (AddIn.CallerShells.ContainsKey(callerType))
                 {
-                    var formula = AddIn.Callers[callerType];
+                    var formula = AddIn.CallerShells[callerType];
                     if (formula.Caller.Read(json))
                     {
                         if (formula.Function != key)
@@ -135,7 +137,7 @@ namespace BH.UI.Excel.Global
                             else
                                 return;
                         }
-                        formula.Register();
+                        AddIn.Register(formula);
                     }
                 }
             }
@@ -229,15 +231,11 @@ namespace BH.UI.Excel.Global
         {
             m_Name = workbook.Name;
             m_Workbook = workbook;
-            m_Sheets = workbook.Sheets;
-            try
-            {
-                m_Sheet = m_Sheets["BHoM_ComponetRequests"] as Worksheet;
-            }
-            catch
-            {
-                m_Sheet = null;
-            }
+
+            m_Sheet = null;
+            if (workbook.Sheets.Contains("BHoM_ComponetRequests"))
+                m_Sheet = workbook.Sheets["BHoM_ComponetRequests"] as Worksheet;
+
             m_Workbook.AfterSaveEvent += OnWorkbookSaved;
         }
 
@@ -249,7 +247,6 @@ namespace BH.UI.Excel.Global
 
         private HashSet<string> m_Stored = new HashSet<string>();
         private Workbook m_Workbook;
-        private Sheets m_Sheets;
         private Worksheet m_Sheet;
         private string m_Name;
         private object m_Mutex = new object();

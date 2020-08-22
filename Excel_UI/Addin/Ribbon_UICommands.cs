@@ -44,25 +44,7 @@ namespace BH.UI.Excel.Addin
         public void Internalise(IRibbonControl control)
         {
             Application app = Application.GetActiveInstance();
-            Range selected = app.Selection as Range;
-
-            foreach (Range objcell in selected)
-            {
-                string value;
-                try
-                {
-                    value = (string)objcell.Value;
-                    if (value == null || value.Length == 0) continue;
-                }
-                catch { continue; }
-
-                Project proj = Project.ForIDs(new string[] { value });
-
-                if (proj.Count((o) => !(o is Adapter.BHoMAdapter)) == 0) continue;
-                proj.SaveData(app.ActiveWorkbook);
-
-                objcell.Value = value;
-            }
+            AddIn.Internalise(app.Selection as Range);
         }
 
         /*******************************************/

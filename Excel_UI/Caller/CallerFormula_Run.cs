@@ -41,13 +41,6 @@ namespace BH.UI.Excel.Templates
     public abstract partial class CallerFormula
     {
         /*******************************************/
-        /**** Events                            ****/
-        /*******************************************/
-
-        public event EventHandler OnRun;
-
-
-        /*******************************************/
         /**** Methods                           ****/
         /*******************************************/
 
@@ -67,9 +60,6 @@ namespace BH.UI.Excel.Templates
                 Engine.Excel.Query.Caller().Note(errors.Select(e => e.Message).Aggregate((a, b) => a + "\n" + b));
             else
                 Engine.Excel.Query.Caller().Note("");
-
-            // Trigger event (why do we need this ?)
-            OnRun?.Invoke(this, null);
 
             // Return result
             return result;
