@@ -29,13 +29,7 @@ using System.Collections.Generic;
 using System.Collections;
 using System.Linq.Expressions;
 using NetOffice.ExcelApi;
-using System.Drawing;
-using System.Xml;
-using BH.oM.UI;
-using BH.Engine.Base;
 using BH.Engine.Serialiser;
-using NetOffice.ExcelApi.Enums;
-using BH.UI.Base;
 using BH.oM.Base;
 using BH.UI.Excel.Templates;
 using BH.UI.Base.Components;
@@ -101,7 +95,7 @@ namespace BH.UI.Excel
         private static void WriteJsonToSheet(string sheetName, Dictionary<string, object> dic)
         {
             // Get the data sheet
-            Worksheet sheet = Sheet(sheetName);
+            Worksheet sheet = Sheet(sheetName, true, true);
 
             // Save the dictionary as json
             int index = 1;
@@ -123,7 +117,7 @@ namespace BH.UI.Excel
         private static Dictionary<string, object> ReadJsonFromSheet(string sheetName)
         {
             // Get the hidden worksheet
-            Worksheet sheet = Sheet(sheetName);
+            Worksheet sheet = Sheet(sheetName, false);
             if (sheet == null)
                 return new Dictionary<string, object>();
 

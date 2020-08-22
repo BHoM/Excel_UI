@@ -262,16 +262,16 @@ namespace BH.UI.Excel.Templates
 
         private object Evaluate(object input)
         {
-            if (input.GetType().IsPrimitive)
-            {
+            if (input == null)
+                return null;
+            else if (input.GetType().IsPrimitive)
                 return input;
-            }
-            if (input is string)
+            else if (input is string)
             {
                 object obj = AddIn.GetObject(input as string);  
                 return obj == null ? input : obj;
             }
-            if (input is object[,])
+            else if (input is object[,])
             {
                 // Keep the 2D array layout but evaluate members recursively
                 // to convert Guid strings into objects from the Project

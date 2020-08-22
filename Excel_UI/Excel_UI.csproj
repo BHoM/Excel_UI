@@ -112,6 +112,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Addin\AddIn_BackwardCompatibility.cs" />
     <Compile Include="Addin\AddIn_Formulas.cs" />
     <Compile Include="Addin\AddIn_Worksheet.cs" />
     <Compile Include="Addin\AddIn_Internalise.cs" />
@@ -119,8 +120,8 @@
     <Compile Include="Addin\AddIn_Objects.cs" />
     <Compile Include="Addin\AddIn_OpenClose.cs" />
     <Compile Include="Addin\AddIn.cs" />
-    <Compile Include="Addin\Ribbon_UICommands.cs" />
-    <Compile Include="Addin\Ribbon.cs" />
+    <Compile Include="Ribbon\Ribbon_UICommands.cs" />
+    <Compile Include="Ribbon\Ribbon.cs" />
     <Compile Include="Caller\CallerFormula_Run.cs" />
     <Compile Include="Caller\CallerFormula_SetItem.cs" />
     <Compile Include="Caller\CallerFormula_Ribbon.cs" />
@@ -153,8 +154,6 @@
     <Compile Include="Components\Engine\SetProperty.cs" />
     <Compile Include="Components\Engine\ToJson.cs" />
     <Compile Include="Components\oM\CreateData.cs" />
-    <Compile Include="Legacy\ComponentManager.cs" />
-    <Compile Include="Legacy\ComponentUpgrader.cs" />
     <Compile Include="Templates\CallerValueListFormula.cs" />
     <Compile Include="Templates\FormulaDataAccessor.cs" />
     <Compile Include="Templates\SingleOptionCallerFormula.cs" />
