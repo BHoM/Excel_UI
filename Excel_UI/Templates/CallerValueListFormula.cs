@@ -20,18 +20,14 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using BH.Engine.Excel;
 using BH.Engine.Reflection;
 using BH.UI.Base;
 using ExcelDna.Integration;
-using Microsoft.Office.Core;
-using Microsoft.Office.Interop.Excel;
 using NetOffice.ExcelApi;
 using NetOffice.ExcelApi.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.InteropServices;
 
 namespace BH.UI.Excel.Templates
 {
@@ -71,7 +67,7 @@ namespace BH.UI.Excel.Templates
             {
                 if (options.Count() > 0)
                 {
-                    ExcelReference xlref = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
+                    ExcelReference xlref = AddIn.RunningCell();
                     if (xlref != null)
                     {
                         ExcelAsyncUtil.QueueAsMacro(() =>
@@ -104,12 +100,12 @@ namespace BH.UI.Excel.Templates
         /**** Private Methods                   ****/
         /*******************************************/
 
-        protected override void Fill(oM.Excel.Reference cell)
+        protected override void Fill(ExcelReference cell)
         {
             var cellcontents = "=" + Function + "()";
             ExcelAsyncUtil.QueueAsMacro(() =>
             {
-                XlCall.Excel(XlCall.xlcFormula, cellcontents, cell.ToExcel());
+                XlCall.Excel(XlCall.xlcFormula, cellcontents, cell);
             });
         }
 

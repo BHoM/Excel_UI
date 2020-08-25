@@ -20,21 +20,13 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using BH.oM.Base;
 using BH.oM.UI;
-using BH.UI.Base;
 using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using ExcelDna.Integration;
-using System.Linq.Expressions;
-using System.Reflection;
 using BH.Engine.Reflection;
-using BH.Engine.Excel;
-using System.Text.RegularExpressions;
 
 namespace BH.UI.Excel.Templates
 {

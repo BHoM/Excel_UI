@@ -21,7 +21,6 @@
  */
 
 using BH.Engine.Reflection;
-using BH.Engine.Excel;
 using BH.oM.UI;
 using BH.UI.Base;
 using ExcelDna.Integration;

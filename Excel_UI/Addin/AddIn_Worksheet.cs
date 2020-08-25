@@ -35,7 +35,6 @@ using BH.oM.UI;
 using BH.Engine.Base;
 using BH.Engine.Serialiser;
 using NetOffice.ExcelApi.Enums;
-using BH.Engine.Excel;
 
 namespace BH.UI.Excel
 {
@@ -74,23 +73,21 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        public static oM.Excel.Reference RunningCell()
+        public static ExcelReference RunningCell()
         {
-            ExcelReference xlref = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
-            return Engine.Excel.Convert.FromExcel(xlref);
+            return XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
         }
 
         /*******************************************/
 
-        public static oM.Excel.Reference CurrentSelection()
+        public static ExcelReference CurrentSelection()
         {
-            ExcelReference xlref = XlCall.Excel(XlCall.xlfSelection) as ExcelReference;
-            return Engine.Excel.Convert.FromExcel(xlref);
+            return XlCall.Excel(XlCall.xlfSelection) as ExcelReference;
         }
 
         /*******************************************/
 
-        public static bool WriteNote(string message, oM.Excel.Reference reference = null)
+        public static bool WriteNote(string message, ExcelReference reference = null)
         {
             if (reference == null)
                 reference = RunningCell();
@@ -99,7 +96,7 @@ namespace BH.UI.Excel
             {
                 try
                 {
-                    XlCall.Excel(XlCall.xlfNote, message, reference.ToExcel());
+                    XlCall.Excel(XlCall.xlfNote, message, reference);
                 }
                 catch (XlCallException exception)
                 {
