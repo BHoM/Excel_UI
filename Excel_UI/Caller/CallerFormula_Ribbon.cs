@@ -40,14 +40,27 @@ namespace BH.UI.Excel.Templates
         public virtual string GetRibbonXml()
         {
             XmlDocument doc = new XmlDocument();
-            XmlElement menu = doc.CreateElement("dynamicMenu");
-            menu.SetAttribute("id", Caller.GetType().Name);
-            menu.SetAttribute("getImage", "GetImage");
-            menu.SetAttribute("label", MenuRoot);
-            menu.SetAttribute("screentip", MenuRoot);
-            menu.SetAttribute("supertip", Caller.Description);
-            menu.SetAttribute("getContent", "GetContent");
-            return menu.OuterXml;
+            XmlElement element;
+            
+            if (Caller.SelectedItem != null) // Single-Choice caller -> button
+            {
+                element = doc.CreateElement("button");
+                element.SetAttribute("tag", Caller.GetType().Name);
+                element.SetAttribute("onAction", "FillFormula");
+            }
+            else // Multi-Choice caller -> drop down menu
+            {
+                element = doc.CreateElement("dynamicMenu");
+                element.SetAttribute("getContent", "GetContent");
+            }
+            
+            // Configure the menu element
+            element.SetAttribute("id", Caller.GetType().Name);
+            element.SetAttribute("getImage", "GetImage");
+            element.SetAttribute("label", Caller.Name);
+            element.SetAttribute("screentip", Caller.Name);
+            element.SetAttribute("supertip", Caller.Description);
+            return element.OuterXml;
         }
 
         /*******************************************/
@@ -78,16 +91,11 @@ namespace BH.UI.Excel.Templates
         {
             ExcelAsyncUtil.QueueAsMacro(() =>
             {
-                m_Menu.Select(id);
+                if (Caller.SelectedItem == null)
+                    m_Menu.Select(id);
                 FillFormula(AddIn.CurrentSelection());
             });
         }
-
-
-        /*******************************************/
-        /**** Private Methods                   ****/
-        /*******************************************/
-
 
 
         /*******************************************/

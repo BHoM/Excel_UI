@@ -31,7 +31,7 @@ using BH.UI.Excel.Callers;
 namespace BH.UI.Excel.Components
 {
     // Bespoke Excel explode method
-    public class ExplodeFormula : SingleOptionCallerFormula
+    public class ExplodeFormula : CallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/

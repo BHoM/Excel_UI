@@ -32,15 +32,13 @@ using BH.UI.Base.Components;
 
 namespace BH.UI.Excel.Components
 {
-    public class CreateCustomFormula : SingleOptionCallerFormula
+    public class CreateCustomFormula : CallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/
         /*******************************************/
 
         public override Caller Caller { get; } = new CreateCustomCaller(false);
-
-        public override string MenuRoot { get; } = "Create Custom";
 
         public override string Function => GetName();
 

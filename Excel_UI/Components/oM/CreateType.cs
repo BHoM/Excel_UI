@@ -40,8 +40,6 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new CreateTypeCaller();
 
-        public override string MenuRoot { get; } = "Create Type";
-
 
         /*******************************************/
         /**** Methods                           ****/

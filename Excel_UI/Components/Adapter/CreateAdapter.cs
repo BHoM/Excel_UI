@@ -40,8 +40,6 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new CreateAdapterCaller();
 
-        public override string MenuRoot { get; } = "Create Adapter";
-
 
         /*******************************************/
         /**** Methods                           ****/

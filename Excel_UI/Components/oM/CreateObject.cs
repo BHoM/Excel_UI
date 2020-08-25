@@ -42,8 +42,6 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new CreateObjectCaller();
 
-        public override string MenuRoot { get; } = "Create Object";
-
         public override string Function
         {
             get
