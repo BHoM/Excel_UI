@@ -79,10 +79,7 @@ namespace BH.UI.Excel.Templates
                 {
                     var xlRef = cell.ToExcel();
                     XlCall.Excel(XlCall.xlcFormula, cellcontents, xlRef);
-                    using (new ExcelSelectionHelper(xlRef))
-                    {
-                        callback();
-                    }
+                    callback();
                 }
                 catch { }
             });
