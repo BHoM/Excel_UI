@@ -21,6 +21,7 @@
  */
 
 using BH.Engine.Reflection;
+using BH.oM.Base;
 using BH.UI.Base;
 using ExcelDna.Integration;
 using NetOffice.ExcelApi;
@@ -60,9 +61,18 @@ namespace BH.UI.Excel.Templates
 
         public override object Run(object[] inputs)
         {
-            var options = GetChoices().ToArray();
-            bool success = false;
+            // Collect the list of options
+            List<string> names = MultiChoiceCaller.GetChoiceNames();
+            string[] options = MultiChoiceCaller.Choices.Select((o, i) =>
+            {
+                if (o is IObject)
+                    return $"{names[i]} [{AddIn.IAddObject(o)}]";
+                else
+                    return names[i];
+            }).ToArray();
 
+            // Create the dropdown in the cell
+            bool success = false;
             try
             {
                 if (options.Count() > 0)
@@ -108,10 +118,6 @@ namespace BH.UI.Excel.Templates
                 XlCall.Excel(XlCall.xlcFormula, cellcontents, cell);
             });
         }
-
-        /*******************************************/
-
-        protected abstract List<string> GetChoices();
 
         /*******************************************/
     }

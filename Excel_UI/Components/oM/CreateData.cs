@@ -49,18 +49,6 @@ namespace BH.UI.Excel.Components
         /**** Methods                           ****/
         /*******************************************/
 
-        protected override List<string> GetChoices()
-        {
-            var names = MultiChoiceCaller.GetChoiceNames();
-            return MultiChoiceCaller.Choices.Select((o, i) =>
-            {
-                string id = AddIn.IAddObject(o);
-                return $"{names[i]} [{id}]";
-            }).ToList();
-        }
-
-        /*******************************************/
-
         public override string GetName()
         {
             return "CreateData." + m_Valid.Replace(Caller.Name, "_");

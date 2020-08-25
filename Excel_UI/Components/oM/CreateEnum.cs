@@ -59,13 +59,6 @@ namespace BH.UI.Excel.Components
         }
 
         /*******************************************/
-
-        protected override List<string> GetChoices()
-        {
-            return MultiChoiceCaller.GetChoiceNames();
-        }
-
-        /*******************************************/
     }
 }
 
