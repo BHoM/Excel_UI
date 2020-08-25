@@ -126,7 +126,7 @@ namespace BH.UI.Excel.Callers
                 outArr = Transpose(outArr);
 
             //Output the values as an array
-            return ArrayResizer.Resize(outArr);
+            return outArr; 
         }
 
 
