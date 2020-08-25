@@ -24,25 +24,29 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
-using BH.oM.Excel;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using BH.Engine.Reflection;
 using BH.oM.Reflection.Attributes;
 using ExcelDna.Integration;
 
 namespace BH.Engine.Excel
 {
-    public static partial class Query
+    public static partial class Convert
     {
         /*******************************************/
         /**** Methods                           ****/
         /*******************************************/
 
-
-        [Description("Removes nulls from a list.")]
-        [Input("list", "The list to clean.")]
-        [Output("A list without nulls in it.")]
-        public static List<T> CleanList<T>(this List<T> list)
+        [Description("Converts a BHoM Reference to an ExcelReference object.")]
+        [Input("omRef", "The reference to convert.")]
+        [Output("An ExcelDNA ExcelReference.")]
+        public static ExcelReference ToExcel(this oM.Excel.Reference omRef)
         {
-            return list.FindAll(item => item != null);
+            var rects = omRef.Rectangles.Select((rect) =>
+                new int[] { rect.RowFirst, rect.RowLast, rect.ColumnFirst, rect.ColumnLast }).ToArray();
+            return new ExcelReference(rects, omRef.Sheet);
         }
 
         /*******************************************/

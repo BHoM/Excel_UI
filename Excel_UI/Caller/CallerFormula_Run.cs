@@ -57,9 +57,9 @@ namespace BH.UI.Excel.Templates
             // Handle possible errors
             var errors = Engine.Reflection.Query.CurrentEvents().Where(e => e.Type == oM.Reflection.Debugging.EventType.Error);
             if (errors.Count() > 0)
-                Engine.Excel.Query.Caller().Note(errors.Select(e => e.Message).Aggregate((a, b) => a + "\n" + b));
+                AddIn.WriteNote(errors.Select(e => e.Message).Aggregate((a, b) => a + "\n" + b));
             else
-                Engine.Excel.Query.Caller().Note("");
+                AddIn.WriteNote("");
 
             // Return result
             return result;

@@ -72,7 +72,7 @@ namespace BH.UI.Excel.Callers
             Engine.Reflection.Compute.ClearCurrentEvents();
 
             // Clean the list
-            List<object> objs = objects.CleanList();
+            List<object> objs = objects.FindAll(item => item != null);
 
             if (objs == null)
                 return "Failed to get object";

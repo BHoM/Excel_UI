@@ -86,7 +86,7 @@ namespace BH.UI.Excel.Templates
             ExcelAsyncUtil.QueueAsMacro(() =>
             {
                 m_Menu.Select(id);
-                FillFormula(Engine.Excel.Query.Selection());
+                FillFormula(AddIn.CurrentSelection());
             });
         }
 
