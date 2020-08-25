@@ -65,92 +65,30 @@ namespace BH.UI.Excel.Templates
         public override object Run(object[] inputs)
         {
             var options = GetChoices().ToArray();
-
-            Application app = null;
-            Range cell = null;
-            Worksheet validation_ws = null;
-            Worksheet worksheet = null;
-            Workbook workbook = null;
-            Sheets sheets = null;
-
             bool success = false;
 
             try
             {
-                var name = $"RANGE_{Function}__";
-
-                app = Application.GetActiveInstance();
-                workbook = app.ActiveWorkbook;
-                sheets = workbook.Sheets;
-
                 if (options.Count() > 0)
                 {
                     ExcelReference xlref = XlCall.Excel(XlCall.xlfCaller) as ExcelReference;
                     if (xlref != null)
                     {
-                        string reftext = XlCall.Excel(XlCall.xlfReftext, xlref, true) as string;
-                        cell = app.Range(reftext);
-                        worksheet = cell.Worksheet;
-                        if (worksheet.Name == "BHoM_ValidationHidden")
+                        ExcelAsyncUtil.QueueAsMacro(() =>
                         {
-                            m_DataAccessor.SetDataItem(0,
-                                ArrayResizer.Resize(options, (target) =>
-                                {
-                                    try
-                                    {
-                                        XlCall.Excel(XlCall.xlcDefineName, name, target);
-                                    }
-                                    catch { }
-                                })
-                            );
-                            success = true;
-                        }
-                        else
-                        {
-                            ExcelAsyncUtil.QueueAsMacro(() =>
-                            {
-                                    string prefix = reftext.Substring(0, reftext.LastIndexOf('!') + 1);
-                                    var nameDef = XlCall.Excel(XlCall.xlfGetName, prefix + name);
-                                    if (nameDef.Equals(ExcelError.ExcelErrorName))
-                                    {
-                                        try
-                                        {
-                                            validation_ws = sheets["BHoM_ValidationHidden"] as Worksheet;
-                                        }
-                                        catch
-                                        {
-                                            validation_ws = sheets.Add() as Worksheet;
-                                            validation_ws.Name = "BHoM_ValidationHidden";
-                                        }
-                                        validation_ws.Visible = XlSheetVisibility.xlSheetHidden;
+                            Application app = Application.GetActiveInstance();
+                            string reftext = XlCall.Excel(XlCall.xlfReftext, xlref, true) as string;
+                            Range cell = app.Range(reftext);
+                            cell.Value = options.FirstOrDefault();
 
-                                        int row = 1;
-                                        Range listcell = validation_ws.Cells[row, 1];
-                                        while (listcell.Value != null)
-                                        {
-                                            row++;
-                                            listcell = validation_ws.Cells[row, 1];
-                                        }
-                                        listcell.Formula = $"={Function}()";
-                                    }
+                            Validation validation = cell.Validation;
+                            validation.Delete();
+                            validation.Add(XlDVType.xlValidateList, null, null, string.Join(",", options));
+                            validation.IgnoreBlank = true;
+                        });
 
-                                    ExcelAsyncUtil.QueueAsMacro(() =>
-                                    {
-                                        Validation validation = null;
-                                            app = Application.GetActiveInstance();
-                                            cell = app.Range(reftext);
-                                            cell.Value = options.FirstOrDefault();
-                                            validation = cell.Validation;
-                                            validation.Delete();
-                                            validation.Add(XlDVType.xlValidateList, null, null, string.Join(",", options));
-                                            validation.IgnoreBlank = true;
-                                    });
-                            });
-
-                            m_DataAccessor.SetDataItem(0, "");
-
-                            success = true;
-                        }
+                        m_DataAccessor.SetDataItem(0, "");
+                        success = true;
                     }
                 }
             }
