@@ -30,7 +30,7 @@ using System.Collections.Generic;
 
 namespace BH.UI.Excel.Components
 {
-    public class SetPropertyFormula : SingleOptionCallerFormula
+    public class SetPropertyFormula : CallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/

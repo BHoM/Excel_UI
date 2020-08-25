@@ -28,7 +28,7 @@ using System.Collections.Generic;
 
 namespace BH.UI.Excel.Components
 {
-    public class PushFormula : SingleOptionCallerFormula
+    public class PushFormula : CallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/

@@ -30,7 +30,7 @@ using Microsoft.Office.Core;
 
 namespace BH.UI.Excel.Components
 {
-    public class PullFormula : SingleOptionCallerFormula
+    public class PullFormula : CallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/

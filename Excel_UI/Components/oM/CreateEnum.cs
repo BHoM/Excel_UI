@@ -41,8 +41,6 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new CreateEnumCaller();
 
-        public override string MenuRoot { get; } = "Create Enum";
-
         public override string Function { get { return GetName(); } }
 
 

@@ -38,8 +38,6 @@ namespace BH.UI.Excel.Components
 
         public override Caller Caller { get; } = new ModifyCaller();
 
-        public override string MenuRoot { get; } = "Modify";
-
 
         /*******************************************/
     }

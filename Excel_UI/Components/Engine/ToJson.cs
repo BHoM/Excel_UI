@@ -30,7 +30,7 @@ using System.Collections.Generic;
 
 namespace BH.UI.Excel.Components
 {
-    public class ToJsonFormula : SingleOptionCallerFormula
+    public class ToJsonFormula : CallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/

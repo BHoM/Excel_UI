@@ -32,7 +32,7 @@ using System.Collections.Generic;
 
 namespace BH.UI.Excel.Components
 {
-    public class MoveFormula : SingleOptionCallerFormula
+    public class MoveFormula : CallerFormula
     {
         /*******************************************/
         /**** Properties                        ****/

@@ -45,8 +45,6 @@ namespace BH.UI.Excel.Templates
 
         public virtual string Category { get { return Caller.Category; } }
 
-        public abstract string MenuRoot { get; }
-
         public abstract Caller Caller { get; }
 
         public virtual string Function
