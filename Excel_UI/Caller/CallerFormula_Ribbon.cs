@@ -20,20 +20,13 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using BH.Engine.Reflection;
-using BH.Engine.Excel;
-using BH.oM.UI;
 using BH.UI.Base;
 using ExcelDna.Integration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.InteropServices;
-using NetOffice.ExcelApi;
 using System.Xml;
-using BH.Engine.Serialiser;
-using System.Reflection;
-using System.Linq.Expressions;
 using System.Collections;
 
 namespace BH.UI.Excel.Templates

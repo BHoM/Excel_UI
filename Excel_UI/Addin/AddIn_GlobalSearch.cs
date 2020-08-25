@@ -85,7 +85,7 @@ namespace BH.UI.Excel
         /*******************************************/
 
         private static SearchMenu m_GlobalSearch = null;
-        private static oM.Excel.Reference m_CurrentSelection = null;
+        private static ExcelReference m_CurrentSelection = null;
 
         /*******************************************/
     }
