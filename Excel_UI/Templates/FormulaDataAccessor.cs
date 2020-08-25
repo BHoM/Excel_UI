@@ -65,7 +65,7 @@ namespace BH.UI.Excel.Templates
             m_Inputs = inputs.Select(x => Evaluate(x)).ToList();
             m_Defaults = defaultValues.Select(x => Evaluate(x)).ToList();
 
-            Engine.Excel.Query.Caller().Note("");
+            AddIn.WriteNote("");
             Outputs = new List<object> { ExcelError.ExcelErrorNull };
         }
 

@@ -42,7 +42,7 @@ namespace BH.UI.Excel
         [ExcelCommand(ShortCut = "^B")]
         public static void OpenGlobalSearch()
         {
-            m_CurrentSelection = Engine.Excel.Query.Selection();
+            m_CurrentSelection = CurrentSelection();
             var control = new System.Windows.Forms.ContainerControl();
             m_GlobalSearch.SetParent(control);
         }
