@@ -41,7 +41,7 @@ namespace BH.UI.Excel
         /**** Methods                           ****/
         /*******************************************/
 
-        public static void Register(CallerFormula caller, System.Action callback = null)
+        public static void Register(CallerFormula caller, System.Action callback = null, bool saveToHiddenSheet = true)
         {
             lock (m_Mutex)
             {
@@ -67,7 +67,8 @@ namespace BH.UI.Excel
                                 new List<List<object>> { formula.Item3 }
                             );
                             m_Registered.Add(function);
-                            SaveCallerToHiddenSheet(caller.Caller);
+                            if (saveToHiddenSheet)
+                                SaveCallerToHiddenSheet(caller.Caller);
                             ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
                         }
 

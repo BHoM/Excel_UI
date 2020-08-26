@@ -114,13 +114,16 @@
   <ItemGroup>
     <Compile Include="Addin\AddIn_BackwardCompatibility.cs" />
     <Compile Include="Addin\AddIn_Formulas.cs" />
+    <Compile Include="Addin\AddIn_Converts.cs" />
     <Compile Include="Addin\AddIn_Worksheet.cs" />
     <Compile Include="Addin\AddIn_Internalise.cs" />
     <Compile Include="Addin\AddIn_GlobalSearch.cs" />
     <Compile Include="Addin\AddIn_Objects.cs" />
     <Compile Include="Addin\AddIn_OpenClose.cs" />
     <Compile Include="Addin\AddIn.cs" />
-    <Compile Include="Ribbon\Ribbon_UICommands.cs" />
+    <Compile Include="Ribbon\Ribbon_Condense.cs" />
+    <Compile Include="Ribbon\Ribbon_Expand.cs" />
+    <Compile Include="Ribbon\Ribbon_Internalise.cs" />
     <Compile Include="Ribbon\Ribbon.cs" />
     <Compile Include="Caller\CallerFormula_Run.cs" />
     <Compile Include="Caller\CallerFormula_FillFormula.cs" />

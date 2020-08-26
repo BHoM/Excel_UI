@@ -112,11 +112,7 @@ namespace BH.UI.Excel.Templates
 
         protected override void Fill(ExcelReference cell)
         {
-            var cellcontents = "=" + Function + "()";
-            ExcelAsyncUtil.QueueAsMacro(() =>
-            {
-                XlCall.Excel(XlCall.xlcFormula, cellcontents, cell);
-            });
+            AddIn.WriteFormula("=" + Function + "()", cell);
         }
 
         /*******************************************/

@@ -28,7 +28,8 @@ using ExcelDna.Integration;
 using System.Collections.Generic;
 using System.Collections;
 using NetOffice.ExcelApi;
-
+using BH.UI.Excel.Templates;
+using ExcelDna.Registration;
 
 namespace BH.UI.Excel
 {
@@ -92,7 +93,14 @@ namespace BH.UI.Excel
             // Set up Excel DNA
             ExcelDna.Registration.ExcelRegistration.RegisterCommands(ExcelDna.Registration.ExcelRegistration.GetExcelCommands());
             ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
-            
+
+            // Register single item formulas
+            foreach (CallerFormula formula in CallerShells.Values.Where(x => !x.Caller.HasPossibleItems))
+                Register(formula, null, false);
+
+            // Register any function that was defined explicitely in this project
+            ExcelRegistration.GetExcelFunctions().RegisterFunctions();
+
             // Initialise global search
             InitGlobalSearch();
             ExcelDna.Logging.LogDisplay.Clear();
@@ -102,6 +110,9 @@ namespace BH.UI.Excel
 
         private void App_WorkbookOpen(Workbook workbook)
         {
+            // First 
+            App_WorkbookOpen(workbook);
+
             // Restore internalised data and callers
             RestoreData();
             RestoreFormulas();

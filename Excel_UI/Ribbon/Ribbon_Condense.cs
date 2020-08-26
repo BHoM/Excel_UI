@@ -20,44 +20,44 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using BH.UI.Base;
+using BH.UI.Excel.Templates;
 using ExcelDna.Integration;
+using ExcelDna.Integration.CustomUI;
+using NetOffice.ExcelApi;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
-using NetOffice.ExcelApi;
-using System.Linq.Expressions;
-using System.Collections;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml;
 
-namespace BH.UI.Excel.Templates
+namespace BH.UI.Excel.Addin
 {
-    public abstract partial class CallerFormula
+    public partial class Ribbon : ExcelRibbon
     {
         /*******************************************/
         /**** Methods                           ****/
         /*******************************************/
 
-        public void FillFormula(ExcelReference cell)
+        public void RunCondense(IRibbonControl control)
         {
-            AddIn.Register(this, () => Fill(cell));
+            ExcelAsyncUtil.QueueAsMacro(() =>
+            {
+                AddIn.WriteFormula("=BHoM.Condense");
+            });
         }
 
-
-        /*******************************************/
-        /**** Private Methods                   ****/
         /*******************************************/
 
-        protected virtual void Fill(ExcelReference cell)
+        [ExcelFunction(Name = "BHoM.Condense", Description = "Take a group of cells and store their content as a list in a single cell.", Category = "UI")]
+        public static object Condense(object[] items)
         {
-            System.Action callback = () => { };
-            var cellcontents = "=" + Function;
-            if (Caller.InputParams.Count == 0)
-                cellcontents += "()";
-
-            AddIn.WriteFormula(cellcontents, cell);
+            items = AddIn.FromExcel(items);
+            return AddIn.ToExcel(items.ToList());
         }
 
         /*******************************************/
     }
 }
-
