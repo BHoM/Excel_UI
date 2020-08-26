@@ -110,9 +110,6 @@ namespace BH.UI.Excel
 
         private void App_WorkbookOpen(Workbook workbook)
         {
-            // First 
-            App_WorkbookOpen(workbook);
-
             // Restore internalised data and callers
             RestoreData();
             RestoreFormulas();
