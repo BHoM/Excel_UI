@@ -42,16 +42,16 @@ namespace BH.UI.Excel.Templates
             XmlDocument doc = new XmlDocument();
             XmlElement element;
             
-            if (Caller.SelectedItem != null) // Single-Choice caller -> button
+            if (Caller.HasPossibleItems) // Multi-Choice caller -> drop down menu
+            {
+                element = doc.CreateElement("dynamicMenu");
+                element.SetAttribute("getContent", "GetContent");
+            }
+            else // Single-Choice caller -> button
             {
                 element = doc.CreateElement("button");
                 element.SetAttribute("tag", Caller.GetType().Name);
                 element.SetAttribute("onAction", "FillFormula");
-            }
-            else // Multi-Choice caller -> drop down menu
-            {
-                element = doc.CreateElement("dynamicMenu");
-                element.SetAttribute("getContent", "GetContent");
             }
             
             // Configure the menu element
@@ -69,9 +69,7 @@ namespace BH.UI.Excel.Templates
         {
             m_Menu = new SelectorMenu_RibbonXml();
             m_Menu.RootName = Caller.GetType().Name;
-
             Caller.SetSelectorMenu(m_Menu);
-            Caller.SelectedItem = null;
             
             XmlDocument doc = new XmlDocument();
             XmlElement root = doc.CreateElement("root");

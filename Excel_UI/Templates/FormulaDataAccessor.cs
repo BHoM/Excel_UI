@@ -40,22 +40,13 @@ namespace BH.UI.Excel.Templates
 
 
         /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public FormulaDataAccessor()
-        {
-
-        }
-
-        /*******************************************/
         /**** Public Methods                    ****/
         /*******************************************/
 
         public virtual void SetInputs(List<object> inputs, List<object> defaultValues)
         {
-            m_Inputs = inputs.Select(x => Evaluate(x)).ToList();
-            m_Defaults = defaultValues.Select(x => Evaluate(x)).ToList();
+            m_Inputs = inputs.Select(x => AddIn.FromExcel(x)).ToList();
+            m_Defaults = defaultValues.Select(x => AddIn.FromExcel(x)).ToList();
 
             AddIn.WriteNote("");
             Outputs = new List<object> { ExcelError.ExcelErrorNull };
@@ -71,7 +62,7 @@ namespace BH.UI.Excel.Templates
             if (Outputs.Count == 1)
                 return Outputs[0];
             else
-                return ToExcel(Outputs.ToList());
+                return AddIn.ToExcel(Outputs.ToList());
         }
 
 
@@ -84,34 +75,30 @@ namespace BH.UI.Excel.Templates
             Type type = typeof(T);
             object item = m_Inputs[index];
 
-            if (IsBlankOrError<T>(item)) {
+            if (IsBlankOrError<T>(item))
+            {
                 object def = m_Defaults[index];
                 return def == null ? default(T) : (T)(def as dynamic);
             }
-            if (item is object[,])
-            {
-                // Incase T is object or something similarly cabable of
-                // holding a list.
-                return (T)(GetDataList<object>(index) as dynamic);
-            }
-            if (type.IsEnum && item is string)
-            {
+            else if (item is object[,])
+                return (T)(GetDataList<object>(index) as dynamic); // Incase T is object or something similarly cabable of holding a list.
+            else if (type.IsEnum && item is string)
                 return (T)Enum.Parse(type, item as string);
-            }
-            if (type == typeof(DateTime) && item is double)
+            else if (type == typeof(DateTime) && item is double)
             {
                 DateTime date = DateTime.FromOADate((double)item);
                 return (T)(date as dynamic);
             }
-            if (type == typeof(Guid) && item is string)
-            {
+            else if (type == typeof(Guid) && item is string)
                 return (T)(Guid.Parse(item as string) as dynamic);
+            else
+            {
+                // Can't always cast directly to T from object storage type even
+                // when the actual type as castable to T. So have to use `as
+                // dynamic` so the cast is between the actual type of `item` to T.
+                return (T)(item as dynamic);
             }
 
-            // Can't always cast directly to T from object storage type even
-            // when the actual type as castable to T. So have to use `as
-            // dynamic` so the cast is between the actual type of `item` to T.
-            return (T)(item as dynamic);
         }
 
         /*******************************************/
@@ -120,18 +107,12 @@ namespace BH.UI.Excel.Templates
         {
             object item = m_Inputs[index];
             if (IsBlankOrError<T>(item))
-            {
                 return m_Defaults[index] as List<T>;
-            }
-            if (item is List<T>)
-            {
+            else if (item is List<T>)
                 return item as List<T>;
-            }
-            if (item is IEnumerable<T>)
-            {
+            else if (item is IEnumerable<T>)
                 return (item as IEnumerable<T>).ToList();
-            }
-            if (item is IEnumerable && !(item is string))
+            else if (item is IEnumerable && !(item is string))
             {
                 // This will flatten object[,]s
                 List<T> list = new List<T>();
@@ -144,7 +125,8 @@ namespace BH.UI.Excel.Templates
                 }
                 return list;
             }
-            return new List<T>() { GetDataItem<T>(index) };
+            else
+                return new List<T>() { GetDataItem<T>(index) };
         }
 
         /*******************************************/
@@ -153,14 +135,10 @@ namespace BH.UI.Excel.Templates
         {
             object item = m_Inputs[index];
             if (IsBlankOrError<T>(item))
-            {
                 return m_Defaults[index] as List<List<T>>;
-            }
-            if (item is List<List<T>>)
-            {
+            else if (item is List<List<T>>)
                 return item as List<List<T>>;
-            }
-            if (item is object[,])
+            else if (item is object[,])
             {
                 // Convert 2D arrays to List<List<T>> with columns as the
                 // inner list, e.g.
@@ -192,19 +170,17 @@ namespace BH.UI.Excel.Templates
                 }
                 return list;
             }
-            if (item is IEnumerable)
+            else if (item is IEnumerable)
             {
                 return (item as IEnumerable).Cast<object>()
                     .Select(o =>
-                        (o is IEnumerable) ? (o as IEnumerable)
-                            .Cast<object>()
-                            .Select(inner => (T)(inner as dynamic))
-                            .ToList()
+                        (o is IEnumerable) ?
+                            (o as IEnumerable).Cast<object>().Select(inner => (T)(inner as dynamic)).ToList()
                             : null as List<T>)
                     .ToList();
-
             }
-            return null;
+            else
+                return null;
         }
 
         /*******************************************/
@@ -221,7 +197,7 @@ namespace BH.UI.Excel.Templates
             while (Outputs.Count <= index)
                 Outputs.Add(null);
 
-            Outputs[index] = ToExcel(data);
+            Outputs[index] = AddIn.ToExcel(data);
             return true;
         }
 
@@ -230,10 +206,9 @@ namespace BH.UI.Excel.Templates
         public virtual bool SetDataList<T>(int index, IEnumerable<T> data)
         {
             if (data is ICollection)
-            {
                 return SetDataItem(index, data);
-            }
-            return SetDataItem(index, data.ToList());
+            else
+                return SetDataItem(index, data.ToList());
         }
 
         /*******************************************/
@@ -241,98 +216,14 @@ namespace BH.UI.Excel.Templates
         public virtual bool SetDataTree<T>(int index, IEnumerable<IEnumerable<T>> data)
         {
             if (data is ICollection && data.All(sub => sub is ICollection))
-            {
                 return SetDataItem(index, data);
-            }
-            return SetDataItem(index, data.Select(sub => sub.ToList()).ToList());
+            else
+                return SetDataItem(index, data.Select(sub => sub.ToList()).ToList());
         }
 
 
         /*******************************************/
         /**** Private Methods                   ****/
-        /*******************************************/
-
-        private object Evaluate(object input)
-        {
-            if (input == null)
-                return null;
-            else if (input.GetType().IsPrimitive)
-                return input;
-            else if (input is string)
-            {
-                object obj = AddIn.GetObject(input as string);  
-                return obj == null ? input : obj;
-            }
-            else if (input is object[,])
-            {
-                // Keep the 2D array layout but evaluate members recursively
-                // to convert Guid strings into objects from the Project
-                return Evaluate(input as object[,]);
-            }
-            return input;
-        }
-
-        /*******************************************/
-
-        private object Evaluate(object[,] input)
-        {
-            int height = input.GetLength(0);
-            int width = input.GetLength(1);
-
-            object[,] evaluated = new object[height, width];
-            for (int i = 0; i < width; i++)
-            {
-                for (int j = 0; j < height; j++)
-                {
-                    evaluated[j, i] = Evaluate(input[j, i]);
-                }
-            }
-            return evaluated;
-        }
-
-        /*******************************************/
-
-        public static object ToExcel(object data) // TODO: make it private once fixed Explode
-        {
-            try
-            {
-                if (data == null)
-                {
-                    return ExcelError.ExcelErrorNull;
-                }
-                if (data.GetType().IsPrimitive || data is string || data is object[,])
-                {
-                    return data;
-                }
-                if (data is Guid)
-                {
-                    return data.ToString();
-                }
-                if (data is IEnumerable && !(data is ICollection))
-                {
-                    return ToExcel((data as IEnumerable).Cast<object>().ToList());
-                }
-                if (data.GetType().IsEnum)
-                {
-                    return Enum.GetName(data.GetType(), data);
-                }
-                if (data is DateTime)
-                {
-                    DateTime? date = data as DateTime?;
-                    if (date.HasValue)
-                    {
-                        return date.Value.ToOADate();
-                    }
-                }
-                return data.GetType().ToText() + " [" + AddIn.IAddObject(data) + "]";
-
-            }
-            catch
-            {
-                return ExcelError.ExcelErrorValue;
-            }
-        }
-
         /*******************************************/
 
         private bool IsBlankOrError<T>(object obj)

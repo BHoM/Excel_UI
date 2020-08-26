@@ -20,44 +20,60 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using BH.UI.Base;
+using BH.UI.Excel.Templates;
 using ExcelDna.Integration;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using ExcelDna.Integration.CustomUI;
 using NetOffice.ExcelApi;
-using System.Linq.Expressions;
+using System;
 using System.Collections;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
+using System.Runtime.InteropServices;
+using System.Text;
+using System.Threading.Tasks;
+using System.Xml;
 
-namespace BH.UI.Excel.Templates
+namespace BH.UI.Excel.Addin
 {
-    public abstract partial class CallerFormula
+    public partial class Ribbon : ExcelRibbon
     {
         /*******************************************/
         /**** Methods                           ****/
         /*******************************************/
 
-        public void FillFormula(ExcelReference cell)
+        public void RunExpand(IRibbonControl control)
         {
-            AddIn.Register(this, () => Fill(cell));
+            ExcelAsyncUtil.QueueAsMacro(() =>
+            {
+                AddIn.WriteFormula("=BHoM.Expand");
+            });
         }
 
-
-        /*******************************************/
-        /**** Private Methods                   ****/
         /*******************************************/
 
-        protected virtual void Fill(ExcelReference cell)
+        [ExcelFunction(Name = "BHoM.Expand", Description = "Take a list stored in a single cell and expand over multiple cells (one cell per item in the list).", Category = "UI")]
+        public static object Expand(object item, bool transpose = false)
         {
-            System.Action callback = () => { };
-            var cellcontents = "=" + Function;
-            if (Caller.InputParams.Count == 0)
-                cellcontents += "()";
+            item = AddIn.FromExcel(item);
 
-            AddIn.WriteFormula(cellcontents, cell);
+            object[] result;
+            if (item is IEnumerable)
+                result = ((IEnumerable)item).Cast<object>().ToArray();
+            else
+                result = new object[] { item };
+
+            if (transpose)
+                return AddIn.ToExcel(result);
+            else
+            { 
+                object[,] transposed = new object[result.Length, 1];
+                for (int i = 0; i < result.Length; i++)
+                    transposed[i, 0] = result[i];
+                return AddIn.ToExcel(transposed);
+            } 
         }
 
         /*******************************************/
     }
 }
-

@@ -87,7 +87,7 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        public static bool WriteNote(string message, ExcelReference reference = null)
+        public static void WriteNote(string message, ExcelReference reference = null)
         {
             if (reference == null)
                 reference = RunningCell();
@@ -103,7 +103,32 @@ namespace BH.UI.Excel
                     Engine.Reflection.Compute.RecordError(exception.Message);
                 }
             });
-            return true;
+        }
+
+        /*******************************************/
+
+        public static void WriteFormula(string formula, ExcelReference reference = null)
+        {
+            if (reference == null)
+                reference = CurrentSelection();
+
+            ExcelAsyncUtil.QueueAsMacro(() =>
+            {
+                try
+                {
+                    XlCall.Excel(XlCall.xlcFormula, formula, reference);
+
+                    // Let the user fill in the parameters if there is any
+                    if (!formula.EndsWith(")"))
+                    {
+                        bool isNumlock = System.Windows.Forms.Control.IsKeyLocked(System.Windows.Forms.Keys.NumLock);
+                        Application.GetActiveInstance().SendKeys("{F2}{(}", true);
+                        if (isNumlock)
+                            Application.GetActiveInstance().SendKeys("{NUMLOCK}", true);
+                    }
+                }
+                catch { }
+            });
         }
 
 
