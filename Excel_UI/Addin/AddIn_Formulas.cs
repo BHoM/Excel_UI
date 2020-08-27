@@ -208,9 +208,9 @@ namespace BH.UI.Excel
             {
                 lock(m_Mutex)
                 {
-                    int index = m_Registered.Count;
-                    sheet.Cells[index, 1].Value = caller.GetType().Name;
-                    sheet.Cells[index, 2].Value = caller.Write();
+                    m_NbSaved++;
+                    sheet.Cells[m_NbSaved, 1].Value = caller.GetType().Name;
+                    sheet.Cells[m_NbSaved, 2].Value = caller.Write();
                 } 
             });
             
@@ -221,6 +221,7 @@ namespace BH.UI.Excel
         /**** Private Fields                    ****/
         /*******************************************/
 
+        private static int m_NbSaved = 0;
         private static HashSet<string> m_Registered = new HashSet<string>();
         private static object m_Mutex = new object();
 
