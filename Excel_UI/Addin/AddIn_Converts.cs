@@ -116,6 +116,9 @@ namespace BH.UI.Excel
 
         public static object[] ToExcel(object[] input)
         {
+            if (input == null)
+                return new object[] { ExcelError.ExcelErrorNull };
+
             return input.Select(x => ToExcel(x)).ToArray();
         }
 
@@ -123,6 +126,9 @@ namespace BH.UI.Excel
 
         public static object[,] ToExcel(object[,] input)
         {
+            if (input == null)
+                return new object[,] { { ExcelError.ExcelErrorNull } };
+
             int height = input.GetLength(0);
             int width = input.GetLength(1);
 
@@ -131,6 +137,25 @@ namespace BH.UI.Excel
             {
                 for (int j = 0; j < height; j++)
                     evaluated[j, i] = ToExcel(input[j, i]);
+            }
+            return evaluated;
+        }
+
+        /*******************************************/
+
+        public static object[,] ToExcel(List<List<object>> input)
+        {
+            if (input == null)
+                return new object[,] { { ExcelError.ExcelErrorNull } };
+
+            int height = input.Count;
+            int width = input.Select(x => x.Count).Min();
+
+            object[,] evaluated = new object[height, width];
+            for (int i = 0; i < width; i++)
+            {
+                for (int j = 0; j < height; j++)
+                    evaluated[j, i] = ToExcel(input[j][i]);
             }
             return evaluated;
         }

@@ -60,7 +60,7 @@ namespace BH.UI.Excel.Templates
             if (Outputs.Count == 0)
                 return ExcelError.ExcelErrorNull;
             if (Outputs.Count == 1)
-                return Outputs[0];
+                return AddIn.ToExcel(Outputs[0]);
             else
                 return AddIn.ToExcel(Outputs.ToList());
         }
@@ -197,7 +197,7 @@ namespace BH.UI.Excel.Templates
             while (Outputs.Count <= index)
                 Outputs.Add(null);
 
-            Outputs[index] = AddIn.ToExcel(data);
+            Outputs[index] = data;
             return true;
         }
 
