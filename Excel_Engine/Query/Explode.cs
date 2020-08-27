@@ -27,81 +27,37 @@ namespace BH.Engine.Excel
 
             // Clean the list
             List<object> objs = objects.FindAll(item => item != null);
-
             if (objs == null)
                 return "Failed to get object";
 
-            //Get the property dictionary for the object
+            // Get the property dictionary for the object
             List<Dictionary<string, object>> props = GetPropertyDictionaries(objs, goDeep);
-
             if (props.Count < 1)
                 return "Failed to get properties";
-            object[,] outArr;
+
+            // Get the exploded table
+            List<List<object>> result = new List<List<object>>();
+            List<string> keys = props.SelectMany(x => x.Keys).Distinct().ToList();
+
             if (includePropertyNames)
-            {
-                //Create an 2d array to contain property names and values
-                outArr = new object[props.Count + 1, props[0].Count];
-                int counter = 0;
+                result.Add(keys.ToList<object>());
 
-                foreach (KeyValuePair<string, object> kvp in props[0])
-                {
-                    outArr[0, counter] = kvp.Key;
-                    outArr[1, counter] = kvp.Value;
-                    counter++;
-                }
-
-                for (int i = 1; i < props.Count; i++)
-                {
-                    counter = 0;
-                    foreach (KeyValuePair<string, object> kvp in props[i])
-                    {
-                        outArr[i + 1, counter] = kvp.Value;
-                        counter++;
-                    }
-                }
-            }
-            else
-            {
-                //Create an object array to contain the property values
-                outArr = new object[props.Count, props[0].Count];
-
-                for (int i = 0; i < props.Count; i++)
-                {
-                    int counter = 0;
-                    foreach (KeyValuePair<string, object> kvp in props[i])
-                    {
-                        outArr[i, counter] = kvp.Value;
-                        counter++;
-                    }
-                }
-            }
+            for (int i = 0; i < props.Count; i++)
+                result.Add(keys.Select(k => props[i].ContainsKey(k) ? props[i][k] : null).ToList());
 
             if (transpose)
-                outArr = Transpose(outArr);
+            {
+                result = result.SelectMany(row => row.Select((value, index) => new { value, index }))
+                    .GroupBy(cell => cell.index, cell => cell.value)
+                    .Select(g => g.ToList()).ToList();
+            }
 
-            //Output the values as an array
-            return outArr;
+            return result;
         }
 
 
         /*******************************************/
         /**** Private Methods                   ****/
-        /*******************************************/
-
-        private static object[,] Transpose(object[,] arr)
-        {
-            int width = arr.GetLength(0);
-            int height = arr.GetLength(1);
-            object[,] transposed = new object[height, width];
-            for (int i = 0; i < width * height; i++)
-            {
-                int x = i % width;
-                int y = i / width;
-                transposed[y, x] = arr[x, y];
-            }
-            return transposed;
-        }
-
         /*******************************************/
 
         private static List<Dictionary<string, object>> GetPropertyDictionaries(List<object> objs, bool goDeep = false)
@@ -131,26 +87,21 @@ namespace BH.Engine.Excel
         private static void GetPropertyDictionary(ref Dictionary<string, object> dict, object obj, bool goDeep = false, string parentType = "")
 
         {
-            if (obj.GetType().IsPrimitive || obj is string)
+            if (obj.GetType().IsPrimitive || obj is string || obj is Guid || obj is Enum)
             {
-                dict = new Dictionary<string, object> { { "Value", obj } };
-                return;
-            }
-
-            if (!goDeep)
-            {
-                dict = obj.PropertyDictionary();
+                string key = parentType.Length > 0 ? parentType : "Value";
+                dict[key] = obj;
                 return;
             }
             else
             {
-                Dictionary<string, object> baseDict = obj.PropertyDictionary();
-                foreach (KeyValuePair<string, object> kvp in baseDict)
+                foreach (KeyValuePair<string, object> kvp in obj.PropertyDictionary())
                 {
-                    if (kvp.Key == "BHoM_Guid")
-                        dict[parentType + kvp.Key] = kvp.Value;
+                    string key = (parentType.Length > 0) ? parentType + "." + kvp.Key : kvp.Key;
+                    if (goDeep)
+                        GetPropertyDictionary(ref dict, kvp.Value, true, key);
                     else
-                        GetPropertyDictionary(ref dict, kvp.Value, true, parentType + kvp.Key + ": ");
+                        dict[key] = kvp.Value;
                 }
             }
         }

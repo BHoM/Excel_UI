@@ -27,6 +27,7 @@ using BH.UI.Base;
 using Microsoft.Office.Core;
 using System.Collections.Generic;
 using BH.UI.Excel.Callers;
+using System.Linq;
 
 namespace BH.UI.Excel.Components
 {
@@ -42,6 +43,18 @@ namespace BH.UI.Excel.Components
         public override string Function { get; } = "BHoM.Explode";
 
         public override string Category { get; } = "Engine";
+
+
+        /*******************************************/
+        /**** Override Methods                  ****/
+        /*******************************************/
+
+        public override object Run(object[] inputs)
+        {
+            base.Run(inputs);
+            return AddIn.ToExcel(m_DataAccessor.Outputs[0] as List<List<object>>);
+
+        }
 
 
         /*******************************************/
