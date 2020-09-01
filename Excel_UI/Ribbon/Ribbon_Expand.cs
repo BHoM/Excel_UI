@@ -23,7 +23,6 @@
 using BH.UI.Excel.Templates;
 using ExcelDna.Integration;
 using ExcelDna.Integration.CustomUI;
-using NetOffice.ExcelApi;
 using System;
 using System.Collections;
 using System.Collections.Generic;
