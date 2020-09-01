@@ -25,7 +25,6 @@ using ExcelDna.Integration;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using NetOffice.ExcelApi;
 using System.Linq.Expressions;
 using System.Collections;
 

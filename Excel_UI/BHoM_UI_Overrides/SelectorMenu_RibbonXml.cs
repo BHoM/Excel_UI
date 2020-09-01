@@ -30,8 +30,6 @@ using System.Text;
 using System.Threading.Tasks;
 using BH.Engine.Reflection;
 using BH.oM.Data.Collections;
-using NetOffice.OfficeApi;
-using NetOffice.OfficeApi.Enums;
 using System.Xml;
 using BH.UI.Base.Menus;
 
