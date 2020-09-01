@@ -96,6 +96,8 @@ namespace BH.UI.Excel
         {
             // Get the data sheet
             Worksheet sheet = Sheet(sheetName, true, true);
+            if (sheet == null)
+                return;
 
             // Save the dictionary as json
             int index = 1;
