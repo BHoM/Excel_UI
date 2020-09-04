@@ -28,7 +28,7 @@ using ExcelDna.Integration;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq.Expressions;
-using NetOffice.ExcelApi;
+using Microsoft.Office.Interop.Excel;
 using BH.Engine.Serialiser;
 using BH.oM.Base;
 using BH.UI.Excel.Templates;

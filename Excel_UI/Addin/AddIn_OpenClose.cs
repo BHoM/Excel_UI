@@ -110,7 +110,7 @@ namespace BH.UI.Excel
         public void App_WorkbookOpen(Workbook workbook)
         {
             // Restore internalised data and callers
-            //RestoreData();
+            RestoreData();
             RestoreFormulas();
 
             // Initialise the BHoM Addin and run first calculation
