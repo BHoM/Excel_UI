@@ -24,11 +24,11 @@ using BH.Engine.Reflection;
 using BH.oM.Base;
 using BH.UI.Base;
 using ExcelDna.Integration;
-using NetOffice.ExcelApi;
-using NetOffice.ExcelApi.Enums;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using Microsoft.Office.Interop.Excel;
+
 
 namespace BH.UI.Excel.Templates
 {
@@ -82,14 +82,15 @@ namespace BH.UI.Excel.Templates
                     {
                         ExcelAsyncUtil.QueueAsMacro(() =>
                         {
-                            Application app = Application.GetActiveInstance();
+                            Application app = ExcelDnaUtil.Application as Application;
                             string reftext = XlCall.Excel(XlCall.xlfReftext, xlref, true) as string;
-                            Range cell = app.Range(reftext);
+                            Range cell = app.Range[reftext];//   .Range(reftext);
                             cell.Value = options.FirstOrDefault();
 
                             Validation validation = cell.Validation;
                             validation.Delete();
-                            validation.Add(XlDVType.xlValidateList, null, null, string.Join(",", options));
+                            validation.Add(XlDVType.xlValidateList, XlDVAlertStyle.xlValidAlertWarning, XlFormatConditionOperator.xlBetween, string.Join(",", options), Type.Missing);
+                            validation.InCellDropdown = true;
                             validation.IgnoreBlank = true;
                         });
 
