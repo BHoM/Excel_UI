@@ -67,9 +67,16 @@
     <Reference Include="ExcelDna.Registration, Version=0.34.6455.41786, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ExcelDna.Registration.0.34.7\lib\net40\ExcelDna.Registration.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.Office.Interop.Excel, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Office.Interop.Excel.15.0.4795.1000\lib\net20\Microsoft.Office.Interop.Excel.dll</HintPath>
+      <EmbedInteropTypes>True</EmbedInteropTypes>
+    </Reference>
     <Reference Include="NetOffice, Version=1.7.3.0, Culture=neutral, PublicKeyToken=acf636d62c39f8f5, processorArchitecture=MSIL">
       <HintPath>..\packages\NetOffice.Core.1.7.4.4\lib\net45\NetOffice.dll</HintPath>
       <EmbedInteropTypes>False</EmbedInteropTypes>
+    </Reference>
+    <Reference Include="office, Version=15.0.0.0, Culture=neutral, PublicKeyToken=71e9bce111e9429c">
+      <EmbedInteropTypes>True</EmbedInteropTypes>
     </Reference>
     <Reference Include="OfficeApi, Version=1.7.3.0, Culture=neutral, PublicKeyToken=7c1c3e9d16cace88, processorArchitecture=MSIL">
       <HintPath>..\packages\NetOffice.Core.1.7.4.4\lib\net45\OfficeApi.dll</HintPath>
