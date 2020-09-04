@@ -23,7 +23,7 @@
 using BH.UI.Excel.Templates;
 using ExcelDna.Integration;
 using ExcelDna.Integration.CustomUI;
-using NetOffice.ExcelApi;
+using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -43,7 +43,7 @@ namespace BH.UI.Excel.Addin
 
         public void Internalise(IRibbonControl control)
         {
-            Application app = Application.GetActiveInstance();
+            Application app = ExcelDnaUtil.Application as Application;
             AddIn.Internalise(app.Selection as Range);
         }
 

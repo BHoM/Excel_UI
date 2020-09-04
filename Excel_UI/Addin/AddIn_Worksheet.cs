@@ -33,7 +33,6 @@ using System.Xml;
 using BH.oM.UI;
 using BH.Engine.Base;
 using BH.Engine.Serialiser;
-using NetOffice.ExcelApi.Enums;
 using Microsoft.Office.Interop.Excel;
 using Microsoft.Office.Core;
 
@@ -74,23 +73,27 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        public static NetOffice.ExcelApi.Worksheet Sheet(string name, bool addIfMissing = true, bool isHidden = false)
+        public static Worksheet Sheet(string name, bool addIfMissing = true, bool isHidden = false)
         {
+            // Get the workbook
+            Application app = ExcelDnaUtil.Application as Application;
+            Workbook workbook = app?.ActiveWorkbook;
+            if (workbook == null)
+                return null;
+
             // Look for the sheet in the active workbook
-            NetOffice.ExcelApi.Application app = NetOffice.ExcelApi.Application.GetActiveInstance();
-            NetOffice.ExcelApi.Workbook workbook = app.ActiveWorkbook;
-            NetOffice.ExcelApi.Worksheet sheet = null;
-            if (workbook.Sheets.OfType<NetOffice.ExcelApi.Worksheet>().Any(x => x.Name == name))
-                sheet = workbook.Sheets[name] as NetOffice.ExcelApi.Worksheet;
+            Worksheet sheet = null;
+            if (workbook.Sheets.OfType<Worksheet>().Any(x => x.Name == name))
+                sheet = workbook.Sheets[name];
 
             // If sheet doesn't exist, create it if requested
             if (sheet == null && addIfMissing)
             {
-                sheet = workbook.Sheets.Add() as NetOffice.ExcelApi.Worksheet;
+                sheet = workbook.Sheets.Add();
                 sheet.Name = name;
 
                 if (isHidden)
-                    sheet.Visible = NetOffice.ExcelApi.Enums.XlSheetVisibility.xlSheetHidden;
+                    sheet.Visible = XlSheetVisibility.xlSheetHidden;
             }
 
             // Return the sheet

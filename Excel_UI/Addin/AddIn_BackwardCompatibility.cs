@@ -27,8 +27,8 @@ using System.Linq;
 using ExcelDna.Integration;
 using System.Collections.Generic;
 using System.Collections;
-using NetOffice.ExcelApi;
 using BH.UI.Excel.Templates;
+using Microsoft.Office.Interop.Excel;
 
 namespace BH.UI.Excel
 {
