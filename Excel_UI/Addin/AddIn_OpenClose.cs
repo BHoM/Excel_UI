@@ -27,16 +27,14 @@ using System.Linq;
 using ExcelDna.Integration;
 using System.Collections.Generic;
 using System.Collections;
-using NetOffice.ExcelApi;
 using BH.UI.Excel.Templates;
 using ExcelDna.Registration;
+using Microsoft.Office.Interop.Excel;
 
 namespace BH.UI.Excel
 {
     public partial class AddIn : IExcelAddIn
     {
-
-
         /*******************************************/
         /**** Methods                           ****/
         /*******************************************/
@@ -50,11 +48,12 @@ namespace BH.UI.Excel
             ExcelAsyncUtil.QueueAsMacro(() => InitBHoMAddin());
 
             // Events on Excel itself
-            Application app = Application.GetActiveInstance();
-            if (app != null)
+            Application app = ExcelDnaUtil.Application as Application;
+            if (app != null && m_WorkbookClosingHandler != null)
             {
-                app.WorkbookOpenEvent += App_WorkbookOpen;
-                app.WorkbookBeforeCloseEvent += App_WorkbookClosed;
+                m_WorkbookClosingHandler = new AppEvents_WorkbookOpenEventHandler(App_WorkbookOpen);
+                app.WorkbookOpen += m_WorkbookClosingHandler;
+                //app.WorkbookBeforeClose += App_WorkbookClosed;
             }
         }
 
@@ -64,15 +63,15 @@ namespace BH.UI.Excel
         {
             try
             {
-                // note: This method only runs if the Addin gets disabled during
-                // execution, it does not run when excel closes.
+                // note: This method only runs if the Addin gets disabled during execution, it does not run when excel closes.
                 ExcelDna.IntelliSense.IntelliSenseServer.Uninstall();
 
-                Application app = Application.GetActiveInstance();
-                if (app != null)
+                Application app = ExcelDnaUtil.Application as Application;
+                if (app != null && m_WorkbookClosingHandler != null)
                 {
-                    app.WorkbookOpenEvent -= App_WorkbookOpen;
-                    app.WorkbookBeforeCloseEvent -= App_WorkbookClosed;
+                    app.WorkbookOpen -= m_WorkbookClosingHandler;
+                    m_WorkbookClosingHandler = null;
+                    //app.WorkbookBeforeClose -= App_WorkbookClosed;
                 }
             }
             catch { }
@@ -108,7 +107,7 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        private void App_WorkbookOpen(Workbook workbook)
+        public void App_WorkbookOpen(Workbook workbook)
         {
             // Restore internalised data and callers
             RestoreData();
@@ -129,7 +128,7 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        private void App_WorkbookClosed(Workbook workbook, ref bool cancel)
+        public void App_WorkbookClosed(Workbook workbook, ref bool cancel)
         {
             ClearObjects();
         }
@@ -140,6 +139,7 @@ namespace BH.UI.Excel
         /*******************************************/
 
         private bool m_Initialised = false;
+        private static AppEvents_WorkbookOpenEventHandler m_WorkbookClosingHandler = null;
 
         /*******************************************/
     }
