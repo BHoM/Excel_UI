@@ -49,7 +49,7 @@ namespace BH.UI.Excel
 
             // Events on Excel itself
             Application app = ExcelDnaUtil.Application as Application;
-            if (app != null && m_WorkbookClosingHandler != null)
+            if (app != null && m_WorkbookClosingHandler == null)
             {
                 m_WorkbookClosingHandler = new AppEvents_WorkbookOpenEventHandler(App_WorkbookOpen);
                 app.WorkbookOpen += m_WorkbookClosingHandler;
@@ -110,7 +110,7 @@ namespace BH.UI.Excel
         public void App_WorkbookOpen(Workbook workbook)
         {
             // Restore internalised data and callers
-            RestoreData();
+            //RestoreData();
             RestoreFormulas();
 
             // Initialise the BHoM Addin and run first calculation
