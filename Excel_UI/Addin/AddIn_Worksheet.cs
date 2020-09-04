@@ -28,13 +28,14 @@ using ExcelDna.Integration;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq.Expressions;
-using NetOffice.ExcelApi;
 using System.Drawing;
 using System.Xml;
 using BH.oM.UI;
 using BH.Engine.Base;
 using BH.Engine.Serialiser;
 using NetOffice.ExcelApi.Enums;
+using Microsoft.Office.Interop.Excel;
+using Microsoft.Office.Core;
 
 namespace BH.UI.Excel
 {
@@ -44,27 +45,52 @@ namespace BH.UI.Excel
         /**** Methods                           ****/
         /*******************************************/
 
-        public static Worksheet Sheet(string name, bool addIfMissing = true, bool isHidden = false)
+        public static void SaveData(string name, string content, bool replaceExisting = false)
         {
-            // Look for the sheet in the dictionary first
-            if (m_SheetReferences.ContainsKey(name) && !m_SheetReferences[name].IsDisposed)
-                return m_SheetReferences[name];
-
-            // Look for the sheet in the active workbook
-            Application app = Application.GetActiveInstance();
+            Application app = ExcelDnaUtil.Application as Application;
             Workbook workbook = app.ActiveWorkbook;
-            Worksheet sheet = null;
-            if (workbook.Sheets.OfType<Worksheet>().Any(x => x.Name == name))
-                sheet = workbook.Sheets[name] as Worksheet;
+
+            if (replaceExisting)
+            {
+                foreach (CustomXMLPart part in workbook.CustomXMLParts.SelectByNamespace($"BH.UI.Excel.{name}").OfType<CustomXMLPart>())
+                    part.Delete();
+            }
+
+            string xmlString = $"<{name} xmlns=\"BH.UI.Excel.{name}\">{content}</{name}>";
+            CustomXMLPart employeeXMLPart = workbook.CustomXMLParts.Add(xmlString);
+        }
+
+        /*******************************************/
+
+        public static List<string> ReadData(string name)
+        {
+            Application app = ExcelDnaUtil.Application as Application;
+            Workbook workbook = app.ActiveWorkbook;
+
+
+            List<CustomXMLPart> parts = workbook.CustomXMLParts.SelectByNamespace($"BH.UI.Excel.{name}").OfType<CustomXMLPart>().ToList();
+            return parts.SelectMany(x => x.SelectNodes("/").OfType<CustomXMLNode>()).Select(x => x.Text.Trim()).ToList();
+        }
+
+        /*******************************************/
+
+        public static NetOffice.ExcelApi.Worksheet Sheet(string name, bool addIfMissing = true, bool isHidden = false)
+        {
+            // Look for the sheet in the active workbook
+            NetOffice.ExcelApi.Application app = NetOffice.ExcelApi.Application.GetActiveInstance();
+            NetOffice.ExcelApi.Workbook workbook = app.ActiveWorkbook;
+            NetOffice.ExcelApi.Worksheet sheet = null;
+            if (workbook.Sheets.OfType<NetOffice.ExcelApi.Worksheet>().Any(x => x.Name == name))
+                sheet = workbook.Sheets[name] as NetOffice.ExcelApi.Worksheet;
 
             // If sheet doesn't exist, create it if requested
             if (sheet == null && addIfMissing)
             {
-                sheet = workbook.Sheets.Add() as Worksheet;
+                sheet = workbook.Sheets.Add() as NetOffice.ExcelApi.Worksheet;
                 sheet.Name = name;
 
                 if (isHidden)
-                    sheet.Visible = XlSheetVisibility.xlSheetHidden;
+                    sheet.Visible = NetOffice.ExcelApi.Enums.XlSheetVisibility.xlSheetHidden;
             }
 
             // Return the sheet
@@ -121,23 +147,18 @@ namespace BH.UI.Excel
                     // Let the user fill in the parameters if there is any
                     if (!formula.EndsWith(")"))
                     {
-                        bool isNumlock = System.Windows.Forms.Control.IsKeyLocked(System.Windows.Forms.Keys.NumLock);
-                        Application.GetActiveInstance().SendKeys("{F2}{(}", true);
-                        if (isNumlock)
-                            Application.GetActiveInstance().SendKeys("{NUMLOCK}", true);
+                        Application app = ExcelDnaUtil.Application as Application;
+                        if (app != null)
+                        {
+                            app.SendKeys("{F2}{(}", true);
+                            if (System.Windows.Forms.Control.IsKeyLocked(System.Windows.Forms.Keys.NumLock))
+                                app.SendKeys("{NUMLOCK}", true);
+                        }
                     }
                 }
                 catch { }
             });
         }
-
-
-        /*******************************************/
-        /**** Private Fields                    ****/
-        /*******************************************/
-
-        private static Dictionary<string, Worksheet> m_SheetReferences = new Dictionary<string, Worksheet>();
-
 
         /*******************************************/
     }
