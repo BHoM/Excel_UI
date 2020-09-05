@@ -46,6 +46,8 @@ namespace BH.UI.Excel.Templates
 
         public abstract Caller Caller { get; }
 
+        public virtual Guid InstanceId { get; } = new Guid();
+
         public virtual string Function
         {
             get
