@@ -25,6 +25,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Collections;
+using ExcelDna.Integration;
+using Microsoft.Office.Interop.Excel;
+
 
 namespace BH.UI.Excel.Templates
 {
@@ -50,6 +53,10 @@ namespace BH.UI.Excel.Templates
                 AddIn.WriteNote(errors.Select(e => e.Message).Aggregate((a, b) => a + "\n" + b));
             else
                 AddIn.WriteNote("");
+
+            // Log usage
+            Application app = ExcelDnaUtil.Application as Application;
+            Engine.UI.Compute.LogUsage("Excel", app?.Version, InstanceId, Caller.Name, Caller.SelectedItem, errors.ToList());
 
             // Return result
             return result;

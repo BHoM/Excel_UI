@@ -64,7 +64,6 @@ namespace BH.UI.Excel
 
             if (selectedItem != null)
                 instance.Caller.SetItem(selectedItem);
-            //CallerInstances[instance.Function] = instance;
 
             return instance;
         }
