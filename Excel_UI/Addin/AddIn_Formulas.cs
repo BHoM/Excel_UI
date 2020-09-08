@@ -45,37 +45,41 @@ namespace BH.UI.Excel
         {
             lock (m_Mutex)
             {
+                // Register the caller formula with Excel if not already done
                 if (m_Registered.Contains(caller.Function))
                 {
                     if (callback != null)
                         ExcelAsyncUtil.QueueAsMacro(() => callback());
-                    return;
+                }
+                else
+                {
+                    var formula = GetExcelDelegate(caller);
+                    string function = caller.Function;
+
+                    ExcelAsyncUtil.QueueAsMacro(() =>
+                    {
+                        lock (m_Mutex)
+                        {
+                            if (!m_Registered.Contains(function))
+                            {
+                                ExcelIntegration.RegisterDelegates(
+                                    new List<Delegate>() { formula.Item1 },
+                                    new List<object> { formula.Item2 },
+                                    new List<List<object>> { formula.Item3 }
+                                );
+                                m_Registered.Add(function);
+                                ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
+                            }
+
+                            if (callback != null)
+                                ExcelAsyncUtil.QueueAsMacro(() => callback());
+                        }
+                    });
                 }
 
-                var formula = GetExcelDelegate(caller);
-                string function = caller.Function;
-
-                ExcelAsyncUtil.QueueAsMacro(() =>
-                {
-                    lock (m_Mutex)
-                    {
-                        if (!m_Registered.Contains(function))
-                        {
-                            ExcelIntegration.RegisterDelegates(
-                                new List<Delegate>() { formula.Item1 },
-                                new List<object> { formula.Item2 },
-                                new List<List<object>> { formula.Item3 }
-                            );
-                            m_Registered.Add(function);
-                            if (saveToHiddenSheet)
-                                SaveCallerToHiddenSheet(caller.Caller);
-                            ExcelDna.IntelliSense.IntelliSenseServer.Refresh();
-                        }
-
-                        if (callback != null)
-                            ExcelAsyncUtil.QueueAsMacro(() => callback());
-                    }
-                });
+                // Save the caller info to the hidden sheet if needed
+                if (saveToHiddenSheet)
+                    SaveCallerToHiddenSheet(caller);
             }
         }
 
@@ -92,7 +96,7 @@ namespace BH.UI.Excel
             }
 
             // Get all the formulas stored in teh BHoM_CallersHidden sheet
-            for (int i = 1; i < 10000; i++)
+            for (int i = 2; i < 10000; i++)
             {
                 // Recover the information about the formula
                 string formulaName = sheet.Cells[i, 1].Value as string;
@@ -108,8 +112,6 @@ namespace BH.UI.Excel
                     Register(formula);
                 }
             }
-
-            // TODO: needs to wait for all formulas to be registered before returning
         }
 
 
@@ -197,7 +199,7 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        private static void SaveCallerToHiddenSheet(Caller caller)
+        private static void SaveCallerToHiddenSheet(CallerFormula caller)
         {
             // Get the hidden worksheet
             Worksheet sheet = Sheet("BHoM_CallersHidden", true, true);
@@ -208,9 +210,27 @@ namespace BH.UI.Excel
             {
                 lock(m_Mutex)
                 {
-                    m_NbSaved++;
-                    sheet.Cells[m_NbSaved, 1].Value = caller.GetType().Name;
-                    sheet.Cells[m_NbSaved, 2].Value = caller.Write();
+                    // Get teh sheet ID
+                    string sheetId = sheet.Cells[1, 1].Value as string;
+                    if (sheetId == null)
+                    {
+                        sheetId = ToString(Guid.NewGuid());
+                        sheet.Cells[1, 1].Value = sheetId;
+                    }
+
+                    // Make sure there is a list of saved callers for this worksheet
+                    if (!m_SavedOnWorkbook.ContainsKey(sheetId))
+                        m_SavedOnWorkbook[sheetId] = new HashSet<string>();
+
+                    // Save the caller if not already done
+                    if (!m_SavedOnWorkbook[sheetId].Contains(caller.Function))
+                    {
+                        m_SavedOnWorkbook[sheetId].Add(caller.Function);
+                        int row = m_SavedOnWorkbook[sheetId].Count + 1;
+
+                        sheet.Cells[row, 1].Value = caller.Caller.GetType().Name;
+                        sheet.Cells[row, 2].Value = caller.Caller.Write();
+                    } 
                 } 
             });
             
@@ -221,8 +241,8 @@ namespace BH.UI.Excel
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private static int m_NbSaved = 0;
         private static HashSet<string> m_Registered = new HashSet<string>();
+        private static Dictionary<string, HashSet<string>> m_SavedOnWorkbook = new Dictionary<string, HashSet<string>>();
         private static object m_Mutex = new object();
 
         /*******************************************/
