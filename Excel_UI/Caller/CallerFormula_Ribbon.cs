@@ -87,12 +87,15 @@ namespace BH.UI.Excel.Templates
 
         public virtual void Select(string id)
         {
-            ExcelAsyncUtil.QueueAsMacro(() =>
+            CallerFormula formula = this;
+            if (m_Menu != null)
             {
-                if (Caller.SelectedItem == null)
-                    m_Menu.Select(id);
-                FillFormula(AddIn.CurrentSelection());
-            });
+                CallerFormula newInstance = AddIn.InstantiateCaller(Caller.GetType().Name, m_Menu.GetItem(id));
+                if (newInstance != null)
+                    formula = newInstance;
+            }
+
+            ExcelAsyncUtil.QueueAsMacro(() => formula.FillFormula(AddIn.CurrentSelection())); 
         }
 
 

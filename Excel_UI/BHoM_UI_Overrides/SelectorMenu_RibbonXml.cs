@@ -62,6 +62,17 @@ namespace BH.UI.Excel.Templates
         }
 
         /*******************************************/
+
+        public object GetItem(string id)
+        {
+            if (m_ItemLinks.ContainsKey(id))
+                return m_ItemLinks[id];
+            else
+                return null;
+        }
+
+
+        /*******************************************/
         /**** Private Methods                   ****/
         /*******************************************/
 
