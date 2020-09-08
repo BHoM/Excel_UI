@@ -182,15 +182,20 @@ namespace BH.UI.Excel
 
             if (argAttrs.Count() > 0)
             {
+                int nbFullName = argAttrs.Count;
                 string argstring = argAttrs.Select(item => item.Name).Aggregate((a, b) => $"{a}, {b}");
-                if (argstring.Length >= 254)
+                while (argstring.Length >= 254)
                 {
-                    int i = 0;
-                    argAttrs = argAttrs.Select(attr => new ExcelArgumentAttribute
-                    {
-                        Description = attr.Description,
-                        Name = "arg" + i++
-                    }).ToList();
+                    nbFullName--;
+                    ExcelArgumentAttribute arg = argAttrs[nbFullName];
+                    bool isOptional = arg.Name.StartsWith("[");
+
+                    arg.Description = "Full name: " + arg.Name + ". " + arg.Description;
+                    arg.Name = string.Concat(arg.Name.Where(x => char.IsUpper(x)));
+                    if (isOptional)
+                        arg.Name = "[" + arg.Name + "]";
+
+                    argstring = argAttrs.Select(item => item.Name).Aggregate((a, b) => $"{a}, {b}");
                 }
             }
 
