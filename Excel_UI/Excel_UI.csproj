@@ -110,7 +110,7 @@
     <Compile Include="Addin\AddIn_BackwardCompatibility.cs" />
     <Compile Include="Addin\AddIn_Formulas.cs" />
     <Compile Include="Addin\AddIn_Converts.cs" />
-    <Compile Include="Addin\AddIn_Worksheet.cs" />
+    <Compile Include="Addin\AddIn_Workbook.cs" />
     <Compile Include="Addin\AddIn_Internalise.cs" />
     <Compile Include="Addin\AddIn_GlobalSearch.cs" />
     <Compile Include="Addin\AddIn_Objects.cs" />
