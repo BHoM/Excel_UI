@@ -44,31 +44,14 @@ namespace BH.UI.Excel
         /**** Methods                           ****/
         /*******************************************/
 
-        public static void SaveData(string name, string content, bool replaceExisting = false)
+        public static Workbook ActiveWorkbook()
         {
             Application app = ExcelDnaUtil.Application as Application;
-            Workbook workbook = app.ActiveWorkbook;
 
-            if (replaceExisting)
-            {
-                foreach (CustomXMLPart part in workbook.CustomXMLParts.SelectByNamespace($"BH.UI.Excel.{name}").OfType<CustomXMLPart>())
-                    part.Delete();
-            }
-
-            string xmlString = $"<{name} xmlns=\"BH.UI.Excel.{name}\">{content}</{name}>";
-            CustomXMLPart employeeXMLPart = workbook.CustomXMLParts.Add(xmlString);
-        }
-
-        /*******************************************/
-
-        public static List<string> ReadData(string name)
-        {
-            Application app = ExcelDnaUtil.Application as Application;
-            Workbook workbook = app.ActiveWorkbook;
-
-
-            List<CustomXMLPart> parts = workbook.CustomXMLParts.SelectByNamespace($"BH.UI.Excel.{name}").OfType<CustomXMLPart>().ToList();
-            return parts.SelectMany(x => x.SelectNodes("/").OfType<CustomXMLNode>()).Select(x => x.Text.Trim()).ToList();
+            if (app == null)
+                return null;
+            else
+                return app.ActiveWorkbook;
         }
 
         /*******************************************/
@@ -76,8 +59,7 @@ namespace BH.UI.Excel
         public static Worksheet Sheet(string name, bool addIfMissing = true, bool isHidden = false)
         {
             // Get the workbook
-            Application app = ExcelDnaUtil.Application as Application;
-            Workbook workbook = app?.ActiveWorkbook;
+            Workbook workbook = ActiveWorkbook();
             if (workbook == null)
                 return null;
 
@@ -161,6 +143,39 @@ namespace BH.UI.Excel
                 }
                 catch { }
             });
+        }
+
+
+        /*******************************************/
+        /**** Unused CustomXMLParts Methods     ****/
+        /*******************************************/
+
+        public static void SaveData(string name, string content, bool replaceExisting = false)
+        {
+            Workbook workbook = ActiveWorkbook();
+            if (workbook == null)
+                return;
+
+            if (replaceExisting)
+            {
+                foreach (CustomXMLPart part in workbook.CustomXMLParts.SelectByNamespace($"BH.UI.Excel.{name}").OfType<CustomXMLPart>())
+                    part.Delete();
+            }
+
+            string xmlString = $"<{name} xmlns=\"BH.UI.Excel.{name}\">{content}</{name}>";
+            CustomXMLPart employeeXMLPart = workbook.CustomXMLParts.Add(xmlString);
+        }
+
+        /*******************************************/
+
+        public static List<string> ReadData(string name)
+        {
+            Workbook workbook = ActiveWorkbook();
+            if (workbook == null)
+                return new List<string>();
+
+            List<CustomXMLPart> parts = workbook.CustomXMLParts.SelectByNamespace($"BH.UI.Excel.{name}").OfType<CustomXMLPart>().ToList();
+            return parts.SelectMany(x => x.SelectNodes("/").OfType<CustomXMLNode>()).Select(x => x.Text.Trim()).ToList();
         }
 
         /*******************************************/
