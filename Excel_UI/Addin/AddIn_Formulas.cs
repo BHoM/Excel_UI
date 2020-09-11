@@ -32,6 +32,7 @@ using Microsoft.Office.Interop.Excel;
 using BH.oM.UI;
 using BH.UI.Base;
 using BH.UI.Excel.Templates;
+using BH.oM.Base;
 
 namespace BH.UI.Excel
 {
@@ -109,7 +110,18 @@ namespace BH.UI.Excel
                 if (formula != null)
                 {
                     formula.Caller.Read(callerJson);
-                    Register(formula);
+                    Register(formula); 
+                }
+
+                // Register the choices as objects if formula is a dropdown
+                CallerValueListFormula valueList = formula as CallerValueListFormula;
+                if (valueList != null)
+                {
+                    foreach (object choice in valueList.MultiChoiceCaller.Choices)
+                    {
+                        if (choice is IObject)
+                            IAddObject(choice);
+                    }
                 }
             }
         }
