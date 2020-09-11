@@ -92,6 +92,9 @@ namespace BH.UI.Excel.Templates
                             validation.Add(XlDVType.xlValidateList, XlDVAlertStyle.xlValidAlertWarning, XlFormatConditionOperator.xlBetween, string.Join(",", options), Type.Missing);
                             validation.InCellDropdown = true;
                             validation.IgnoreBlank = true;
+
+                            // Log usage
+                            Engine.UI.Compute.LogUsage("Excel", app?.Version, InstanceId, Caller.GetType().Name, Caller.SelectedItem);
                         });
 
                         m_DataAccessor.SetDataItem(0, "");
