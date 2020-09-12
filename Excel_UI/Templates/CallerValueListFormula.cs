@@ -28,7 +28,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using Microsoft.Office.Interop.Excel;
-
+using BH.Engine.Serialiser;
 
 namespace BH.UI.Excel.Templates
 {
@@ -56,26 +56,26 @@ namespace BH.UI.Excel.Templates
         }
 
         /*******************************************/
-        /**** Methods                           ****/
+        /**** Override Methods                  ****/
         /*******************************************/
 
         public override object Run(object[] inputs)
         {
             // Collect the list of options
             List<string> names = MultiChoiceCaller.GetChoiceNames();
-            string[] options = MultiChoiceCaller.Choices.Select((o, i) =>
+            List<string> choices = MultiChoiceCaller.Choices.Select((o, i) =>
             {
                 if (o is IObject)
                     return $"{names[i]} [{AddIn.IAddObject(o)}]";
                 else
                     return names[i];
-            }).ToArray();
+            }).ToList();
 
             // Create the dropdown in the cell
             bool success = false;
             try
             {
-                if (options.Count() > 0)
+                if (choices.Count > 0)
                 {
                     ExcelReference xlref = AddIn.RunningCell();
                     if (xlref != null)
@@ -84,12 +84,14 @@ namespace BH.UI.Excel.Templates
                         {
                             Application app = ExcelDnaUtil.Application as Application;
                             string reftext = XlCall.Excel(XlCall.xlfReftext, xlref, true) as string;
-                            Range cell = app.Range[reftext];//   .Range(reftext);
-                            cell.Value = options.FirstOrDefault();
+                            Range cell = app.Range[reftext];
+                            cell.Value = choices.FirstOrDefault();
+
+                            string formula = GetChoicesFormula(MultiChoiceCaller.SelectedItem.ToJson(), choices);
 
                             Validation validation = cell.Validation;
                             validation.Delete();
-                            validation.Add(XlDVType.xlValidateList, XlDVAlertStyle.xlValidAlertWarning, XlFormatConditionOperator.xlBetween, string.Join(",", options), Type.Missing);
+                            validation.Add(XlDVType.xlValidateList, XlDVAlertStyle.xlValidAlertWarning, XlFormatConditionOperator.xlBetween, formula, Type.Missing);
                             validation.InCellDropdown = true;
                             validation.IgnoreBlank = true;
 
@@ -109,14 +111,54 @@ namespace BH.UI.Excel.Templates
             return success;
         }
 
-
-        /*******************************************/
-        /**** Private Methods                   ****/
         /*******************************************/
 
         protected override void Fill(ExcelReference cell)
         {
             AddIn.WriteFormula("=" + Function + "()", cell);
+        }
+
+
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
+
+        protected string GetChoicesFormula(string collectionName, List<string> choices)
+        {
+            // Get the data sheet
+            Worksheet sheet = AddIn.Sheet("BHoM_ChoicesHidden", true, true);
+            if (sheet == null)
+                return string.Join(",", choices);
+
+            // Try to find the list of choices in the spreadsheet
+            int i = 0;
+            while (i++ < 1000) // Just for safety
+            {
+                try
+                {
+                    string name = sheet.Cells[i,1].Value as string;
+                    if (string.IsNullOrEmpty(name))
+                    {
+                        // Need to add the choices here
+                        sheet.Cells[i, 1].Value = collectionName;
+                        for (int j = 0; j < choices.Count; j++)
+                            sheet.Cells[i, j + 2].Value = choices[j];
+                        break;
+                    } 
+                    else if (collectionName == name)
+                    {
+                        break;
+                    }
+                }
+                catch
+                {
+                    break;
+                }
+            }
+
+            // Create the range
+            Range range = sheet.Range[sheet.Cells[i, 2], sheet.Cells[i, choices.Count + 1]];
+            return $"=BHoM_ChoicesHidden!{range.Address}";
         }
 
         /*******************************************/
