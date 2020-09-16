@@ -63,6 +63,23 @@ namespace BH.UI.Excel.Templates
         }
 
         /*******************************************/
+
+        public virtual object RunWithOutputConfig(object[] inputs, bool includeOutputNames = false, bool transposeOutputs = false)
+        {
+            if (m_DataAccessor != null)
+            {
+                m_DataAccessor.TransposeOutputs = transposeOutputs;
+
+                if (includeOutputNames)
+                    m_DataAccessor.OutputNames = Caller.OutputParams.Select(x => x.Name).ToList();
+                else
+                    m_DataAccessor.OutputNames = new List<string>();
+            }
+
+            return Run(inputs);
+        }
+
+        /*******************************************/
     }
 }
 

@@ -38,6 +38,10 @@ namespace BH.UI.Excel.Templates
 
         public List<object> Outputs { get; private set; } = new List<object> { ExcelError.ExcelErrorNull };
 
+        public List<string> OutputNames { get; set; } = new List<string>();
+
+        public bool TransposeOutputs { get; set; } = false;
+
 
         /*******************************************/
         /**** Public Methods                    ****/
@@ -62,7 +66,20 @@ namespace BH.UI.Excel.Templates
             if (Outputs.Count == 1)
                 return AddIn.ToExcel(Outputs[0]);
             else
-                return AddIn.ToExcel(Outputs.ToList());
+            {
+                List<List<object>> result = new List<List<object>> { Outputs };
+                if (OutputNames.Count == Outputs.Count)
+                    result.Insert(0, OutputNames.ToList<object>());
+
+                if (TransposeOutputs)
+                {
+                    result = result.SelectMany(row => row.Select((value, index) => new { value, index }))
+                        .GroupBy(cell => cell.index, cell => cell.value)
+                        .Select(g => g.ToList()).ToList();
+                }
+
+                return AddIn.ToExcel(result);
+            }    
         }
 
 
