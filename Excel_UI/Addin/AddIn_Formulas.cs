@@ -33,6 +33,7 @@ using BH.oM.UI;
 using BH.UI.Base;
 using BH.UI.Excel.Templates;
 using BH.oM.Base;
+using BH.UI.Excel.Components;
 
 namespace BH.UI.Excel
 {
@@ -133,17 +134,37 @@ namespace BH.UI.Excel
 
         private static Tuple<Delegate, ExcelFunctionAttribute, List<object>> GetExcelDelegate(CallerFormula caller)
         {
-            ParameterExpression[] lambdaParams = caller.Caller.InputParams.Select(p => Expression.Parameter(typeof(object))).ToArray();
+            int nbInputs = caller.Caller.InputParams.Count;
+            List<ParamInfo> inputs = caller.Caller.InputParams;
+            ParameterExpression[] lambdaParams = inputs.Select(p => Expression.Parameter(typeof(object))).ToArray();
             NewArrayExpression array = Expression.NewArrayInit(typeof(object), lambdaParams);
 
-            MethodInfo method = caller.GetType().GetMethod("Run");
-            MethodCallExpression methodCall = Expression.Call(Expression.Constant(caller), method, array);
-            LambdaExpression lambda = Expression.Lambda(methodCall, lambdaParams);
+            // Define the method to call depending on the number of outputs
+            MethodCallExpression methodCall;
+            if (caller.Caller.OutputParams.Count > 1)
+            {
+                List<ParamInfo> extraInputs = new List<ParamInfo>
+                {
+                    new ParamInfo { DataType = typeof(bool), DefaultValue = false, HasDefaultValue = true, IsRequired = false, Name = "_includeOutputNames", Description = "Include the name of the outputs" },
+                    new ParamInfo { DataType = typeof(bool), DefaultValue = false, HasDefaultValue = true, IsRequired = false, Name = "_transposeOutputs", Description = "Transpose the resulting table (i.e. one output per row instead of per column)" }
+                };
 
+                inputs.AddRange(extraInputs);
+                lambdaParams = lambdaParams.Concat(new ParameterExpression[] { Expression.Parameter(typeof(bool)), Expression.Parameter(typeof(bool)) }).ToArray();
+                MethodInfo method = caller.GetType().GetMethod("RunWithOutputConfig");
+                methodCall = Expression.Call(Expression.Constant(caller), method, array, lambdaParams[nbInputs], lambdaParams[nbInputs + 1]);
+            }
+            else
+            {
+                MethodInfo method = caller.GetType().GetMethod("Run");
+                methodCall = Expression.Call(Expression.Constant(caller), method, array);
+            }
+            
+            LambdaExpression lambda = Expression.Lambda(methodCall, lambdaParams);
             return new Tuple<Delegate, ExcelFunctionAttribute, List<object>>(
                 lambda.Compile(),
                 GetFunctionAttribute(caller),
-                GetArgumentAttributes(caller.Caller.InputParams).ToList<object>()
+                GetArgumentAttributes(inputs).ToList<object>()
             );
         }
 
