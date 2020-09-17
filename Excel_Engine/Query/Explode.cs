@@ -24,11 +24,13 @@ namespace BH.Engine.Excel
         public static object Explode(List<object> objects, bool includePropertyNames = false, bool goDeep = false, bool transpose = false)
         {
             Engine.Reflection.Compute.ClearCurrentEvents();
+            if (objects == null || objects.Count == 0)
+                return "No objects to explode";
 
             // Clean the list
             List<object> objs = objects.FindAll(item => item != null);
-            if (objs == null)
-                return "Failed to get object";
+            if (objs == null || objs.Count == 0)
+                return "Failed to get non null objects";
 
             // Get the property dictionary for the object
             List<Dictionary<string, object>> props = GetPropertyDictionaries(objs, goDeep);
@@ -85,9 +87,12 @@ namespace BH.Engine.Excel
         /*******************************************/
 
         private static void GetPropertyDictionary(ref Dictionary<string, object> dict, object obj, bool goDeep = false, string parentType = "")
-
         {
-            if (obj.GetType().IsPrimitive || obj is string || obj is Guid || obj is Enum)
+            if (obj == null)
+            {
+                return;
+            }
+            else if (obj.GetType().IsPrimitive || obj is string || obj is Guid || obj is Enum)
             {
                 string key = parentType.Length > 0 ? parentType : "Value";
                 dict[key] = obj;
