@@ -135,7 +135,7 @@ namespace BH.UI.Excel
         private static Tuple<Delegate, ExcelFunctionAttribute, List<object>> GetExcelDelegate(CallerFormula caller)
         {
             int nbInputs = caller.Caller.InputParams.Count;
-            List<ParamInfo> inputs = caller.Caller.InputParams;
+            List<ParamInfo> inputs = caller.Caller.InputParams.ToList();
             ParameterExpression[] lambdaParams = inputs.Select(p => Expression.Parameter(typeof(object))).ToArray();
             NewArrayExpression array = Expression.NewArrayInit(typeof(object), lambdaParams);
 
