@@ -104,7 +104,13 @@ namespace BH.UI.Excel
                         return date.Value.ToOADate();
                 }
 
-                return data.GetType().ToText() + " [" + AddIn.IAddObject(data) + "]";
+                string name = "";
+                if (data is Type)
+                    name = ((Type)data).ToText(true);
+                else
+                    name = data.GetType().ToText();
+
+                return name + " [" + AddIn.IAddObject(data) + "]";
             }
             catch
             {
