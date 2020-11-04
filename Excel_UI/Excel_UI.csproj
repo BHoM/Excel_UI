@@ -118,6 +118,7 @@
     <Compile Include="Addin\AddIn_Objects.cs" />
     <Compile Include="Addin\AddIn_OpenClose.cs" />
     <Compile Include="Addin\AddIn.cs" />
+    <Compile Include="Components\Engine\GetEvents.cs" />
     <Compile Include="Ribbon\Ribbon_Condense.cs" />
     <Compile Include="Ribbon\Ribbon_Expand.cs" />
     <Compile Include="Ribbon\Ribbon_Internalise.cs" />
