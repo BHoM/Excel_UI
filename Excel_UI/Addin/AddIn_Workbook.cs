@@ -135,8 +135,9 @@ namespace BH.UI.Excel
                         Application app = ExcelDnaUtil.Application as Application;
                         if (app != null)
                         {
+                            bool numLocked = System.Windows.Forms.Control.IsKeyLocked(System.Windows.Forms.Keys.NumLock);
                             app.SendKeys("{F2}{(}", true);
-                            if (System.Windows.Forms.Control.IsKeyLocked(System.Windows.Forms.Keys.NumLock))
+                            if (numLocked)
                                 app.SendKeys("{NUMLOCK}", true);
                         }
                     }
