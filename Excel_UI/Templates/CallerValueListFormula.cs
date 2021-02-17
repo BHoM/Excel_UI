@@ -96,7 +96,8 @@ namespace BH.UI.Excel.Templates
                             validation.IgnoreBlank = true;
 
                             // Log usage
-                            Engine.UI.Compute.LogUsage("Excel", app?.Version, InstanceId, Caller.GetType().Name, Caller.SelectedItem);
+                            Workbook workbook = app.ActiveWorkbook;
+                            Engine.UI.Compute.LogUsage("Excel", app?.Version, InstanceId, Caller.GetType().Name, Caller.SelectedItem, null, AddIn.WorkbookId(workbook), workbook.FullName);
                         });
 
                         m_DataAccessor.SetDataItem(0, "");
