@@ -146,6 +146,27 @@ namespace BH.UI.Excel
             });
         }
 
+        /*******************************************/
+
+        public static string WorkbookId(Workbook workbook = null)
+        {
+            if (workbook == null)
+                workbook = ActiveWorkbook();
+            if (workbook == null)
+                return null;
+
+            DocumentProperties properties = workbook.CustomDocumentProperties;
+            foreach (DocumentProperty prop in properties)
+            {
+                if (prop.Name == "BHoM_Guid")
+                    return prop.Value.ToString();
+            }
+
+            string newId = Guid.NewGuid().ToString();
+            properties.Add("BHoM_Guid", false, MsoDocProperties.msoPropertyTypeString, newId);
+            return newId;
+        }
+
 
         /*******************************************/
         /**** Unused CustomXMLParts Methods     ****/

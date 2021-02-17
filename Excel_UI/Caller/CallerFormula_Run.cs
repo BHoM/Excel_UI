@@ -56,7 +56,8 @@ namespace BH.UI.Excel.Templates
 
             // Log usage
             Application app = ExcelDnaUtil.Application as Application;
-            Engine.UI.Compute.LogUsage("Excel", app?.Version, InstanceId, Caller.GetType().Name, Caller.SelectedItem, errors.ToList());
+            Workbook workbook = app.ActiveWorkbook;
+            Engine.UI.Compute.LogUsage("Excel", app?.Version, InstanceId, Caller.GetType().Name, Caller.SelectedItem, Engine.Reflection.Query.CurrentEvents(), AddIn.WorkbookId(workbook), workbook.FullName);
 
             // Return result
             return result;
