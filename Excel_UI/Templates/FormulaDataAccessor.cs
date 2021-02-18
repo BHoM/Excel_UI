@@ -108,6 +108,8 @@ namespace BH.UI.Excel.Templates
             }
             else if (type == typeof(Guid) && item is string)
                 return (T)(Guid.Parse(item as string) as dynamic);
+            else if (type == typeof(string) && !(item is string))
+                return item.ToString() as dynamic;
             else
             {
                 // Can't always cast directly to T from object storage type even
