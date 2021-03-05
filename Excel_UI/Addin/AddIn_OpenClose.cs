@@ -30,9 +30,12 @@ using System.Collections;
 using BH.UI.Excel.Templates;
 using ExcelDna.Registration;
 using Microsoft.Office.Interop.Excel;
+using System.Runtime.InteropServices;
+using ExcelDna.ComInterop;
 
 namespace BH.UI.Excel
 {
+    [ComVisible(false)]
     public partial class AddIn : IExcelAddIn
     {
         /*******************************************/
@@ -55,6 +58,9 @@ namespace BH.UI.Excel
                 app.WorkbookOpen += m_WorkbookClosingHandler;
                 //app.WorkbookBeforeClose += App_WorkbookClosed;
             }
+
+            // Register COM
+            ComServer.DllRegisterServer();
         }
 
         /*******************************************/
@@ -73,6 +79,9 @@ namespace BH.UI.Excel
                     m_WorkbookClosingHandler = null;
                     //app.WorkbookBeforeClose -= App_WorkbookClosed;
                 }
+
+                // Unregister COM
+                ComServer.DllUnregisterServer();
             }
             catch { }
         }
