@@ -118,7 +118,10 @@ namespace BH.UI.Excel
 
         public void SetProperty(string key, object value)
         {
-            m_Properties[key] = value;
+            if (key == "_t" && value is string)
+                SetType(value as string);
+            else
+                m_Properties[key] = value;
         }
 
         /***************************************************/
