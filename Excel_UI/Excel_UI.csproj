@@ -213,6 +213,7 @@ xcopy "$(TargetDir)ExcelDna.IntelliSense.dll"  "C:\ProgramData\BHoM\Assemblies" 
 xcopy "$(TargetDir)ExcelDna.Registration.dll"  "C:\ProgramData\BHoM\Assemblies" /Y
 
 call "$(DevEnvDir)..\..\VC\Auxiliary\Build\vcvarsall.bat" x86
+call "$(DevEnvDir)..\Tools\VsDevCmd.bat"
 xcopy "$(ProjectDir)..\packages\ExcelDna.Integration.0.34.6\lib\ExcelDna.Integration.dll" "C:\ProgramData\BHoM\Assemblies" /Y
 tlbexp.exe "C:\ProgramData\BHoM\Assemblies\$(TargetName)$(TargetExt)" /out:"C:\ProgramData\BHoM\Assemblies\$(TargetName).tlb"
 del "C:\ProgramData\BHoM\Assemblies\ExcelDna.Integration.dll"</PostBuildEvent>
