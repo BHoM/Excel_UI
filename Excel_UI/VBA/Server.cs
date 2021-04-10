@@ -71,6 +71,17 @@ namespace BH.UI.Excel
 
         /***************************************************/
 
+        public object GetObject(string id)
+        {
+            object result = AddIn.GetObject(id);
+            if (result == null)
+                return null;
+            else
+                return result.ToCom();
+        }
+
+        /***************************************************/
+
         public object CallMethod(string methodName, Collection inputs = null)
         {
             int index = methodName.LastIndexOf('.');
