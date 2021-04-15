@@ -96,7 +96,7 @@ namespace BH.UI.Excel
                 else if (data is IEnumerable && !(data is ICollection))
                     return ToExcel((data as IEnumerable).Cast<object>().ToList());
                 else if (data.GetType().IsEnum)
-                    return Enum.GetName(data.GetType(), data);
+                    return System.Enum.GetName(data.GetType(), data);
                 else if (data is DateTime)
                 {
                     DateTime? date = data as DateTime?;

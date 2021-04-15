@@ -20,31 +20,65 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using System;
+ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using ExcelDna.Integration;
-using ExcelDna.ComInterop;
 using BH.Engine.Reflection;
+using BH.oM.Base;
 using System.Reflection;
 
 namespace BH.UI.Excel
 {
     [ComVisible(true)]
     [ClassInterface(ClassInterfaceType.AutoDual)]
-    [Guid("751262D0-CEF4-47BA-8A77-C9B349DE887A")]
-    public class Server
+    [Guid("F01B959C-B6CD-4CA7-AA33-7E9A5191CE9A")]
+    public class Enum
     {
+        /***************************************************/
+        /**** Properties                                ****/
+        /***************************************************/
+
+        public string Type
+        {
+            get
+            {
+                return GetTypeName();
+            }
+
+            set
+            {
+                SetType(value);
+            }
+        }
+
+        /***************************************************/
+
+        public string Value { get; set; } = "";
+
+
         /***************************************************/
         /**** Constructors                              ****/
         /***************************************************/
 
-        public Server()
+        public Enum()
         {
-            BH.Engine.Reflection.Compute.LoadAllAssemblies();
+
+        }
+
+        /***************************************************/
+
+        public Enum(Type type, string value)
+        {
+            try
+            {
+                m_Type = type;
+                Value = value;
+            }
+            catch { }
         }
 
 
@@ -52,86 +86,42 @@ namespace BH.UI.Excel
         /**** Public Methods                            ****/
         /***************************************************/
 
-        public string SayHello()
+        public bool SetType(string typeName)
         {
-            return "Hello from the BHoM !";
+            m_Type = BH.Engine.Reflection.Create.Type(typeName);    
+            return m_Type != null;
         }
 
         /***************************************************/
 
-        public Object CreateObject(string typeName)
+        public string GetTypeName()
         {
-            Type type = BH.Engine.Reflection.Create.Type(typeName);
-            if (type == null)
-                return null;
-
-            object instance = Activator.CreateInstance(type);
-            return new Object(type, instance.PropertyDictionary());
-        }
-
-        /***************************************************/
-
-        public Enum CreateEnum(string typeName, string value)
-        {
-            Type type = BH.Engine.Reflection.Create.Type(typeName);
-            if (type == null)
-                return null;
-
-            object instance = Activator.CreateInstance(type);
-            return new Enum(type, value);
-        }
-
-        /***************************************************/
-
-        public object GetObject(string id)
-        {
-            object result = AddIn.GetObject(id);
-            if (result == null)
-                return null;
+            if (m_Type != null)
+                return m_Type.FullName;
             else
-                return result.IToCom();
+                return "";
         }
 
         /***************************************************/
 
-        public object CallMethod(string methodName, Collection inputs = null)
+        public Type GetCSharpType()
         {
-            int index = methodName.LastIndexOf('.');
-            if (index < 0)
-                return null;
-
-            string typeName = methodName.Substring(0, index);
-            methodName = methodName.Substring(index + 1);
-
-            Type type = BH.Engine.Reflection.Query.EngineTypeList().Where(x => x.FullName == typeName).FirstOrDefault();
-            if (type == null)
-                return null;
-
-            List<MethodInfo> methods = type.GetMethods(BindingFlags.Public | BindingFlags.Static | BindingFlags.DeclaredOnly)
-                    .Where(x => x.Name == methodName)
-                    .OfType<MethodInfo>()
-                    .ToList();
-
-            return Helpers.RunBestComMethod(methods, inputs);
+            return m_Type;
         }
 
         /***************************************************/
 
-        public object CreateAdapter(string adapterName, Collection inputs = null)
+        public void SetValue(string value)
         {
-            Type type = BH.Engine.Reflection.Query.AdapterTypeList().Where(x => x.FullName == adapterName).FirstOrDefault();
-            if (type == null)
-                return null;
-
-            return new Adapter(adapterName, inputs);
+            Value = value;
         }
 
 
         /***************************************************/
-        /**** Private Methods                           ****/
+        /**** Private Fields                            ****/
         /***************************************************/
 
-        
+        protected Type m_Type = null;
 
         /***************************************************/
     }

@@ -100,7 +100,7 @@ namespace BH.UI.Excel.Templates
             else if (item is object[,])
                 return (T)(GetDataList<object>(index) as dynamic); // Incase T is object or something similarly cabable of holding a list.
             else if (type.IsEnum && item is string)
-                return (T)Enum.Parse(type, item as string);
+                return (T)System.Enum.Parse(type, item as string);
             else if (type == typeof(DateTime) && item is double)
             {
                 DateTime date = DateTime.FromOADate((double)item);
