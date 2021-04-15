@@ -66,6 +66,10 @@ namespace BH.UI.Excel
             if (method == null)
                 return null;
 
+            ParameterInfo[] parameters = method.GetParameters();
+            if (parameters.Length > arguments.Length)
+                arguments = arguments.Concat(parameters.Skip(arguments.Length).Select(x => x.DefaultValue)).ToArray();
+
             object result = null;
             if (method is ConstructorInfo)
                 result = (method as ConstructorInfo).Invoke(arguments);
