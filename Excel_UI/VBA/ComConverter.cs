@@ -42,23 +42,12 @@ namespace BH.UI.Excel
         /**** ToCom Methods                             ****/
         /***************************************************/
 
-        public static object ToCom(this object obj)
+        public static object IToCom(this object obj)
         {
             if (obj == null)
                 return null;
 
-            Type type = obj.GetType();
-
-            if (obj is Enum || obj is Type || obj is MethodInfo)
-                return obj.ToString();
-            else if (obj is string || type.IsValueType)
-                return obj;
-            else if (obj is IObject)
-                return ToCom(obj as IObject);
-            else if (obj is IEnumerable)
-                return ToCom(obj as IEnumerable);
-            else
-                return obj;
+            return ToCom(obj as dynamic);
         }
 
         /***************************************************/
@@ -69,7 +58,7 @@ namespace BH.UI.Excel
                 return null;
 
             Type type = obj.GetType();
-            Dictionary<string, object> properties = obj.PropertyDictionary().ToDictionary(x => x.Key, x => x.Value.ToCom());
+            Dictionary<string, object> properties = obj.PropertyDictionary().ToDictionary(x => x.Key, x => x.Value.IToCom());
             return new Object(type, properties);
         }
 
@@ -80,7 +69,7 @@ namespace BH.UI.Excel
             if (obj == null)
                 return null;
 
-            return new Collection(obj.Cast<object>().Select(x => x.ToCom()));
+            return new Collection(obj.Cast<object>().Select(x => x.IToCom()));
         }
 
         /***************************************************/
@@ -88,8 +77,36 @@ namespace BH.UI.Excel
         public static PushType ToCom(this BH.oM.Adapter.PushType obj)
         {
             PushType result = PushType.AdapterDefault;
-            Enum.TryParse(obj.ToString(), out result);
+            System.Enum.TryParse(obj.ToString(), out result);
             return result;
+        }
+
+        /***************************************************/
+
+        public static string ToCom(this Type type)
+        {
+            return type?.ToText(true);
+        }
+
+        /***************************************************/
+
+        public static string ToCom(this MethodBase method)
+        {
+            return method?.ToText(true);
+        }
+
+        /***************************************************/
+
+        public static string ToCom(this string text)
+        {
+            return text;
+        }
+
+        /***************************************************/
+
+        private static object ToCom(this object obj)
+        {
+            return obj;
         }
 
 
@@ -97,23 +114,12 @@ namespace BH.UI.Excel
         /**** FromCom Methods                           ****/
         /***************************************************/
 
-        public static object FromCom(this object obj)
+        public static object IFromCom(this object obj)
         {
             if (obj == null)
                 return null;
 
-            Type type = obj.GetType();
-
-            if (obj is Enum)
-                return obj.ToString();
-            else if (obj is string || type.IsValueType)
-                return obj;
-            else if (obj is Object)
-                return FromCom(obj as Object);
-            else if (obj is Collection)
-                return FromCom(obj as Collection);
-            else
-                return obj;
+            return FromCom(obj as dynamic);
         }
 
         /***************************************************/
@@ -129,7 +135,7 @@ namespace BH.UI.Excel
 
             object instance = Activator.CreateInstance(type);
             foreach (string propName in obj.GetProperties())
-                Engine.Reflection.Modify.SetPropertyValue(instance, propName, obj[propName].FromCom());
+                Engine.Reflection.Modify.SetPropertyValue(instance, propName, obj[propName].IFromCom());
             //prop.AssignProperty(instance, obj[prop.Name].FromCom());
 
             return instance;
@@ -142,7 +148,7 @@ namespace BH.UI.Excel
             if (obj == null)
                 return null;
 
-            return obj.Cast<object>().Select(x => x.FromCom()).ToList();
+            return obj.Cast<object>().Select(x => x.IFromCom()).ToList();
         }
 
         /***************************************************/
@@ -150,8 +156,39 @@ namespace BH.UI.Excel
         public static BH.oM.Adapter.PushType FromCom(this PushType obj)
         {
             BH.oM.Adapter.PushType result = oM.Adapter.PushType.AdapterDefault;
-            Enum.TryParse(obj.ToString(), out result);
+            System.Enum.TryParse(obj.ToString(), out result);
             return result;
+        }
+
+        /***************************************************/
+
+        public static object FromCom(this Excel.Enum e)
+        {
+            if (e == null)
+                return null;
+
+            try
+            {
+                return System.Enum.Parse(e.GetCSharpType(), e.Value);
+            }
+            catch 
+            {
+                return null;
+            }
+        }
+
+        /***************************************************/
+
+        public static object FromCom(this string text)
+        {
+            return text;
+        }
+
+        /***************************************************/
+
+        private static object FromCom(this object obj)
+        {
+            return obj;
         }
 
 

@@ -75,7 +75,7 @@ namespace BH.UI.Excel
             if (result == null)
                 return null;
             else
-                return result.ToCom();
+                return result.IToCom();
         }
 
         /***************************************************/
