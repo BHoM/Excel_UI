@@ -88,7 +88,14 @@ namespace BH.UI.Excel
 
         public bool SetType(string typeName)
         {
-            m_Type = BH.Engine.Reflection.Create.Type(typeName);    
+            m_Type = BH.Engine.Reflection.Create.Type(typeName);
+
+            if (m_Type != null)
+            {
+                System.Enum e = Activator.CreateInstance(m_Type) as System.Enum;
+                Value = e.ToString();
+            }
+
             return m_Type != null;
         }
 
