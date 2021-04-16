@@ -30,6 +30,7 @@ using ExcelDna.Integration;
 using ExcelDna.ComInterop;
 using BH.Engine.Reflection;
 using System.Reflection;
+using System.ComponentModel;
 
 namespace BH.UI.Excel
 {
@@ -53,7 +54,7 @@ namespace BH.UI.Excel
                 {
                     bool match = true;
                     for (int i = 0; i < arguments.Length; i++)
-                        match &= paramTypes[i].IsAssignableFrom(arguments[i].GetType());
+                        match &= IsAssignableFrom(paramTypes[i], arguments[i].GetType());
 
                     if (match)
                     {
@@ -81,6 +82,22 @@ namespace BH.UI.Excel
             else
                 return result.IToCom();
         }
+
+        /***************************************************/
+        /**** Private Methods                           ****/
+        /***************************************************/
+
+        private static bool IsAssignableFrom(Type a, Type b)
+        {
+            if (a == b)
+                return true;
+            else if (b.IsPrimitive)
+                return TypeDescriptor.GetConverter(b).CanConvertTo(a);
+            else
+                return a.IsAssignableFrom(b);
+        }
+
+
 
         /***************************************************/
     }
