@@ -55,7 +55,7 @@ namespace BH.UI.Excel
                 }
                 else
                 {
-                    var formula = GetExcelDelegate(caller);
+                    var formula = caller.GetExcelDelegate();
                     string function = caller.Function;
 
                     ExcelAsyncUtil.QueueAsMacro(() =>
@@ -130,111 +130,6 @@ namespace BH.UI.Excel
 
         /*******************************************/
         /**** Private Methods                   ****/
-        /*******************************************/
-
-        private static Tuple<Delegate, ExcelFunctionAttribute, List<object>> GetExcelDelegate(CallerFormula caller)
-        {
-            int nbInputs = caller.Caller.InputParams.Count;
-            List<ParamInfo> inputs = caller.Caller.InputParams.ToList();
-            ParameterExpression[] lambdaParams = inputs.Select(p => Expression.Parameter(typeof(object))).ToArray();
-            NewArrayExpression array = Expression.NewArrayInit(typeof(object), lambdaParams);
-
-            // Define the method to call depending on the number of outputs
-            MethodCallExpression methodCall;
-            if (caller.Caller.OutputParams.Count > 1)
-            {
-                List<ParamInfo> extraInputs = new List<ParamInfo>
-                {
-                    new ParamInfo { DataType = typeof(bool), DefaultValue = false, HasDefaultValue = true, IsRequired = false, Name = "_includeOutputNames", Description = "Include the name of the outputs" },
-                    new ParamInfo { DataType = typeof(bool), DefaultValue = false, HasDefaultValue = true, IsRequired = false, Name = "_transposeOutputs", Description = "Transpose the resulting table (i.e. one output per row instead of per column)" }
-                };
-
-                inputs.AddRange(extraInputs);
-                lambdaParams = lambdaParams.Concat(new ParameterExpression[] { Expression.Parameter(typeof(bool)), Expression.Parameter(typeof(bool)) }).ToArray();
-                MethodInfo method = caller.GetType().GetMethod("RunWithOutputConfig");
-                methodCall = Expression.Call(Expression.Constant(caller), method, array, lambdaParams[nbInputs], lambdaParams[nbInputs + 1]);
-            }
-            else
-            {
-                MethodInfo method = caller.GetType().GetMethod("Run");
-                methodCall = Expression.Call(Expression.Constant(caller), method, array);
-            }
-            
-            LambdaExpression lambda = Expression.Lambda(methodCall, lambdaParams);
-            return new Tuple<Delegate, ExcelFunctionAttribute, List<object>>(
-                lambda.Compile(),
-                GetFunctionAttribute(caller),
-                GetArgumentAttributes(inputs).ToList<object>()
-            );
-        }
-
-        /*******************************************/
-
-        private static ExcelFunctionAttribute GetFunctionAttribute(CallerFormula caller)
-        {
-            int limit = 254;
-            string description = caller.Caller.Description;
-            if (description.Length >= limit)
-                description = description.Substring(0, limit - 1);
-            return new ExcelFunctionAttribute()
-            {
-                Name = caller.Function,
-                Description = description,
-                Category = "BHoM." + caller.Caller.Category,
-                IsMacroType = true
-            };
-        }
-
-        /*******************************************/
-
-        private static List<ExcelArgumentAttribute> GetArgumentAttributes(List<ParamInfo> rawParams)
-        {
-            List<ExcelArgumentAttribute> argAttrs = rawParams.Select(p =>
-            {
-                string name = p.HasDefaultValue ? $"[{p.Name}]" : p.Name;
-                string postfix = string.Empty;
-                if (p.HasDefaultValue)
-                {
-                    postfix += " [default: " +
-                    (p.DefaultValue is string
-                        ? $"\"{p.DefaultValue}\""
-                        : p.DefaultValue == null
-                            ? "null"
-                            : p.DefaultValue.ToString()
-                    ) + "]";
-                }
-
-                int limit = 253 - name.Length;
-                string desc = p.Description + postfix;
-
-                if (desc.Length >= limit)
-                    desc = p.Description.Substring(limit - postfix.Length) + postfix;
-
-                return new ExcelArgumentAttribute() { Name = name, Description = desc };
-            }).ToList();
-
-            if (argAttrs.Count() > 0)
-            {
-                int nbFullName = argAttrs.Count;
-                string argstring = argAttrs.Select(item => item.Name).Aggregate((a, b) => $"{a}, {b}");
-                while (argstring.Length >= 254)
-                {
-                    nbFullName--;
-                    ExcelArgumentAttribute arg = argAttrs[nbFullName];
-                    bool isOptional = arg.Name.StartsWith("[");
-
-                    arg.Description = "Full name: " + arg.Name + ". " + arg.Description;
-                    arg.Name = string.Concat(arg.Name.Where(x => char.IsUpper(x)));
-                    if (isOptional)
-                        arg.Name = "[" + arg.Name + "]";
-
-                    argstring = argAttrs.Select(item => item.Name).Aggregate((a, b) => $"{a}, {b}");
-                }
-            }
-
-            return argAttrs;
-        }
-
         /*******************************************/
 
         private static void SaveCallerToHiddenSheet(CallerFormula caller)
