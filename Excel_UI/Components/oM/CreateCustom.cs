@@ -89,7 +89,7 @@ namespace BH.UI.Excel.Components
 
                 m_DataAccessor.SetInputs(objects, objects.Select(x => null as object).ToList());
 
-                for (int i = 0; i < Math.Min(Caller.InputParams.Count, types.Count); i++)
+                for (int i = 0; i < Math.Min(objects.Count, types.Count); i++)
                 {
 
                     if (types[i] != null && objects[i] != null)
