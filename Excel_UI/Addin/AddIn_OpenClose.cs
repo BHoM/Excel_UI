@@ -52,11 +52,10 @@ namespace BH.UI.Excel
 
             // Events on Excel itself
             Application app = ExcelDnaUtil.Application as Application;
-            if (app != null && m_WorkbookClosingHandler == null)
+            if (app != null && m_WorkbookOpeningHandler == null)
             {
-                m_WorkbookClosingHandler = new AppEvents_WorkbookOpenEventHandler(App_WorkbookOpen);
-                app.WorkbookOpen += m_WorkbookClosingHandler;
-                //app.WorkbookBeforeClose += App_WorkbookClosed;
+                m_WorkbookOpeningHandler = new AppEvents_WorkbookOpenEventHandler(App_WorkbookOpen);
+                app.WorkbookOpen += m_WorkbookOpeningHandler;
             }
 
             // Register COM
@@ -73,10 +72,10 @@ namespace BH.UI.Excel
                 ExcelDna.IntelliSense.IntelliSenseServer.Uninstall();
 
                 Application app = ExcelDnaUtil.Application as Application;
-                if (app != null && m_WorkbookClosingHandler != null)
+                if (app != null && m_WorkbookOpeningHandler != null)
                 {
-                    app.WorkbookOpen -= m_WorkbookClosingHandler;
-                    m_WorkbookClosingHandler = null;
+                    app.WorkbookOpen -= m_WorkbookOpeningHandler;
+                    m_WorkbookOpeningHandler = null;
                     //app.WorkbookBeforeClose -= App_WorkbookClosed;
                 }
 
@@ -119,8 +118,10 @@ namespace BH.UI.Excel
         public void App_WorkbookOpen(Workbook workbook)
         {
             // Restore internalised data and callers
+            BH.UI.Base.Global.DocumentListener.OnDocumentBeginOpening(workbook.FullName);
             RestoreData();
             RestoreFormulas();
+            BH.UI.Base.Global.DocumentListener.OnDocumentEndOpening(workbook.FullName);
 
             // Initialise the BHoM Addin and run first calculation
             ExcelAsyncUtil.QueueAsMacro(() =>
@@ -148,7 +149,7 @@ namespace BH.UI.Excel
         /*******************************************/
 
         private bool m_Initialised = false;
-        private static AppEvents_WorkbookOpenEventHandler m_WorkbookClosingHandler = null;
+        private static AppEvents_WorkbookOpenEventHandler m_WorkbookOpeningHandler = null;
 
         /*******************************************/
     }
