@@ -147,7 +147,7 @@ namespace BH.UI.Excel
         {
             try
             {
-                BH.UI.Base.Global.DocumentListener.OnDocumentClosing();
+                BH.UI.Base.Global.DocumentListener.OnDocumentClosing(workbook.FullName);
                 ClearObjects();
             }
             catch (Exception e)
