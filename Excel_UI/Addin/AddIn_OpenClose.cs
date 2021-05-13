@@ -32,6 +32,7 @@ using ExcelDna.Registration;
 using Microsoft.Office.Interop.Excel;
 using System.Runtime.InteropServices;
 using ExcelDna.ComInterop;
+using System.Diagnostics;
 
 namespace BH.UI.Excel
 {
@@ -56,6 +57,7 @@ namespace BH.UI.Excel
             {
                 m_WorkbookOpeningHandler = new AppEvents_WorkbookOpenEventHandler(App_WorkbookOpen);
                 app.WorkbookOpen += m_WorkbookOpeningHandler;
+                app.WorkbookBeforeClose += App_WorkbookClosed;
             }
 
             // Register COM
@@ -75,14 +77,17 @@ namespace BH.UI.Excel
                 if (app != null && m_WorkbookOpeningHandler != null)
                 {
                     app.WorkbookOpen -= m_WorkbookOpeningHandler;
+                    app.WorkbookBeforeClose -= App_WorkbookClosed;
                     m_WorkbookOpeningHandler = null;
-                    //app.WorkbookBeforeClose -= App_WorkbookClosed;
                 }
 
                 // Unregister COM
                 ComServer.DllUnregisterServer();
             }
-            catch { }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+            }
         }
 
 
@@ -140,7 +145,15 @@ namespace BH.UI.Excel
 
         public void App_WorkbookClosed(Workbook workbook, ref bool cancel)
         {
-            ClearObjects();
+            try
+            {
+                BH.UI.Base.Global.DocumentListener.OnDocumentClosing();
+                ClearObjects();
+            }
+            catch (Exception e)
+            {
+                Debug.WriteLine(e.Message);
+            }
         }
 
 
