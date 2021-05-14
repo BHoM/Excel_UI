@@ -34,6 +34,7 @@ using BH.UI.Base;
 using BH.UI.Excel.Templates;
 using BH.oM.Base;
 using BH.UI.Excel.Components;
+using BH.oM.Versioning;
 
 namespace BH.UI.Excel
 {
@@ -103,6 +104,7 @@ namespace BH.UI.Excel
                 // Recover the information about the formula
                 string formulaName = sheet.Cells[i, 1].Value as string;
                 string callerJson = sheet.Cells[i, 2].Value as string;
+                string oldFunction = sheet.Cells[i, 3].Value as string;
                 if (formulaName == null || formulaName.Length == 0 || callerJson == null || callerJson.Length == 0)
                     break;
 
@@ -110,8 +112,17 @@ namespace BH.UI.Excel
                 CallerFormula formula = InstantiateCaller(formulaName);
                 if (formula != null)
                 {
+                    BH.Engine.Reflection.Compute.ClearCurrentEvents();
                     formula.Caller.Read(callerJson);
-                    Register(formula); 
+
+                    VersioningEvent versioning = BH.Engine.Reflection.Query.CurrentEvents().OfType<VersioningEvent>().FirstOrDefault();
+
+                    Register(formula, () =>
+                    {
+                        if (versioning != null && !string.IsNullOrEmpty(oldFunction))
+                            UpgradeCellsFormula(formula, oldFunction);
+                    });
+                    
                 }
 
                 // Register the choices as objects if formula is a dropdown
@@ -163,10 +174,29 @@ namespace BH.UI.Excel
 
                         sheet.Cells[row, 1].Value = caller.Caller.GetType().Name;
                         sheet.Cells[row, 2].Value = caller.Caller.Write();
+                        sheet.Cells[row, 3].Value = caller.Function;
                     } 
                 } 
             });
             
+        }
+
+        /*******************************************/
+
+        private static void UpgradeCellsFormula(CallerFormula formula, string oldFunction)
+        {
+            if (formula?.Caller?.SelectedItem == null)
+                return;
+
+            string oldFormula = '=' + oldFunction + '(';
+            string newFormula = '=' + formula.Function + '(';
+
+            Workbook workbook = ActiveWorkbook();
+            if (workbook != null)
+            {
+                foreach (Worksheet sheet in workbook.Sheets.OfType<Worksheet>().Where(x => x.Visible == XlSheetVisibility.xlSheetVisible))
+                    sheet.Cells.Replace(oldFormula, newFormula, XlLookAt.xlPart);
+            }
         }
 
 
