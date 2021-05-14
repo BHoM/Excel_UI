@@ -53,7 +53,7 @@ namespace BH.UI.Excel.Addin
         [ExcelFunction(Name = "BHoM.Condense", Description = "Take a group of cells and store their content as a list in a single cell.", Category = "UI")]
         public static object Condense(object[] items)
         {
-            items = AddIn.FromExcel(items);
+            items = AddIn.FromExcel(items.Where(x => !(x is ExcelEmpty)).ToArray());
             return AddIn.ToExcel(items.ToList());
         }
 
