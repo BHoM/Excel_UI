@@ -41,9 +41,18 @@ namespace BH.UI.Excel
 
         public static Dictionary<string, CallerFormula> CallerShells { get; private set; } = new Dictionary<string, CallerFormula>();
 
+        public static AddIn Instance { get; private set; } = null;
+
 
         /*******************************************/
         /**** Constructors                      ****/
+        /*******************************************/
+
+        public AddIn()
+        {
+            Instance = this;
+        }
+
         /*******************************************/
 
         static AddIn()

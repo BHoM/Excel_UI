@@ -65,6 +65,17 @@ namespace BH.UI.Excel.Addin
             return ribbonxml;
         }
 
+        /*******************************************/
+
+        public override void OnBeginShutdown(ref Array custom)
+        {
+            AddIn addIn = AddIn.Instance;
+            if (addIn != null)
+                addIn.AutoClose();
+
+            base.OnBeginShutdown(ref custom);
+        }
+
 
         /*******************************************/
         /**** Methods                           ****/
