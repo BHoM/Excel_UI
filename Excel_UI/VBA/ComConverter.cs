@@ -64,6 +64,13 @@ namespace BH.UI.Excel
 
         /***************************************************/
 
+        public static Collection ToCom(this FragmentSet obj)
+        {
+            return ToCom(obj as IEnumerable);
+        }
+
+        /***************************************************/
+
         public static Collection ToCom(this IEnumerable obj)
         {
             if (obj == null)
@@ -106,7 +113,10 @@ namespace BH.UI.Excel
 
         private static object ToCom(this object obj)
         {
-            return obj;
+            if (obj.GetType().IsEnum)
+                return obj.ToString();
+            else
+                return obj;
         }
 
 
