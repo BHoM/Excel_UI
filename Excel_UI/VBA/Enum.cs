@@ -123,6 +123,16 @@ namespace BH.UI.Excel
             Value = value;
         }
 
+        /***************************************************/
+
+        public string[] GetPossibleValues()
+        {
+            if (m_Type == null)
+                return new string[0];
+            else
+                return System.Enum.GetNames(m_Type).ToArray();
+        }
+
 
         /***************************************************/
         /**** Private Fields                            ****/
