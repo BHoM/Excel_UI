@@ -90,6 +90,7 @@ namespace BH.UI.Excel
             }
         }
 
+
         /***************************************************/
         /**** Constructors                              ****/
         /***************************************************/
@@ -164,6 +165,27 @@ namespace BH.UI.Excel
                 return m_Type.FullName;
             else
                 return "";
+        }
+
+        /***************************************************/
+
+        public string GetPropertyType(string propertyName)
+        {
+            if (m_Type == null)
+                return "";
+
+            try
+            {
+                PropertyInfo prop = m_Type.GetProperty(propertyName);
+                if (prop == null)
+                    return "";
+                else
+                    return prop.PropertyType.FullName;
+            }
+            catch
+            {
+                return "";
+            }
         }
 
         /***************************************************/
