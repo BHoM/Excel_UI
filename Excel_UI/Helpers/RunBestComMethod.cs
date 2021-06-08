@@ -54,7 +54,7 @@ namespace BH.UI.Excel
                 {
                     bool match = true;
                     for (int i = 0; i < arguments.Length; i++)
-                        match &= IsAssignableFrom(paramTypes[i], arguments[i].GetType());
+                        match &= IsAssignableFrom(paramTypes[i], arguments[i]?.GetType());
 
                     if (match)
                     {
@@ -89,7 +89,11 @@ namespace BH.UI.Excel
 
         private static bool IsAssignableFrom(Type a, Type b)
         {
-            if (a == b)
+            if (b == null)
+                return true;
+            else if (a == null)
+                return false;
+            else if (a == b)
                 return true;
             else if (b.IsPrimitive)
                 return TypeDescriptor.GetConverter(b).CanConvertTo(a);
