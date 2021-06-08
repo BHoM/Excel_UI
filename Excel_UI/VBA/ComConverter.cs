@@ -126,7 +126,7 @@ namespace BH.UI.Excel
 
         public static object IFromCom(this object obj)
         {
-            if (obj == null)
+            if (obj == null || obj is DBNull)
                 return null;
 
             return FromCom(obj as dynamic);
@@ -198,7 +198,10 @@ namespace BH.UI.Excel
 
         private static object FromCom(this object obj)
         {
-            return obj;
+            if (obj == null || obj is DBNull)
+                return null;
+            else
+                return obj;
         }
 
 
