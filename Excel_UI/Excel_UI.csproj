@@ -169,6 +169,7 @@
     <Compile Include="Components\oM\CreateType.cs" />
     <Compile Include="BHoM_UI_Overrides\SelectorMenu_RibbonXml.cs" />
     <Compile Include="Caller\CallerFormula.cs" />
+    <Compile Include="VBA\Dictionary.cs" />
     <Compile Include="VBA\Enum.cs" />
     <Compile Include="VBA\PushType.cs" />
     <Compile Include="VBA\Collection.cs" />
