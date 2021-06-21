@@ -117,7 +117,7 @@ namespace BH.UI.Excel
 
         /***************************************************/
 
-        public object CreateAdapter(string adapterName, Collection inputs = null)
+        public Adapter CreateAdapter(string adapterName, Collection inputs = null)
         {
             Type type = BH.Engine.Reflection.Query.AdapterTypeList().Where(x => x.FullName == adapterName).FirstOrDefault();
             if (type == null)
