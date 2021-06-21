@@ -59,6 +59,16 @@ namespace BH.UI.Excel
 
             Type type = obj.GetType();
             Dictionary<string, object> properties = obj.PropertyDictionary().ToDictionary(x => x.Key, x => x.Value.IToCom());
+
+            if (obj is BHoMObject)
+            {
+                foreach (var kvp in ((BHoMObject)obj).CustomData)
+                {
+                    if (!properties.ContainsKey(kvp.Key))
+                        properties.Add(kvp.Key, kvp.Value);
+                }
+            }
+
             return new Object(type, properties);
         }
 
@@ -67,6 +77,16 @@ namespace BH.UI.Excel
         public static Collection ToCom(this FragmentSet obj)
         {
             return ToCom(obj as IEnumerable);
+        }
+
+        /***************************************************/
+
+        public static Dictionary ToCom<T>(this Dictionary<string, T> obj)
+        {
+            if (obj == null)
+                return null;
+
+            return new Dictionary(obj.Keys, obj.Values.Cast<object>().Select(x => x.IToCom()));
         }
 
         /***************************************************/
@@ -159,6 +179,16 @@ namespace BH.UI.Excel
                 return null;
 
             return obj.Cast<object>().Select(x => x.IFromCom()).ToList();
+        }
+
+        /***************************************************/
+
+        public static Dictionary<string, object> FromCom(this Dictionary obj)
+        {
+            if (obj == null)
+                return null;
+
+            return obj.Keys.Zip(obj.Values, (k, v) => new { k, v }).ToDictionary(x => x.k, x => x.v); 
         }
 
         /***************************************************/
