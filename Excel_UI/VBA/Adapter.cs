@@ -121,6 +121,27 @@ namespace BH.UI.Excel
             return result.ToCom();
         }
 
+        /***************************************************/
+
+        public int Remove(Object request, Object actionConfig = null)
+        {
+            IRequest actualRequest = null;
+            if (!m_Adapter.SetupRemoveRequest(ComConverter.FromCom(request) as IRequest, out actualRequest))
+            {
+                BH.Engine.Reflection.Compute.RecordError($"Invalid `{nameof(request)}` input.");
+                return 0;
+            }
+
+            ActionConfig removeConfig = null;
+            if (!m_Adapter.SetupRemoveConfig(ComConverter.FromCom(actionConfig) as ActionConfig, out removeConfig))
+            {
+                BH.Engine.Reflection.Compute.RecordError($"Invalid `{nameof(actionConfig)}` input.");
+                return 0;
+            }
+
+            return m_Adapter.Remove(actualRequest, removeConfig);
+        }
+
 
         /***************************************************/
         /**** Private Fields                            ****/
