@@ -44,7 +44,7 @@ namespace BH.UI.Excel
         {
             if (inputs == null)
                 inputs = new Collection();
-            object[] arguments = inputs.FromCom().ToArray();
+            object[] arguments = inputs.FromCom().Select(x => FixType(x)).ToArray();
 
             T method = null;
             foreach (T m in methods)
@@ -101,7 +101,29 @@ namespace BH.UI.Excel
                 return a.IsAssignableFrom(b);
         }
 
+        /***************************************************/
 
+        private static object FixType(object argument)
+        {
+            if (argument is List<object>)
+            {
+                List<object> list = argument as List<object>;
+                List<Type> types = list.Select(x => x.GetType()).Distinct().ToList();
+                if (types.Count == 1)
+                    return CastList(list, list.First() as dynamic);
+                else
+                    return argument;
+            }
+            else
+                return argument;
+        }
+
+        /***************************************************/
+
+        private static List<T> CastList<T>(List<object> list, T first)
+        {
+            return list.Cast<T>().ToList();
+        }
 
         /***************************************************/
     }
