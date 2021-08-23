@@ -63,9 +63,18 @@ namespace BH.UI.Excel
 
         public Adapter(string adapterName, Collection parameters = null)
         {
-            Type type = BH.Engine.Reflection.Query.AdapterTypeList().Where(x => x.FullName == adapterName).FirstOrDefault();
+            Type type = BH.Engine.Reflection.Query.AdapterTypeList().Where(x => x.FullName.Contains(adapterName)).FirstOrDefault();
             if (type != null)
                 m_Adapter = Helpers.RunBestComMethod(type.GetConstructors(), parameters) as BHoMAdapter;
+        }
+
+        /***************************************************/
+
+        public Adapter(string adapterName, string filePath, Object toolkitConfig = null)
+        {
+            Type type = BH.Engine.Reflection.Query.AdapterTypeList().Where(x => x.FullName.Contains(adapterName)).FirstOrDefault();
+            if (type != null)
+                m_Adapter = BH.Engine.Adapter.Create.BHoMAdapter(type, filePath, toolkitConfig.FromCom(), true) as BHoMAdapter;
         }
 
 
