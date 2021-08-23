@@ -119,7 +119,7 @@ namespace BH.UI.Excel
 
         public Adapter CreateAdapter(string adapterName, Collection inputs = null)
         {
-            Type type = BH.Engine.Reflection.Query.AdapterTypeList().Where(x => x.FullName == adapterName).FirstOrDefault();
+            Type type = BH.Engine.Reflection.Query.AdapterTypeList().Where(x => x.FullName.Contains(adapterName)).FirstOrDefault();
             if (type == null)
                 return null;
 
@@ -128,10 +128,21 @@ namespace BH.UI.Excel
 
 
         /***************************************************/
+
+        public Adapter CreateAdapter(string adapterName, string filePath, Object toolkitConfig = null)
+        {
+            Type type = BH.Engine.Reflection.Query.AdapterTypeList().Where(x => x.FullName.Contains(adapterName)).FirstOrDefault();
+            if (type == null)
+                return null;
+
+            return new Adapter(adapterName, filePath, toolkitConfig);
+        }
+
+        /***************************************************/
         /**** Private Methods                           ****/
         /***************************************************/
 
-        
+
 
         /***************************************************/
     }
