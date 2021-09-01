@@ -224,8 +224,7 @@ xcopy "$(TargetDir)ExcelDna.Registration.dll"  "C:\ProgramData\BHoM\Assemblies" 
 call "$(DevEnvDir)..\..\VC\Auxiliary\Build\vcvarsall.bat" x86
 call "$(DevEnvDir)..\Tools\VsDevCmd.bat"
 xcopy "$(ProjectDir)..\packages\ExcelDna.Integration.0.34.6\lib\ExcelDna.Integration.dll" "C:\ProgramData\BHoM\Assemblies" /Y
-"C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\tlbexp.exe" "C:\ProgramData\BHoM\Assemblies\$(TargetName)$(TargetExt)" /out:"$(TargetDir)$(TargetName).tlb"
-xcopy "$(TargetDir)$(TargetName).tlb" "C:\ProgramData\BHoM\Assemblies" /Y
+"C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\tlbexp.exe" "C:\ProgramData\BHoM\Assemblies\$(TargetName)$(TargetExt)" /out:"C:\ProgramData\BHoM\Assemblies\$(TargetName).tlb"
 del "C:\ProgramData\BHoM\Assemblies\ExcelDna.Integration.dll"</PostBuildEvent>
   </PropertyGroup>
   <Import Project="..\packages\ExcelDna.AddIn.0.34.6\tools\ExcelDna.AddIn.targets" Condition="Exists('..\packages\ExcelDna.AddIn.0.34.6\tools\ExcelDna.AddIn.targets')" />
