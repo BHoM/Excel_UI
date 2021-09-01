@@ -224,7 +224,7 @@ xcopy "$(TargetDir)ExcelDna.Registration.dll"  "C:\ProgramData\BHoM\Assemblies" 
 call "$(DevEnvDir)..\..\VC\Auxiliary\Build\vcvarsall.bat" x86
 call "$(DevEnvDir)..\Tools\VsDevCmd.bat"
 xcopy "$(ProjectDir)..\packages\ExcelDna.Integration.0.34.6\lib\ExcelDna.Integration.dll" "C:\ProgramData\BHoM\Assemblies" /Y
-tlbexp.exe "C:\ProgramData\BHoM\Assemblies\$(TargetName)$(TargetExt)" /out:"$(TargetDir)$(TargetName).tlb"
+"C:\Program Files (x86)\Microsoft SDKs\Windows\v10.0A\bin\NETFX 4.8 Tools\tlbexp.exe" "C:\ProgramData\BHoM\Assemblies\$(TargetName)$(TargetExt)" /out:"$(TargetDir)$(TargetName).tlb"
 xcopy "$(TargetDir)$(TargetName).tlb" "C:\ProgramData\BHoM\Assemblies" /Y
 del "C:\ProgramData\BHoM\Assemblies\ExcelDna.Integration.dll"</PostBuildEvent>
   </PropertyGroup>
