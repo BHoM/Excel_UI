@@ -88,7 +88,7 @@
   </ItemGroup>
 
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-<Exec Command="xcopy &quot;$(TargetDir)$(TargetFileName)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y" />
+<Exec Command="xcopy &quot;$(TargetPath)&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y&#xD;&#xA;&#xD;&#xA;xcopy &quot;$(TargetDir)*.xll&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)*.dna&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)OfficeApi.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)NetOffice.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)ExcelApi.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)ExcelDna.IntelliSense.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)ExcelDna.Registration.dll&quot;  &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y&#xD;&#xA;&#xD;&#xA;call &quot;$(DevEnvDir)..\..\VC\Auxiliary\Build\vcvarsall.bat&quot; x86&#xD;&#xA;call &quot;$(DevEnvDir)..\Tools\VsDevCmd.bat&quot;&#xD;&#xA;xcopy &quot;$(ProjectDir)..\packages\ExcelDna.Integration.0.34.6\lib\ExcelDna.Integration.dll&quot; &quot;C:\ProgramData\BHoM\Assemblies&quot; /Y&#xD;&#xA;" />
   </Target>
 
 </Project>
