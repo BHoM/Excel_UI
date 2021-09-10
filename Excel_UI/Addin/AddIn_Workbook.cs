@@ -36,6 +36,7 @@ using BH.Engine.Serialiser;
 using Microsoft.Office.Interop.Excel;
 using Microsoft.Office.Core;
 
+
 namespace BH.UI.Excel
 {
     public partial class AddIn : IExcelAddIn
@@ -66,12 +67,12 @@ namespace BH.UI.Excel
             // Look for the sheet in the active workbook
             Worksheet sheet = null;
             if (workbook.Sheets.OfType<Worksheet>().Any(x => x.Name == name))
-                sheet = workbook.Sheets[name];
+                sheet = workbook.Sheets[name] as Worksheet;
 
             // If sheet doesn't exist, create it if requested
             if (sheet == null && addIfMissing)
             {
-                sheet = workbook.Sheets.Add();
+                sheet = workbook.Sheets.Add() as Worksheet;
                 sheet.Name = name;
 
                 if (isHidden)
@@ -155,7 +156,7 @@ namespace BH.UI.Excel
             if (workbook == null)
                 return null;
 
-            DocumentProperties properties = workbook.CustomDocumentProperties;
+            DocumentProperties properties = workbook.CustomDocumentProperties as DocumentProperties;
             foreach (DocumentProperty prop in properties)
             {
                 if (prop.Name == "BHoM_Guid")

@@ -44,7 +44,7 @@ namespace BH.UI.Excel.Addin
         public void Internalise(IRibbonControl control)
         {
             Application app = ExcelDnaUtil.Application as Application;
-            AddIn.Internalise(app.Selection as Range);
+            AddIn.Internalise(app.Selection as Microsoft.Office.Interop.Excel.Range);
         }
 
         /*******************************************/

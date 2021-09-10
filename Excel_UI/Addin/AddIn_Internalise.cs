@@ -42,7 +42,7 @@ namespace BH.UI.Excel
         /**** Methods                           ****/
         /*******************************************/
 
-        public static void Internalise(Range selection)
+        public static void Internalise(Microsoft.Office.Interop.Excel.Range selection)
         {
             // Get the FromJson caller 
             string callerName = typeof(FromJsonCaller).Name;
@@ -54,7 +54,7 @@ namespace BH.UI.Excel
             Register(formula);
 
             // Replace the function to recover the internalised data
-            foreach (Range cell in selection)
+            foreach (Microsoft.Office.Interop.Excel.Range cell in selection)
             {
                 object value = cell.Value; 
                 if (value != null)
@@ -107,7 +107,7 @@ namespace BH.UI.Excel
             {
                 try
                 {
-                    sheet.Cells[index, 1].Value = json.Substring(i, Math.Min(characterLimit, json.Length - i));
+                    (sheet.Cells[index, 1] as Microsoft.Office.Interop.Excel.Range).Value = json.Substring(i, Math.Min(characterLimit, json.Length - i));
                     index++;
                 }
                 catch { }
@@ -129,7 +129,7 @@ namespace BH.UI.Excel
             {
                 try
                 {
-                    string segment = sheet.Cells[i, 1].Value as string;
+                    string segment = (sheet.Cells[i, 1] as Microsoft.Office.Interop.Excel.Range).Value as string;
                     if (string.IsNullOrEmpty(segment))
                         break;
                     else

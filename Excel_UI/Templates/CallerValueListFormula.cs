@@ -84,7 +84,7 @@ namespace BH.UI.Excel.Templates
                         {
                             Application app = ExcelDnaUtil.Application as Application;
                             string reftext = XlCall.Excel(XlCall.xlfReftext, xlref, true) as string;
-                            Range cell = app.Range[reftext];
+                            Microsoft.Office.Interop.Excel.Range cell = app.Range[reftext];
                             cell.Value = choices.FirstOrDefault();
 
                             string formula = GetChoicesFormula(MultiChoiceCaller.SelectedItem.ToJson(), choices);
@@ -137,13 +137,13 @@ namespace BH.UI.Excel.Templates
             {
                 try
                 {
-                    string name = sheet.Cells[i,1].Value as string;
+                    string name = (sheet.Cells[i,1] as Microsoft.Office.Interop.Excel.Range).Value as string;
                     if (string.IsNullOrEmpty(name))
                     {
                         // Need to add the choices here
-                        sheet.Cells[i, 1].Value = collectionName;
+                        (sheet.Cells[i, 1] as Microsoft.Office.Interop.Excel.Range).Value = collectionName;
                         for (int j = 0; j < choices.Count; j++)
-                            sheet.Cells[i, j + 2].Value = choices[j];
+                            (sheet.Cells[i, j + 2] as Microsoft.Office.Interop.Excel.Range).Value = choices[j];
                         break;
                     } 
                     else if (collectionName == name)
@@ -158,7 +158,7 @@ namespace BH.UI.Excel.Templates
             }
 
             // Create the range
-            Range range = sheet.Range[sheet.Cells[i, 2], sheet.Cells[i, choices.Count + 1]];
+            Microsoft.Office.Interop.Excel.Range range = sheet.Range[sheet.Cells[i, 2], sheet.Cells[i, choices.Count + 1]];
             return $"=BHoM_ChoicesHidden!{range.Address}";
         }
 

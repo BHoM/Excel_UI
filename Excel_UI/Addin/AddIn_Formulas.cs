@@ -102,9 +102,9 @@ namespace BH.UI.Excel
             for (int i = 2; i < 10000; i++)
             {
                 // Recover the information about the formula
-                string formulaName = sheet.Cells[i, 1].Value as string;
-                string callerJson = sheet.Cells[i, 2].Value as string;
-                string oldFunction = sheet.Cells[i, 3].Value as string;
+                string formulaName = (sheet.Cells[i, 1] as Microsoft.Office.Interop.Excel.Range).Value as string;
+                string callerJson = (sheet.Cells[i, 2] as Microsoft.Office.Interop.Excel.Range).Value as string;
+                string oldFunction = (sheet.Cells[i, 3] as Microsoft.Office.Interop.Excel.Range).Value as string;
                 if (formulaName == null || formulaName.Length == 0 || callerJson == null || callerJson.Length == 0)
                     break;
 
@@ -155,11 +155,11 @@ namespace BH.UI.Excel
                 lock(m_Mutex)
                 {
                     // Get teh sheet ID
-                    string sheetId = sheet.Cells[1, 1].Value as string;
+                    string sheetId = (sheet.Cells[1, 1] as Microsoft.Office.Interop.Excel.Range).Value as string;
                     if (sheetId == null)
                     {
                         sheetId = ToString(Guid.NewGuid());
-                        sheet.Cells[1, 1].Value = sheetId;
+                        (sheet.Cells[1, 1] as Microsoft.Office.Interop.Excel.Range).Value = sheetId;
                     }
 
                     // Make sure there is a list of saved callers for this worksheet
@@ -172,9 +172,9 @@ namespace BH.UI.Excel
                         m_SavedOnWorkbook[sheetId].Add(caller.Function);
                         int row = m_SavedOnWorkbook[sheetId].Count + 1;
 
-                        sheet.Cells[row, 1].Value = caller.Caller.GetType().Name;
-                        sheet.Cells[row, 2].Value = caller.Caller.Write();
-                        sheet.Cells[row, 3].Value = caller.Function;
+                        (sheet.Cells[row, 1] as Microsoft.Office.Interop.Excel.Range).Value = caller.Caller.GetType().Name;
+                        (sheet.Cells[row, 2] as Microsoft.Office.Interop.Excel.Range).Value = caller.Caller.Write();
+                        (sheet.Cells[row, 3] as Microsoft.Office.Interop.Excel.Range).Value = caller.Function;
                     } 
                 } 
             });

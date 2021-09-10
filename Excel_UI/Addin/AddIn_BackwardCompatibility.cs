@@ -71,21 +71,21 @@ namespace BH.UI.Excel
 
             // Collect the formulas
             List<Tuple<string, string>> components = new List<Tuple<string, string>>();
-            foreach (Range row in sheet.UsedRange)
+            foreach (Microsoft.Office.Interop.Excel.Range row in sheet.UsedRange)
             {
                 string str = "";
                 string callerType = "";
                 try
                 {
-                    Range cell = row.Cells[1, 2];
+                    Microsoft.Office.Interop.Excel.Range cell = row.Cells[1, 2] as Microsoft.Office.Interop.Excel.Range;
                     callerType = cell.Value.ToString();
 
                     int col = 3;
-                    cell = row.Cells[1, col++];
+                    cell = row.Cells[1, col++] as Microsoft.Office.Interop.Excel.Range;
                     while (cell.Value != null && cell.Value is string && (cell.Value as string).Length > 0)
                     {
                         str += cell.Value;
-                        cell = row.Cells[1, col++];
+                        cell = row.Cells[1, col++] as Microsoft.Office.Interop.Excel.Range;
                     }
                 }
                 catch { }
