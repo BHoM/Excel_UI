@@ -190,6 +190,23 @@ namespace BH.UI.Excel
 
         /***************************************************/
 
+        public string GetBHoMId()
+        {
+            if (!m_Properties.ContainsKey("BHoM_Guid"))
+                m_Properties["BHoM_Guid"] = Guid.NewGuid();
+
+            return m_Properties["BHoM_Guid"].ToString();
+        }
+
+        /***************************************************/
+
+        public void SetBHoMId(string id)
+        {
+            m_Properties["BHoM_Guid"] = Guid.Parse(id);
+        }
+
+        /***************************************************/
+
         public Type GetCSharpType()
         {
             return m_Type;

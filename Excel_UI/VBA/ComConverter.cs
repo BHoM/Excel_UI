@@ -74,6 +74,13 @@ namespace BH.UI.Excel
 
         /***************************************************/
 
+        public static string ToCom(this Enumeration enumeration)
+        {
+            return enumeration.Value;
+        }
+
+        /***************************************************/
+
         public static Collection ToCom(this FragmentSet obj)
         {
             return ToCom(obj as IEnumerable);
@@ -209,7 +216,7 @@ namespace BH.UI.Excel
 
             try
             {
-                return System.Enum.Parse(e.GetCSharpType(), e.Value);
+                return BH.Engine.Excel.Compute.ParseEnum(e.GetCSharpType(), e.Value);
             }
             catch 
             {
