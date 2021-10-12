@@ -62,7 +62,7 @@ namespace BH.UI.Excel
         {
             get
             {
-                return m_Objects.Keys.ToArray();
+                return m_Objects.Keys.OrderBy(x => x).ToArray();
             }
         }
 

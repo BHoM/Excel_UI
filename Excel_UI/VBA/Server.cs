@@ -94,6 +94,17 @@ namespace BH.UI.Excel
 
         /***************************************************/
 
+        public string GetEnumName(string typeName, string value)
+        {
+            Type type = BH.Engine.Reflection.Create.Type(typeName);
+            if (type == null)
+                return "";
+
+            return Engine.Excel.Compute.ParseEnum(type, value)?.ToString();
+        }
+
+        /***************************************************/
+
         public object CallMethod(string methodName, Collection inputs = null)
         {
             int index = methodName.LastIndexOf('.');
