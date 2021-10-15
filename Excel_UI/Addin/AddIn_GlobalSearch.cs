@@ -27,8 +27,8 @@ using System.Linq;
 using ExcelDna.Integration;
 using System.Collections.Generic;
 using System.Collections;
-using System.Linq.Expressions;
 using BH.UI.Excel.Templates;
+using BH.UI.Base.Global;
 
 
 namespace BH.UI.Excel
@@ -36,56 +36,56 @@ namespace BH.UI.Excel
     public partial class AddIn : IExcelAddIn
     {
         /*******************************************/
-        /**** Properties                        ****/
+        /**** Methods                           ****/
         /*******************************************/
 
-        public static Dictionary<string, CallerFormula> CallerShells { get; private set; } = new Dictionary<string, CallerFormula>();
-
-        public static AddIn Instance { get; private set; } = null;
-
-
-        /*******************************************/
-        /**** Constructors                      ****/
-        /*******************************************/
-
-        public AddIn()
+        [ExcelCommand(ShortCut = "^B")]
+        public static void OpenGlobalSearch()
         {
-            Instance = this;
+            m_CurrentSelection = CurrentSelection();
+            var control = new System.Windows.Forms.ContainerControl();
+            m_GlobalSearch.SetParent(control);
+        }
+
+
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
+
+        protected void InitGlobalSearch()
+        {
+            if (m_GlobalSearch == null)
+            {
+                try
+                {
+                    m_GlobalSearch = new SearchMenu_WinForm();
+                    m_GlobalSearch.ItemSelected += GlobalSearch_ItemSelected;
+                }
+                catch (Exception e)
+                {
+                    Engine.Reflection.Compute.RecordError(e.Message);
+                }
+            }
         }
 
         /*******************************************/
 
-        static AddIn()
+        protected void GlobalSearch_ItemSelected(object sender, oM.UI.ComponentRequest e)
         {
-            // Collect the callers from assemblies
-            CallerShells = ExcelIntegration.GetExportedAssemblies()
-                .SelectMany(a => a.GetTypes())
-                .Where(t => t.Namespace == "BH.UI.Excel.Components" && typeof(CallerFormula).IsAssignableFrom(t))
-                .Select(t => InstantiateCaller(t))
-                .ToDictionary(o => o.Caller.GetType().Name);
+            if (e != null && e.CallerType != null)
+            {
+                CallerFormula formula = InstantiateCaller(e.CallerType.Name, e.SelectedItem);
+                if (formula != null)
+                    formula.FillFormula(m_CurrentSelection);
+            }
         }
 
         /*******************************************/
-
-        public static CallerFormula InstantiateCaller(Type formulaType, object selectedItem = null)
-        {
-            CallerFormula instance = formulaType.GetConstructor(new Type[] { }).Invoke(new object[] { }) as CallerFormula;
-
-            if (selectedItem != null)
-                instance.Caller.SetItem(selectedItem);
-
-            return instance;
-        }
-
+        /**** Private Fields                    ****/
         /*******************************************/
 
-        public static CallerFormula InstantiateCaller(string callerName, object selectedItem = null)
-        {
-            if (CallerShells.ContainsKey(callerName))
-                return InstantiateCaller(CallerShells[callerName].GetType(), selectedItem);
-            else
-                return null;
-        }
+        private static SearchMenu m_GlobalSearch = null;
+        private static ExcelReference m_CurrentSelection = null;
 
         /*******************************************/
     }

@@ -1,5 +1,5 @@
 <DnaLibrary Name="BHoM Add-In" RuntimeVersion="v4.0">
-  <ExternalLibrary Path="Excel_UI.dll" LoadFromBytes="true" Pack="true" ExplicitRegistration="true" />
+  <ExternalLibrary Path="Excel_UI.dll" LoadFromBytes="true" Pack="true" ExplicitRegistration="true" ComServer="true" />
   <!-- 
   ExplicitExports="true"
        The RuntimeVersion attribute above allows two settings:

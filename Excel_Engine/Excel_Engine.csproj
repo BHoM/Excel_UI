@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
@@ -9,7 +9,7 @@
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>BH.Engine.Excel</RootNamespace>
     <AssemblyName>Excel_Engine</AssemblyName>
-    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile />
   </PropertyGroup>
@@ -42,10 +42,6 @@
     <Reference Include="ClosedXML">
       <HintPath>..\packages\ClosedXML.0.95.0\lib\net40\ClosedXML.dll</HintPath>
     </Reference>
-    <Reference Include="ExcelDna.Integration, Version=0.34.6373.42344, Culture=neutral, processorArchitecture=MSIL">
-      <HintPath>..\packages\ExcelDna.Integration.0.34.6\lib\ExcelDna.Integration.dll</HintPath>
-      <Private>False</Private>
-    </Reference>
     <Reference Include="Reflection_Engine">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\ProgramData\BHoM\Assemblies\Reflection_Engine.dll</HintPath>
@@ -63,28 +59,14 @@
     <Reference Include="System.Data" />
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
+    <Reference Include="UI_oM">
+      <HintPath>C:\ProgramData\BHoM\Assemblies\UI_oM.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Compute\Contents.cs" />
-    <Compile Include="Compute\Note.cs" />
-    <Compile Include="Convert\FromExcel\Expression.cs" />
-    <Compile Include="Convert\ToExcel\Formula.cs" />
     <Compile Include="Create\CellContents.cs" />
-    <Compile Include="Query\Selection.cs" />
-    <Compile Include="Query\Filename.cs" />
-    <Compile Include="Query\Formula.cs" />
-    <Compile Include="Compute\NumberFormat.cs" />
-    <Compile Include="Create\Reference.cs" />
-    <Compile Include="Convert\FromExcel\Reference.cs" />
-    <Compile Include="Convert\ToExcel\Reference.cs" />
-    <Compile Include="Convert\ToExcel\DateTime.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Query\CleanList.cs" />
-    <Compile Include="Query\RefText.cs" />
-    <Compile Include="Query\Caller.cs" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
+    <Compile Include="Query\Explode.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Excel_oM\Excel_oM.csproj">
@@ -92,6 +74,11 @@
       <Name>Excel_oM</Name>
       <Private>False</Private>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Compute\" />
+    <Folder Include="Convert\" />
+    <Folder Include="Create\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
