@@ -4,12 +4,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{22E74CD3-B19C-4617-9142-F5B349F007DA}</ProjectGuid>
+    <ProjectGuid>{79D1BABE-DF98-4635-A605-AA396FF58915}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>Excel_Adapter</RootNamespace>
     <AssemblyName>Excel_Adapter</AssemblyName>
-    <TargetFrameworkVersion>v4.6.1</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <Deterministic>true</Deterministic>
   </PropertyGroup>
@@ -31,26 +31,26 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
-    <Reference Include="Adapter_Engine, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Adapter_Engine">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\ProgramData\BHoM\Assemblies\Adapter_Engine.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Adapter_oM, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Adapter_oM">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\ProgramData\BHoM\Assemblies\Adapter_oM.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="BHoM, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="BHoM">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="BHoM_Adapter, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="BHoM_Adapter">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM_Adapter.dll</HintPath>
     </Reference>
-    <Reference Include="BHoM_Engine, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="BHoM_Engine">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM_Engine.dll</HintPath>
       <Private>False</Private>
@@ -58,7 +58,7 @@
     <Reference Include="ClosedXML, Version=0.95.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\ClosedXML.0.95.0\lib\net46\ClosedXML.dll</HintPath>
     </Reference>
-    <Reference Include="Data_oM, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Data_oM">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\ProgramData\BHoM\Assemblies\Data_oM.dll</HintPath>
     </Reference>
@@ -68,11 +68,11 @@
     <Reference Include="ExcelNumberFormat, Version=1.0.10.0, Culture=neutral, PublicKeyToken=23c6f5d73be07eca, processorArchitecture=MSIL">
       <HintPath>..\packages\ExcelNumberFormat.1.0.10\lib\net20\ExcelNumberFormat.dll</HintPath>
     </Reference>
-    <Reference Include="Reflection_Engine, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Reflection_Engine">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\ProgramData\BHoM\Assemblies\Reflection_Engine.dll</HintPath>
     </Reference>
-    <Reference Include="Reflection_oM, Version=3.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+    <Reference Include="Reflection_oM">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\ProgramData\BHoM\Assemblies\Reflection_oM.dll</HintPath>
     </Reference>

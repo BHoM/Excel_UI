@@ -54,7 +54,7 @@ namespace BH.Adapter.ExcelAdapter
             _fileSettings = fileSettings;
             _excelSettings = excelSettings;
 
-            AdapterIdName = "Excel_Adapter";
+            //AdapterIdName = "Excel_Adapter";
         }
 
         /***************************************************/

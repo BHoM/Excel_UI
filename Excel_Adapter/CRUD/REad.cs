@@ -84,7 +84,7 @@ namespace BH.Adapter.ExcelAdapter
                         if(valuesOnly)
                             dataRow.Add(worksheet.Cell(row.RowNumber(), column.ColumnNumber()).GetValue<object>());
                         else
-                            dataRow.Add(Create.CellContents(worksheet.Cell(row.RowNumber(), column.ColumnNumber())));
+                            dataRow.Add(BH.Engine.Excel.Create.CellContents(worksheet.Cell(row.RowNumber(), column.ColumnNumber())));
                     }
                         
                     table.Rows.Add(dataRow.ToArray());
