@@ -20,7 +20,7 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using BH.oM.Excel;
+using BH.oM.Adapters.Excel;
 using ClosedXML.Excel;
 
 namespace BH.Engine.Excel
@@ -30,6 +30,7 @@ namespace BH.Engine.Excel
         /*******************************************/
         /**** Methods                           ****/
         /*******************************************/
+
         public static CellContents CellContents(IXLCell xLCell)
         {
             return new CellContents()
@@ -44,5 +45,7 @@ namespace BH.Engine.Excel
                 RichText = xLCell.HasRichText ? xLCell.RichText.Text : ""
             };
         }
+
+        /*******************************************/
     }
 }

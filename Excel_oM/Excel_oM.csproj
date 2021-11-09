@@ -31,6 +31,9 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Adapter_oM">
+      <HintPath>..\..\..\..\..\..\..\ProgramData\BHoM\Assemblies\Adapter_oM.dll</HintPath>
+    </Reference>
     <Reference Include="BHoM">
       <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM.dll</HintPath>
       <Private>False</Private>
@@ -60,8 +63,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="ClosedXML\CellContents.cs" />
+    <Compile Include="Config\ExcelPushConfig.cs" />
     <Compile Include="Requests\CellsRequest.cs" />
-    <Compile Include="Settings\ExcelSettings.cs" />
     <Compile Include="ClosedXML\RuleSet.cs" />
     <Compile Include="ClosedXML\Style.cs" />
     <Compile Include="Requests\ValuesRequest.cs" />

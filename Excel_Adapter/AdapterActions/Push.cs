@@ -35,13 +35,8 @@ namespace BH.Adapter.Excel
             if (pushType == PushType.AdapterDefault)
                 pushType = PushType.DeleteThenCreate;
 
-            if (m_ExcelSettings == null)
-            {
-                BH.Engine.Reflection.Compute.RecordError("Please set Excel Settings on the Excel Adapter before pushing to an Excel file.");
-                return new List<object>();
-            }
-
             //TODO: make sure Others than CreateOnly are supported, also sort out overwrite etc.
+            //TODO: make sure the tables are actually overwritten instead of added with the new name (see Create)
 
             IEnumerable<IBHoMObject> objectsToPush = ProcessObjectsForPush(objects, actionConfig); // Note: default Push only supports IBHoMObjects.
             if (!objectsToPush.Any())

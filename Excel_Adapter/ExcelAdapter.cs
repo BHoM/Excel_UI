@@ -20,7 +20,8 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using BH.oM.Excel.Settings;
+using BH.Adapter;
+using BH.oM.Adapters.Excel;
 using BH.oM.Reflection.Attributes;
 using System.ComponentModel;
 using System.IO;
@@ -35,9 +36,8 @@ namespace BH.Adapter.Excel
 
         [Description("Specify Excel file and properties for data transfer.")]
         [Input("fileSettings", "Input the file settings to get the file name and directory the Excel Adapter should use.")]
-        [Input("excelSettings", "Input the additional Excel Settings the adapter should use. Default null.")]
         [Output("adapter", "Adapter to Excel.")]
-        public ExcelAdapter(BH.oM.Adapter.FileSettings fileSettings = null, ExcelSettings excelSettings = null)
+        public ExcelAdapter(BH.oM.Adapter.FileSettings fileSettings = null)
         {
             if (fileSettings == null)
             {
@@ -53,7 +53,6 @@ namespace BH.Adapter.Excel
             }
 
             m_FileSettings = fileSettings;
-            m_ExcelSettings = excelSettings;
         }
 
 
@@ -62,7 +61,6 @@ namespace BH.Adapter.Excel
         /***************************************************/
 
         private BH.oM.Adapter.FileSettings m_FileSettings = null;
-        private ExcelSettings m_ExcelSettings = null;
 
         /***************************************************/
     }

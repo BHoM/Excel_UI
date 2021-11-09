@@ -23,14 +23,16 @@
 using BH.oM.Base;
 using System.Collections.Generic;
 
-namespace BH.oM.Excel
+namespace BH.oM.Adapters.Excel
 {
     public class Style : BHoMObject
     {
         /*******************************************/
         /**** Properties                        ****/
         /*******************************************/
+
         public virtual List<RuleSet> RuleSets { get; set; } = new List<RuleSet>();
+
         /*******************************************/
     }
 }

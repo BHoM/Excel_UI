@@ -23,15 +23,18 @@
 using BH.oM.Base;
 using System.Collections.Generic;
 
-namespace BH.oM.Excel
+namespace BH.oM.Adapters.Excel
 {
     public class RuleSet : BHoMObject
     {
         /*******************************************/
         /**** Properties                        ****/
         /*******************************************/
+
         public virtual string Selector { get; set; } = "";
+
         public virtual Dictionary<string, object> Declarations { get; set; } = new Dictionary<string, object>();
+
         /*******************************************/
     }
 }

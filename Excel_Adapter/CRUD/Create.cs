@@ -33,6 +33,7 @@ using System.Reflection;
 using System.Threading;
 using BH.oM.Base;
 using BH.Engine.Base;
+using BH.oM.Adapters.Excel;
 
 namespace BH.Adapter.Excel
 {
@@ -47,6 +48,19 @@ namespace BH.Adapter.Excel
             //TODO: check if the file and workbook found
             string fileName = m_FileSettings.GetFullFileName();
             XLWorkbook workbook = new XLWorkbook(fileName);
+
+            if (actionConfig == null)
+            {
+                BH.Engine.Reflection.Compute.RecordNote($"{nameof(ExcelPushConfig)} has not been provided, default one is used.");
+                actionConfig = new ExcelPushConfig();
+            }
+
+            ExcelPushConfig config = actionConfig as ExcelPushConfig;
+            if (config == null)
+            {
+                BH.Engine.Reflection.Compute.RecordError($"Provided {nameof(ActionConfig)} is not {nameof(ExcelPushConfig)}.");
+                return false;
+            }
 
             List<Type> objectTypes = objects.Select(x => x.GetType()).Distinct().ToList();
             if (objectTypes.Count != 1)
@@ -75,8 +89,8 @@ namespace BH.Adapter.Excel
                 return false;
             }
 
-            ApplyStyles(workbook);
-            ApplyProperties(workbook);
+            ApplyStyles(workbook, config);
+            ApplyProperties(workbook, config);
             workbook.SaveAs(fileName);
 
             //TODO: why is that?
@@ -136,13 +150,13 @@ namespace BH.Adapter.Excel
 
         /***************************************************/
 
-        private void ApplyStyles(XLWorkbook workbook)
+        private void ApplyStyles(XLWorkbook workbook, ExcelPushConfig config)
         {
-            ApplyWorkbookStyle(workbook);
+            ApplyWorkbookStyle(workbook, config);
 
             foreach (IXLWorksheet sheet in workbook.Worksheets)
             {
-                ApplyWorksheetStyle(sheet);
+                ApplyWorksheetStyle(sheet, config);
 
                 foreach (IXLTable table in sheet.Tables)
                     ApplyTableStyle(table);  
@@ -151,30 +165,30 @@ namespace BH.Adapter.Excel
 
         /***************************************************/
 
-        private void ApplyProperties(IXLWorkbook workbook)
+        private void ApplyProperties(IXLWorkbook workbook, ExcelPushConfig config)
         {
-            workbook.Properties.Author = m_ExcelSettings.WorkbookProperties.Author;
-            workbook.Properties.Title = m_ExcelSettings.WorkbookProperties.Title;
-            workbook.Properties.Subject = m_ExcelSettings.WorkbookProperties.Subject;
-            workbook.Properties.Category = m_ExcelSettings.WorkbookProperties.Category;
-            workbook.Properties.Keywords = m_ExcelSettings.WorkbookProperties.Keywords;
-            workbook.Properties.Comments = m_ExcelSettings.WorkbookProperties.Comments;
-            workbook.Properties.Status = m_ExcelSettings.WorkbookProperties.Status;
-            workbook.Properties.LastModifiedBy = m_ExcelSettings.WorkbookProperties.LastModifiedBy;
-            workbook.Properties.Company = m_ExcelSettings.WorkbookProperties.Company;
-            workbook.Properties.Manager = m_ExcelSettings.WorkbookProperties.Manager;
+            workbook.Properties.Author = config.WorkbookProperties.Author;
+            workbook.Properties.Title = config.WorkbookProperties.Title;
+            workbook.Properties.Subject = config.WorkbookProperties.Subject;
+            workbook.Properties.Category = config.WorkbookProperties.Category;
+            workbook.Properties.Keywords = config.WorkbookProperties.Keywords;
+            workbook.Properties.Comments = config.WorkbookProperties.Comments;
+            workbook.Properties.Status = config.WorkbookProperties.Status;
+            workbook.Properties.LastModifiedBy = config.WorkbookProperties.LastModifiedBy;
+            workbook.Properties.Company = config.WorkbookProperties.Company;
+            workbook.Properties.Manager = config.WorkbookProperties.Manager;
         }
 
         /***************************************************/
 
-        private void ApplyWorkbookStyle(XLWorkbook workbook)
+        private void ApplyWorkbookStyle(XLWorkbook workbook, ExcelPushConfig config)
         {
 
         }
 
         /***************************************************/
 
-        private void ApplyWorksheetStyle(IXLWorksheet worksheet)
+        private void ApplyWorksheetStyle(IXLWorksheet worksheet, ExcelPushConfig config)
         {
 
         }
