@@ -20,10 +20,8 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using System;
-using System.Collections.Generic;
 using BH.oM.Base;
-
+using System.Collections.Generic;
 using System.ComponentModel;
 
 namespace BH.oM.Excel.Settings
@@ -33,22 +31,17 @@ namespace BH.oM.Excel.Settings
         /***************************************************/
         /**** Properties                                ****/
         /***************************************************/
-        [Description("Names of the worksheet(s) to read or write")]
+
+        [Description("Names of the worksheet(s) to read or write.")]
         public virtual List<string> Worksheets { get; set; } = null;
 
-        //TODO: explain the format etc.
-        [Description("Range to read or write")]
+        [Description("Range to read or write, in standard Excel format (e.g. A1:B6).")]
         public virtual string Range { get; set; } = null;
 
-        [Description("Set to false if you want to append to a file when pushing Excel. If set to true then a file will be created. If a file exists, it will be overwritten. Default true")]
-        //TODO: OVERWRITE?
-        public virtual bool NewFile { get; set; } = true;
-
-        [Description("Styling to apply to workbook and contents")]
+        [Description("Styling to apply to workbook and contents.")]
         public virtual Style Style { get; set; } = new Style();
 
-        //TODO: RENAME TO WORKBOOK?
-        [Description("Properties to apply to workbook and contents")]
+        [Description("Properties to apply to workbook and contents.")]
         public virtual WorkbookProperties WorkbookProperties { get; set; } = new WorkbookProperties();
 
         /***************************************************/

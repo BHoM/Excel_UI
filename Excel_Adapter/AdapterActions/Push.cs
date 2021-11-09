@@ -33,23 +33,20 @@ namespace BH.Adapter.Excel
         {
             // If unset, set the pushType to AdapterSettings' value (base AdapterSettings default is FullCRUD).
             if (pushType == PushType.AdapterDefault)
-                pushType = m_AdapterSettings.DefaultPushType;
+                pushType = PushType.DeleteThenCreate;
 
             if (m_ExcelSettings == null)
             {
-                BH.Engine.Reflection.Compute.RecordError("Please set some Excel Settings on the Excel Adapter before pushing to an Excel File");
+                BH.Engine.Reflection.Compute.RecordError("Please set Excel Settings on the Excel Adapter before pushing to an Excel file.");
                 return new List<object>();
             }
 
             //TODO: make sure Others than CreateOnly are supported, also sort out overwrite etc.
 
             IEnumerable<IBHoMObject> objectsToPush = ProcessObjectsForPush(objects, actionConfig); // Note: default Push only supports IBHoMObjects.
-
-            List<object> result = new List<object>();
-                        
             if (!objectsToPush.Any())
-                return result;
-            
+                new List<object>();
+
             bool success = ICreate(objectsToPush);
 
             return success ? objects.ToList() : new List<object>();
