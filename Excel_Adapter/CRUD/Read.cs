@@ -32,25 +32,25 @@ using BH.oM.Data.Collections;
 using System.Data;
 using BH.oM.Excel;
 using BH.Engine.Excel;
+using BH.oM.Data.Requests;
 
 namespace BH.Adapter.Excel
 {
     public partial class ExcelAdapter
     {
-        protected override IEnumerable<IBHoMObject> IRead(Type type, IList ids, ActionConfig actionConfig = null)
-        {
-            return Read(type);
-        }
-
-        private IEnumerable<IBHoMObject> Read(Type type = null)
+        protected override IEnumerable<IBHoMObject> Read(IRequest request, ActionConfig actionConfig = null)
         {
             XLWorkbook workbook = new XLWorkbook(m_FileSettings.GetFullFileName());
-            if (type == typeof(ValuesRequest))
-                return ReadExcel(workbook,true);
-            if (type == typeof(CellsRequest))
-                return ReadExcel(workbook,false);
-            else
+
+            if (request is ValuesRequest)
                 return ReadExcel(workbook, true);
+            else if (request is CellsRequest)
+                return ReadExcel(workbook, false);
+            else
+            {
+                BH.Engine.Reflection.Compute.RecordError($"Requests of type {request?.GetType()} are not supported by the Excel adapter.");
+                return new List<IBHoMObject>();
+            }
         }
 
         /***************************************************/
@@ -125,7 +125,6 @@ namespace BH.Adapter.Excel
         }
 
         /***************************************************/
-
     }
 }
 
