@@ -33,8 +33,7 @@ using System.Reflection;
 using System.Threading;
 using BH.oM.Base;
 
-//TODO: rename to BH.Adapter.Excel!
-namespace BH.Adapter.ExcelAdapter
+namespace BH.Adapter.Excel
 {
     public partial class ExcelAdapter
     {
@@ -44,10 +43,10 @@ namespace BH.Adapter.ExcelAdapter
 
         protected override bool ICreate<T>(IEnumerable<T> objects, ActionConfig actionConfig = null)
         {
-            string fileName = _fileSettings.GetFullFileName();
+            string fileName = m_FileSettings.GetFullFileName();
             XLWorkbook workbook = new XLWorkbook();
             
-            if (_excelSettings.NewFile)
+            if (m_ExcelSettings.NewFile)
                 workbook = new XLWorkbook();
             else
                 workbook = new XLWorkbook(fileName);
@@ -134,16 +133,16 @@ namespace BH.Adapter.ExcelAdapter
 
         private void ApplyProperties(IXLWorkbook workbook)
         {
-            workbook.Properties.Author = _excelSettings.WorkbookProperties.Author;
-            workbook.Properties.Title = _excelSettings.WorkbookProperties.Title;
-            workbook.Properties.Subject = _excelSettings.WorkbookProperties.Subject;
-            workbook.Properties.Category = _excelSettings.WorkbookProperties.Category;
-            workbook.Properties.Keywords = _excelSettings.WorkbookProperties.Keywords;
-            workbook.Properties.Comments = _excelSettings.WorkbookProperties.Comments;
-            workbook.Properties.Status = _excelSettings.WorkbookProperties.Status;
-            workbook.Properties.LastModifiedBy = _excelSettings.WorkbookProperties.LastModifiedBy;
-            workbook.Properties.Company = _excelSettings.WorkbookProperties.Company;
-            workbook.Properties.Manager = _excelSettings.WorkbookProperties.Manager;
+            workbook.Properties.Author = m_ExcelSettings.WorkbookProperties.Author;
+            workbook.Properties.Title = m_ExcelSettings.WorkbookProperties.Title;
+            workbook.Properties.Subject = m_ExcelSettings.WorkbookProperties.Subject;
+            workbook.Properties.Category = m_ExcelSettings.WorkbookProperties.Category;
+            workbook.Properties.Keywords = m_ExcelSettings.WorkbookProperties.Keywords;
+            workbook.Properties.Comments = m_ExcelSettings.WorkbookProperties.Comments;
+            workbook.Properties.Status = m_ExcelSettings.WorkbookProperties.Status;
+            workbook.Properties.LastModifiedBy = m_ExcelSettings.WorkbookProperties.LastModifiedBy;
+            workbook.Properties.Company = m_ExcelSettings.WorkbookProperties.Company;
+            workbook.Properties.Manager = m_ExcelSettings.WorkbookProperties.Manager;
         }
         /***************************************************/
         private void ApplyWorkbookStyle(XLWorkbook workbook)

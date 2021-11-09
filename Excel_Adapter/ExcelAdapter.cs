@@ -20,23 +20,23 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using System;
+using BH.oM.Excel.Settings;
+using BH.oM.Reflection.Attributes;
 using System.ComponentModel;
 using System.IO;
-using BH.oM.Reflection.Attributes;
-using BH.oM.Excel.Settings;
 
-namespace BH.Adapter.ExcelAdapter
+namespace BH.Adapter.Excel
 {
     public partial class ExcelAdapter : BHoMAdapter
     {
         /***************************************************/
         /**** Constructor                               ****/
         /***************************************************/
-        [Description("Specify Excel file and properties for data transfer")]
-        [Input("fileSettings", "Input the file settings to get the file name and directory the Excel Adapter should use")]
-        [Input("excelSettings", "Input the additional Excel Settings the adapter should use. Default null")]
-        [Output("adapter", "Adapter to Excel")]
+
+        [Description("Specify Excel file and properties for data transfer.")]
+        [Input("fileSettings", "Input the file settings to get the file name and directory the Excel Adapter should use.")]
+        [Input("excelSettings", "Input the additional Excel Settings the adapter should use. Default null.")]
+        [Output("adapter", "Adapter to Excel.")]
         public ExcelAdapter(BH.oM.Adapter.FileSettings fileSettings = null, ExcelSettings excelSettings = null)
         {
             if (fileSettings == null)
@@ -52,24 +52,19 @@ namespace BH.Adapter.ExcelAdapter
                 return;
             }
 
-            _fileSettings = fileSettings;
-            _excelSettings = excelSettings;
-
-            //AdapterIdName = "Excel_Adapter";
+            m_FileSettings = fileSettings;
+            m_ExcelSettings = excelSettings;
         }
 
-        /***************************************************/
-        /**** Public Adapter Methods overrides          ****/
-        /***************************************************/
-
-        
 
         /***************************************************/
         /**** Private Fields                            ****/
         /***************************************************/
 
-        private BH.oM.Adapter.FileSettings _fileSettings { get; set; } = null;
-        private ExcelSettings _excelSettings { get; set; } = null;
+        private BH.oM.Adapter.FileSettings m_FileSettings = null;
+        private ExcelSettings m_ExcelSettings = null;
+
+        /***************************************************/
     }
 }
 
