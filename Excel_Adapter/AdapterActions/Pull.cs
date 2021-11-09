@@ -41,13 +41,8 @@ namespace BH.Adapter.Excel
                 BH.Engine.Reflection.Compute.RecordError("File does not exist to pull from");
                 return new List<IBHoMObject>();
             }
-            if (request != null)
-            {
-                //TODO: this could possibly be aligned with SQL_Adapter?
-                return Read(request.GetType());
-            }
-            else
-                return Read(null);
+
+            return Read(request);
         }
     }
 }
