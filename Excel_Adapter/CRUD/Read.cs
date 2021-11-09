@@ -20,19 +20,16 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using BH.oM.Adapter;
-using BH.oM.Base;
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using BH.Engine.Adapter;
-using ClosedXML.Excel;
+using BH.oM.Adapter;
+using BH.oM.Adapters.Excel;
+using BH.oM.Base;
 using BH.oM.Data.Collections;
-using System.Data;
-using BH.oM.Excel;
-using BH.Engine.Excel;
 using BH.oM.Data.Requests;
+using ClosedXML.Excel;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
 
 namespace BH.Adapter.Excel
 {
@@ -47,6 +44,7 @@ namespace BH.Adapter.Excel
             //TODO: check if the file and workbook found
             XLWorkbook workbook = new XLWorkbook(m_FileSettings.GetFullFileName());
 
+            //TODO: rethink this!
             if (request is ValuesRequest)
                 return ReadExcel(workbook, true);
             else if (request is CellsRequest)

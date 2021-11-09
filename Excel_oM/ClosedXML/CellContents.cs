@@ -21,29 +21,33 @@
  */
 
 using BH.oM.Base;
-using ClosedXML.Excel;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace BH.oM.Excel
+namespace BH.oM.Adapters.Excel
 {
     public class CellContents : BHoMObject
     {
         /*******************************************/
         /**** Properties                        ****/
         /*******************************************/
-        public virtual string Comment { get; set; }
-        public virtual object Value { get; set; }
-        public virtual string Address { get; set; }
-        public virtual Type DataType { get; set; }
-        public virtual string FormulaA1 { get; set; }
-        public virtual string FormulaR1C1 { get; set; }
-        public virtual string HyperLink { get; set; }
-        public virtual string RichText { get; set; }
-        public virtual Style Style { get; set; }
+
+        public virtual string Comment { get; set; } = "";
+
+        public virtual object Value { get; set; } = null;
+
+        public virtual string Address { get; set; } = "";
+
+        public virtual Type DataType { get; set; } = null;
+
+        public virtual string FormulaA1 { get; set; } = "";
+
+        public virtual string FormulaR1C1 { get; set; } = "";
+
+        public virtual string HyperLink { get; set; } = "";
+
+        public virtual string RichText { get; set; } = "";
+
+        public virtual Style Style { get; set; } = new Style();
 
         /*******************************************/
     }

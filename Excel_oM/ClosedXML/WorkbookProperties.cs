@@ -20,13 +20,9 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using System;
-using System.Collections.Generic;
 using BH.oM.Base;
 
-using System.ComponentModel;
-
-namespace BH.oM.Excel.Settings
+namespace BH.oM.Adapters.Excel
 {
     public class WorkbookProperties : BHoMObject
     {
@@ -35,14 +31,23 @@ namespace BH.oM.Excel.Settings
         /***************************************************/
 
         public virtual string Author { get; set; } = "author";
+
         public virtual string Title { get; set; } = "title";
+
         public virtual string Subject { get; set; } = "subject";
+
         public virtual string Category { get; set; } = "category";
+
         public virtual string Keywords { get; set; } = "keywords";
+
         public virtual string Comments{ get; set; } = "comments";
+
         public virtual string Status { get; set; } = "status";
+
         public virtual string LastModifiedBy { get; set; } = "lastModified";
+
         public virtual string Company { get; set; } = "Buro Happold";
+
         public virtual string Manager{ get; set; } = "manager";
 
         /***************************************************/
