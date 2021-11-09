@@ -72,17 +72,16 @@ namespace BH.Adapter.Excel
                     return false;
                 }
             }
-            else
-            {
-                AddTable(workbook, objects.Cast<IObject>().ToList().ToTable());
-            }
 
             ApplyStyles(workbook);
             ApplyProperties(workbook);
             workbook.SaveAs(fileName);
+
+            //TODO: why is that?
             Thread.Sleep(1000);
             return true;
         }
+
 
         /***************************************************/
         /**** Private Methods                           ****/
@@ -129,6 +128,7 @@ namespace BH.Adapter.Excel
                     ApplyTableStyle(table);  
             }
         }
+
         /***************************************************/
 
         private void ApplyProperties(IXLWorkbook workbook)
@@ -144,21 +144,29 @@ namespace BH.Adapter.Excel
             workbook.Properties.Company = m_ExcelSettings.WorkbookProperties.Company;
             workbook.Properties.Manager = m_ExcelSettings.WorkbookProperties.Manager;
         }
+
         /***************************************************/
+
         private void ApplyWorkbookStyle(XLWorkbook workbook)
         {
 
         }
+
         /***************************************************/
+
         private void ApplyWorksheetStyle(IXLWorksheet worksheet)
         {
 
         }
+
         /***************************************************/
+
         private void ApplyTableStyle(IXLTable table)
         {
             table.Theme = XLTableTheme.None;
         }
+
+        /***************************************************/
     }
 }
 
