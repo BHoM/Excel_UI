@@ -34,6 +34,10 @@ namespace BH.Adapter.Excel
 {
     public partial class ExcelAdapter : BHoMAdapter
     {
+        /***************************************************/
+        /**** Method Overrides                          ****/
+        /***************************************************/
+
         public override IEnumerable<object> Pull(IRequest request, PullType pullOption = PullType.AdapterDefault, ActionConfig actionConfig = null)
         {
             if (!File.Exists(Path.Combine(m_FileSettings.Directory, m_FileSettings.FileName)))
@@ -44,6 +48,8 @@ namespace BH.Adapter.Excel
 
             return Read(request);
         }
+
+        /***************************************************/
     }
 }
 
