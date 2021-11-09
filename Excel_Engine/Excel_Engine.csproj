@@ -39,6 +39,9 @@
       <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM_Engine.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="ClosedXML">
+      <HintPath>..\packages\ClosedXML.0.95.0\lib\net40\ClosedXML.dll</HintPath>
+    </Reference>
     <Reference Include="Reflection_Engine">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>C:\ProgramData\BHoM\Assemblies\Reflection_Engine.dll</HintPath>
@@ -63,6 +66,7 @@
   <ItemGroup>
     <Compile Include="Compute\ParseEnum.cs" />
     <Compile Include="Compute\ListToText.cs" />
+    <Compile Include="Create\CellContents.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Query\Explode.cs" />
   </ItemGroup>
