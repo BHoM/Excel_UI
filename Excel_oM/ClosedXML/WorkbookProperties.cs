@@ -33,6 +33,7 @@ namespace BH.oM.Excel.Settings
         /***************************************************/
         /**** Properties                                ****/
         /***************************************************/
+
         public virtual string Author { get; set; } = "author";
         public virtual string Title { get; set; } = "title";
         public virtual string Subject { get; set; } = "subject";
@@ -43,6 +44,7 @@ namespace BH.oM.Excel.Settings
         public virtual string LastModifiedBy { get; set; } = "lastModified";
         public virtual string Company { get; set; } = "Buro Happold";
         public virtual string Manager{ get; set; } = "manager";
+
         /***************************************************/
     }
 }

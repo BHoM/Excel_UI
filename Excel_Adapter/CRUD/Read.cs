@@ -44,6 +44,7 @@ namespace BH.Adapter.Excel
 
         protected override IEnumerable<IBHoMObject> Read(IRequest request, ActionConfig actionConfig = null)
         {
+            //TODO: check if the file and workbook found
             XLWorkbook workbook = new XLWorkbook(m_FileSettings.GetFullFileName());
 
             if (request is ValuesRequest)
@@ -62,7 +63,7 @@ namespace BH.Adapter.Excel
         /**** Private Methods                           ****/
         /***************************************************/
 
-        private List<IBHoMObject> ReadExcel(XLWorkbook workbook,bool valuesOnly)
+        private List<IBHoMObject> ReadExcel(XLWorkbook workbook, bool valuesOnly)
         {
             List<IBHoMObject> objects = new List<IBHoMObject>();
             foreach (IXLWorksheet worksheet in Worksheets(workbook))

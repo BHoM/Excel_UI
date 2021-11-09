@@ -32,6 +32,7 @@ using BH.Engine.Data;
 using System.Reflection;
 using System.Threading;
 using BH.oM.Base;
+using BH.Engine.Base;
 
 namespace BH.Adapter.Excel
 {
@@ -43,13 +44,9 @@ namespace BH.Adapter.Excel
 
         protected override bool ICreate<T>(IEnumerable<T> objects, ActionConfig actionConfig = null)
         {
+            //TODO: check if the file and workbook found
             string fileName = m_FileSettings.GetFullFileName();
-            XLWorkbook workbook = new XLWorkbook();
-            
-            if (m_ExcelSettings.NewFile)
-                workbook = new XLWorkbook();
-            else
-                workbook = new XLWorkbook(fileName);
+            XLWorkbook workbook = new XLWorkbook(fileName);
 
             List<Type> objectTypes = objects.Select(x => x.GetType()).Distinct().ToList();
             if (objectTypes.Count != 1)
@@ -72,6 +69,11 @@ namespace BH.Adapter.Excel
                     return false;
                 }
             }
+            else
+            {
+                BH.Engine.Reflection.Compute.RecordError($"Excel Adapter can push only one objects of type {nameof(Table)}.");
+                return false;
+            }
 
             ApplyStyles(workbook);
             ApplyProperties(workbook);
@@ -89,29 +91,47 @@ namespace BH.Adapter.Excel
 
         private bool AddTable(IXLWorkbook workbook, Table table)
         {
-            int sheetnum = workbook.Worksheets.Count();
-            if (table.Name == null || table.Name == "")
-                table.Data.TableName = "sheet " + workbook.Worksheets.Count();
-            else
-                table.Data.TableName = table.Name;
-            if (WorksheetExists(workbook, table.Name))
-                table.Data.TableName += sheetnum;
+            if (table?.Data == null)
+            {
+                BH.Engine.Reflection.Compute.RecordError("The input table is null or does not contain a table. Push aborted.");
+                return false;
+            }
 
-            workbook.Worksheets.Add(table.Data);
-            
-            return true;
+            int sheetCount = workbook.Worksheets.Count();
+            string name = table.Name;
+            if (string.IsNullOrWhiteSpace(name))
+                table.Data.TableName = "Sheet" + sheetCount;
+
+            while (WorksheetExists(workbook, name))
+            {
+                if (name == "Sheet" + sheetCount)
+                    sheetCount++;
+                else
+                    BH.Engine.Reflection.Compute.RecordWarning($"Worksheet named {name} already exists in the workbook. Default name (sheet 1 etc.) used instead");
+
+                name = "Sheet" + sheetCount;
+            }
+
+            DataTable toAdd = table.Data.DeepClone();
+            toAdd.TableName = name;
+
+            try
+            {
+                workbook.Worksheets.Add(toAdd);
+                return true;
+            }
+            catch
+            {
+                BH.Engine.Reflection.Compute.RecordError("Creation of a new worksheet failed.");
+                return false;
+            }
         }
 
         /***************************************************/
 
         private bool WorksheetExists(IXLWorkbook workbook, string name)
         {
-            foreach(IXLWorksheet worksheet in workbook.Worksheets)
-            {
-                if (worksheet.Name == name)
-                    return true;
-            }
-            return false;
+            return workbook.Worksheets.Any(x => x.Name == name);
         }
 
         /***************************************************/
