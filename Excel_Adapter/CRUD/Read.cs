@@ -38,6 +38,10 @@ namespace BH.Adapter.Excel
 {
     public partial class ExcelAdapter
     {
+        /***************************************************/
+        /**** Method Overrides                          ****/
+        /***************************************************/
+
         protected override IEnumerable<IBHoMObject> Read(IRequest request, ActionConfig actionConfig = null)
         {
             XLWorkbook workbook = new XLWorkbook(m_FileSettings.GetFullFileName());
@@ -52,6 +56,7 @@ namespace BH.Adapter.Excel
                 return new List<IBHoMObject>();
             }
         }
+
 
         /***************************************************/
         /**** Private Methods                           ****/
@@ -68,11 +73,13 @@ namespace BH.Adapter.Excel
                     Engine.Reflection.Compute.RecordError("Range provided is not in the correct format for and xlsx file");
                     return objects;
                 }
+
                 List<DataColumn> columns = new List<DataColumn>();
                 foreach (IXLRangeColumn column in range.Columns())
                 {
                     columns.Add(new DataColumn(column.ColumnLetter(), typeof(object)));
                 }
+
                 DataTable table = new DataTable();
                 table.Columns.AddRange(columns.ToArray());
 
@@ -89,9 +96,10 @@ namespace BH.Adapter.Excel
                         
                     table.Rows.Add(dataRow.ToArray());
                 }
+
                 objects.Add(new Table { Data = table, Name = worksheet.Name });
-                
             }
+
             return objects;
         }
        
@@ -100,28 +108,20 @@ namespace BH.Adapter.Excel
         private IXLRange Range(IXLWorksheet worksheet)
         {
             if (m_ExcelSettings.Range != null)
-            {
-
                 return worksheet.Range(m_ExcelSettings.Range);
-            }
-            return worksheet.Range(worksheet.FirstCellUsed().Address,worksheet.LastCellUsed().Address);
+            else
+                return worksheet.Range(worksheet.FirstCellUsed().Address, worksheet.LastCellUsed().Address);
         }
 
         /***************************************************/
 
         private List<IXLWorksheet> Worksheets(XLWorkbook workbook)
         {
-            if(m_ExcelSettings.Worksheets.Count() != 0)
-            {
-                List<IXLWorksheet> sheets = new List<IXLWorksheet>();
-                foreach(string wsName in m_ExcelSettings.Worksheets)
-                {
-                    if (workbook.Worksheet(wsName) != null)
-                        sheets.Add(workbook.Worksheet(wsName));
-                }
-                return sheets;
-            }
-            return workbook.Worksheets.ToList();
+            IEnumerable<IXLWorksheet> result = workbook.Worksheets;
+            if (m_ExcelSettings.Worksheets.Count != 0)
+                result = result.Where(x => m_ExcelSettings.Worksheets.Contains(x.Name));
+
+            return result.ToList();
         }
 
         /***************************************************/
