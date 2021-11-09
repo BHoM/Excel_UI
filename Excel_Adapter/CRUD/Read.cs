@@ -33,7 +33,7 @@ using System.Data;
 using BH.oM.Excel;
 using BH.Engine.Excel;
 
-namespace BH.Adapter.ExcelAdapter
+namespace BH.Adapter.Excel
 {
     public partial class ExcelAdapter
     {
@@ -44,7 +44,7 @@ namespace BH.Adapter.ExcelAdapter
 
         private IEnumerable<IBHoMObject> Read(Type type = null)
         {
-            XLWorkbook workbook = new XLWorkbook(_fileSettings.GetFullFileName());
+            XLWorkbook workbook = new XLWorkbook(m_FileSettings.GetFullFileName());
             if (type == typeof(ValuesRequest))
                 return ReadExcel(workbook,true);
             if (type == typeof(CellsRequest))
@@ -99,10 +99,10 @@ namespace BH.Adapter.ExcelAdapter
 
         private IXLRange Range(IXLWorksheet worksheet)
         {
-            if (_excelSettings.Range != null)
+            if (m_ExcelSettings.Range != null)
             {
 
-                return worksheet.Range(_excelSettings.Range);
+                return worksheet.Range(m_ExcelSettings.Range);
             }
             return worksheet.Range(worksheet.FirstCellUsed().Address,worksheet.LastCellUsed().Address);
         }
@@ -111,10 +111,10 @@ namespace BH.Adapter.ExcelAdapter
 
         private List<IXLWorksheet> Worksheets(XLWorkbook workbook)
         {
-            if(_excelSettings.Worksheets.Count() != 0)
+            if(m_ExcelSettings.Worksheets.Count() != 0)
             {
                 List<IXLWorksheet> sheets = new List<IXLWorksheet>();
-                foreach(string wsName in _excelSettings.Worksheets)
+                foreach(string wsName in m_ExcelSettings.Worksheets)
                 {
                     if (workbook.Worksheet(wsName) != null)
                         sheets.Add(workbook.Worksheet(wsName));

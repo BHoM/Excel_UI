@@ -25,7 +25,7 @@ using BH.oM.Base;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace BH.Adapter.ExcelAdapter
+namespace BH.Adapter.Excel
 {
     public partial class ExcelAdapter : BHoMAdapter
     {
@@ -35,7 +35,7 @@ namespace BH.Adapter.ExcelAdapter
             if (pushType == PushType.AdapterDefault)
                 pushType = m_AdapterSettings.DefaultPushType;
 
-            if (_excelSettings == null)
+            if (m_ExcelSettings == null)
             {
                 BH.Engine.Reflection.Compute.RecordError("Please set some Excel Settings on the Excel Adapter before pushing to an Excel File");
                 return new List<object>();

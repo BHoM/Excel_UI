@@ -30,13 +30,13 @@ using System.Reflection;
 using BH.oM.Data.Requests;
 using System.IO;
 
-namespace BH.Adapter.ExcelAdapter
+namespace BH.Adapter.Excel
 {
     public partial class ExcelAdapter : BHoMAdapter
     {
         public override IEnumerable<object> Pull(IRequest request, PullType pullOption = PullType.AdapterDefault, ActionConfig actionConfig = null)
         {
-            if (!File.Exists(Path.Combine(_fileSettings.Directory, _fileSettings.FileName)))
+            if (!File.Exists(Path.Combine(m_FileSettings.Directory, m_FileSettings.FileName)))
             {
                 BH.Engine.Reflection.Compute.RecordError("File does not exist to pull from");
                 return new List<IBHoMObject>();
