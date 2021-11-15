@@ -21,6 +21,7 @@
  */
 
 using BH.Adapter;
+using BH.Engine.Adapter;
 using BH.oM.Adapter;
 using BH.oM.Base;
 using BH.oM.Data.Requests;
@@ -37,7 +38,7 @@ namespace BH.Adapter.Excel
 
         public override IEnumerable<object> Pull(IRequest request, PullType pullOption = PullType.AdapterDefault, ActionConfig actionConfig = null)
         {
-            if (!File.Exists(Path.Combine(m_FileSettings.Directory, m_FileSettings.FileName)))
+            if (!File.Exists(m_FileSettings.GetFullFileName()))
             {
                 BH.Engine.Reflection.Compute.RecordError("No file exists under the location specified in the settings.");
                 return new List<IBHoMObject>();
