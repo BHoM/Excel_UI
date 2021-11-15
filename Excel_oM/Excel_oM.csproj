@@ -65,8 +65,6 @@
     <Compile Include="ClosedXML\CellContents.cs" />
     <Compile Include="Config\ExcelPushConfig.cs" />
     <Compile Include="Requests\CellsRequest.cs" />
-    <Compile Include="ClosedXML\RuleSet.cs" />
-    <Compile Include="ClosedXML\Style.cs" />
     <Compile Include="Requests\ValuesRequest.cs" />
     <Compile Include="ClosedXML\WorkbookProperties.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

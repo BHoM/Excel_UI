@@ -47,8 +47,6 @@ namespace BH.oM.Adapters.Excel
 
         public virtual string RichText { get; set; } = "";
 
-        public virtual Style Style { get; set; } = new Style();
-
         /*******************************************/
     }
 }
