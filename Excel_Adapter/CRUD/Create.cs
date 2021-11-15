@@ -45,13 +45,12 @@ namespace BH.Adapter.Excel
 
         protected override bool ICreate<T>(IEnumerable<T> objects, ActionConfig actionConfig = null)
         {
-            //TODO: check if the file and workbook found
             string fileName = m_FileSettings.GetFullFileName();
             XLWorkbook workbook = new XLWorkbook(fileName);
 
             if (actionConfig == null)
             {
-                BH.Engine.Reflection.Compute.RecordNote($"{nameof(ExcelPushConfig)} has not been provided, default one is used.");
+                BH.Engine.Reflection.Compute.RecordNote($"{nameof(ExcelPushConfig)} has not been provided, default config is used.");
                 actionConfig = new ExcelPushConfig();
             }
 
@@ -89,7 +88,6 @@ namespace BH.Adapter.Excel
                 return false;
             }
 
-            ApplyStyles(workbook, config);
             ApplyProperties(workbook, config);
             workbook.SaveAs(fileName);
 
@@ -107,7 +105,7 @@ namespace BH.Adapter.Excel
         {
             if (table?.Data == null)
             {
-                BH.Engine.Reflection.Compute.RecordError("The input table is null or does not contain a table. Push aborted.");
+                BH.Engine.Reflection.Compute.RecordError("The input table is null or does not contain a table. Creation aborted.");
                 return false;
             }
 
@@ -150,21 +148,6 @@ namespace BH.Adapter.Excel
 
         /***************************************************/
 
-        private void ApplyStyles(XLWorkbook workbook, ExcelPushConfig config)
-        {
-            ApplyWorkbookStyle(workbook, config);
-
-            foreach (IXLWorksheet sheet in workbook.Worksheets)
-            {
-                ApplyWorksheetStyle(sheet, config);
-
-                foreach (IXLTable table in sheet.Tables)
-                    ApplyTableStyle(table);  
-            }
-        }
-
-        /***************************************************/
-
         private void ApplyProperties(IXLWorkbook workbook, ExcelPushConfig config)
         {
             workbook.Properties.Author = config.WorkbookProperties.Author;
@@ -177,27 +160,6 @@ namespace BH.Adapter.Excel
             workbook.Properties.LastModifiedBy = config.WorkbookProperties.LastModifiedBy;
             workbook.Properties.Company = config.WorkbookProperties.Company;
             workbook.Properties.Manager = config.WorkbookProperties.Manager;
-        }
-
-        /***************************************************/
-
-        private void ApplyWorkbookStyle(XLWorkbook workbook, ExcelPushConfig config)
-        {
-
-        }
-
-        /***************************************************/
-
-        private void ApplyWorksheetStyle(IXLWorksheet worksheet, ExcelPushConfig config)
-        {
-
-        }
-
-        /***************************************************/
-
-        private void ApplyTableStyle(IXLTable table)
-        {
-            table.Theme = XLTableTheme.None;
         }
 
         /***************************************************/
