@@ -73,7 +73,6 @@ namespace BH.Adapter.Excel
                 return new List<IBHoMObject>();
             }
 
-            //TODO: allow for null/whitespace range == entire scope
             IXLRange ixlRange = Range(ixlWorksheet, range);
             if (ixlRange == null)
             {
