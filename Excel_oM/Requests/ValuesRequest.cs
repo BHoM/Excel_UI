@@ -33,11 +33,11 @@ namespace BH.oM.Adapters.Excel
         /****                Properties                 ****/
         /***************************************************/
 
-        [Description("Names of the worksheet(s) to read from.")]
-        public virtual List<string> Worksheets { get; set; } = null;
+        [Description("Name of the worksheet to read from.")]
+        public virtual string Worksheet { get; set; } = "";
 
         [Description("Range to read, in standard Excel format (e.g. A1:B6).")]
-        public virtual string Range { get; set; } = null;
+        public virtual string Range { get; set; } = "";
 
         /***************************************************/
     }
