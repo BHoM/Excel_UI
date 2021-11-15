@@ -29,16 +29,23 @@ namespace BH.Adapter.Excel
 {
     public partial class ExcelAdapter : BHoMAdapter
     {
+        /***************************************************/
+        /**** Public Overrides                          ****/
+        /***************************************************/
+
         public override List<object> Push(IEnumerable<object> objects, string tag = "", PushType pushType = PushType.AdapterDefault, ActionConfig actionConfig = null)
         {
             // If unset, set the pushType to AdapterSettings' value (base AdapterSettings default is FullCRUD).
             if (pushType == PushType.AdapterDefault)
                 pushType = PushType.DeleteThenCreate;
 
-            //TODO: make sure Others than CreateOnly are supported, also sort out overwrite etc.
-            //TODO: make sure the tables are actually overwritten instead of added with the new name (see Create)
+            if (pushType != PushType.DeleteThenCreate)
+            {
+                BH.Engine.Reflection.Compute.RecordError($"Currently Excel adapter supports only {nameof(PushType)} equal to {PushType.DeleteThenCreate}");
+                return new List<object>();
+            }
 
-            IEnumerable<IBHoMObject> objectsToPush = ProcessObjectsForPush(objects, actionConfig); // Note: default Push only supports IBHoMObjects.
+            IEnumerable<IBHoMObject> objectsToPush = ProcessObjectsForPush(objects, actionConfig);
             if (!objectsToPush.Any())
                 new List<object>();
 
@@ -46,6 +53,7 @@ namespace BH.Adapter.Excel
 
             return success ? objects.ToList() : new List<object>();
         }
+
+        /***************************************************/
     }
 }
-
