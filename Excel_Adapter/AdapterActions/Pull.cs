@@ -39,7 +39,7 @@ namespace BH.Adapter.Excel
         {
             if (!File.Exists(Path.Combine(m_FileSettings.Directory, m_FileSettings.FileName)))
             {
-                BH.Engine.Reflection.Compute.RecordError("File does not exist to pull from");
+                BH.Engine.Reflection.Compute.RecordError("No file exists under the location specified in the settings.");
                 return new List<IBHoMObject>();
             }
 

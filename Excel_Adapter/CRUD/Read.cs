@@ -41,8 +41,12 @@ namespace BH.Adapter.Excel
 
         protected override IEnumerable<IBHoMObject> Read(IRequest request, ActionConfig actionConfig = null)
         {
-            //TODO: check if the file and workbook found
             XLWorkbook workbook = new XLWorkbook(m_FileSettings.GetFullFileName());
+            if (workbook == null)
+            {
+                BH.Engine.Reflection.Compute.RecordError("The file under location specified in the settings is not a valid Excel workbook.");
+                return new List<IBHoMObject>();
+            }
 
             if (request is ValuesRequest)
                 return ReadExcel(workbook, ((ValuesRequest)request).Worksheet, ((ValuesRequest)request).Range, true);
