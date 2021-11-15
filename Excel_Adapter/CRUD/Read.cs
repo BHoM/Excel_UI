@@ -44,11 +44,10 @@ namespace BH.Adapter.Excel
             //TODO: check if the file and workbook found
             XLWorkbook workbook = new XLWorkbook(m_FileSettings.GetFullFileName());
 
-            //TODO: rethink this!
             if (request is ValuesRequest)
-                return ReadExcel(workbook, true);
+                return ReadExcel(workbook, ((ValuesRequest)request).Worksheet, ((ValuesRequest)request).Range, true);
             else if (request is CellsRequest)
-                return ReadExcel(workbook, false);
+                return ReadExcel(workbook, ((CellsRequest)request).Worksheet, ((CellsRequest)request).Range, true);
             else
             {
                 BH.Engine.Reflection.Compute.RecordError($"Requests of type {request?.GetType()} are not supported by the Excel adapter.");
@@ -61,69 +60,68 @@ namespace BH.Adapter.Excel
         /**** Private Methods                           ****/
         /***************************************************/
 
-        private List<IBHoMObject> ReadExcel(XLWorkbook workbook, bool valuesOnly)
+        private List<IBHoMObject> ReadExcel(XLWorkbook workbook, string worksheet, string range, bool valuesOnly)
         {
-            List<IBHoMObject> objects = new List<IBHoMObject>();
-            foreach (IXLWorksheet worksheet in Worksheets(workbook))
+            IXLWorksheet ixlWorksheet = Worksheet(workbook, worksheet);
+            if (ixlWorksheet == null)
             {
-                IXLRange range = Range(worksheet);
-                if(range == null)
-                {
-                    Engine.Reflection.Compute.RecordError("Range provided is not in the correct format for and xlsx file");
-                    return objects;
-                }
-
-                List<DataColumn> columns = new List<DataColumn>();
-                foreach (IXLRangeColumn column in range.Columns())
-                {
-                    columns.Add(new DataColumn(column.ColumnLetter(), typeof(object)));
-                }
-
-                DataTable table = new DataTable();
-                table.Columns.AddRange(columns.ToArray());
-
-                foreach (IXLRangeRow row in range.Rows())
-                {
-                    List<object> dataRow = new List<object>();
-                    foreach (IXLRangeColumn column in range.Columns())
-                    {
-                        if(valuesOnly)
-                            dataRow.Add(worksheet.Cell(row.RowNumber(), column.ColumnNumber()).GetValue<object>());
-                        else
-                            dataRow.Add(BH.Engine.Excel.Create.CellContents(worksheet.Cell(row.RowNumber(), column.ColumnNumber())));
-                    }
-                        
-                    table.Rows.Add(dataRow.ToArray());
-                }
-
-                objects.Add(new Table { Data = table, Name = worksheet.Name });
+                BH.Engine.Reflection.Compute.RecordError("No worksheets matching the request have been found.");
+                return new List<IBHoMObject>();
             }
 
-            return objects;
+            IXLRange ixlRange = Range(ixlWorksheet, range);
+            if (ixlRange == null)
+            {
+                Engine.Reflection.Compute.RecordError("Range provided is not in the correct format for an Excel spreadsheet.");
+                return new List<IBHoMObject>();
+            }
+
+            List<DataColumn> columns = new List<DataColumn>();
+            foreach (IXLRangeColumn column in ixlRange.Columns())
+            {
+                columns.Add(new DataColumn(column.ColumnLetter(), typeof(object)));
+            }
+
+            DataTable table = new DataTable();
+            table.Columns.AddRange(columns.ToArray());
+
+            foreach (IXLRangeRow row in ixlRange.Rows())
+            {
+                List<object> dataRow = new List<object>();
+                foreach (IXLRangeColumn column in ixlRange.Columns())
+                {
+                    if (valuesOnly)
+                        dataRow.Add(ixlWorksheet.Cell(row.RowNumber(), column.ColumnNumber()).GetValue<object>());
+                    else
+                        dataRow.Add(BH.Engine.Excel.Create.CellContents(ixlWorksheet.Cell(row.RowNumber(), column.ColumnNumber())));
+                }
+
+                table.Rows.Add(dataRow.ToArray());
+            }
+
+            return new List<IBHoMObject> { new Table { Data = table, Name = ixlWorksheet.Name } };
         }
-       
+
         /***************************************************/
 
-        private IXLRange Range(IXLWorksheet worksheet)
+        private IXLWorksheet Worksheet(IXLWorkbook workbook, string worksheet)
         {
-            if (m_ExcelSettings.Range != null)
-                return worksheet.Range(m_ExcelSettings.Range);
+            if (!string.IsNullOrWhiteSpace(worksheet))
+                return workbook.Worksheet(worksheet);
+            else
+                return workbook.Worksheet(0);
+        }
+
+        /***************************************************/
+
+        private IXLRange Range(IXLWorksheet worksheet, string range)
+        {
+            if (!string.IsNullOrWhiteSpace(range))
+                return worksheet.Range(range);
             else
                 return worksheet.Range(worksheet.FirstCellUsed().Address, worksheet.LastCellUsed().Address);
         }
 
         /***************************************************/
-
-        private List<IXLWorksheet> Worksheets(XLWorkbook workbook)
-        {
-            IEnumerable<IXLWorksheet> result = workbook.Worksheets;
-            if (m_ExcelSettings.Worksheets.Count != 0)
-                result = result.Where(x => m_ExcelSettings.Worksheets.Contains(x.Name));
-
-            return result.ToList();
-        }
-
-        /***************************************************/
     }
 }
-
