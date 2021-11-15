@@ -45,7 +45,7 @@ namespace BH.Adapter.Excel
             if (pushType == PushType.AdapterDefault)
                 pushType = PushType.DeleteThenCreate;
 
-            // Set the action config.
+            // Cast action config to ExcelPushConfig, then validate it.
             if (actionConfig == null)
             {
                 BH.Engine.Reflection.Compute.RecordNote($"{nameof(ExcelPushConfig)} has not been provided, default config is used.");
@@ -64,7 +64,7 @@ namespace BH.Adapter.Excel
             if (!objectsToPush.Any())
                 return new List<object>();
 
-            // Check if the workbook exists and create it.
+            // Check if the workbook exists and create it if not.
             string fileName = m_FileSettings.GetFullFileName();
             XLWorkbook workbook;
             if (!File.Exists(fileName))
@@ -123,13 +123,13 @@ namespace BH.Adapter.Excel
                 case PushType.CreateNonExisting:
                     {
                         toDelete = null;
-                        toCreate = tables.Where(x => workbook.Worksheets.All(y => x != y)).ToList();
+                        toCreate = tables.Where(x => workbook.Worksheets.All(y => x.Name != y.Name)).ToList();
                         toUpdate = null;
                         break;
                     }
                 case PushType.DeleteThenCreate:
                     {
-                        toDelete = tables.Where(x => workbook.Worksheets.Any(y => x == y)).ToList();
+                        toDelete = tables.Where(x => workbook.Worksheets.Any(y => x.Name == y.Name)).ToList();
                         toCreate = tables.Except(toDelete).ToList();
                         toUpdate = null;
                         break;
@@ -138,13 +138,13 @@ namespace BH.Adapter.Excel
                     {
                         toDelete = null;
                         toCreate = null;
-                        toUpdate = tables.Where(x => workbook.Worksheets.Any(y => x == y)).ToList();
+                        toUpdate = tables.Where(x => workbook.Worksheets.Any(y => x.Name == y.Name)).ToList();
                         break;
                     }
                 case PushType.UpdateOrCreateOnly:
                     {
                         toDelete = null;
-                        toCreate = tables.Where(x => workbook.Worksheets.All(y => x != y)).ToList();
+                        toCreate = tables.Where(x => workbook.Worksheets.All(y => x.Name != y.Name)).ToList();
                         toUpdate = tables.Except(toCreate).ToList();
                         break;
                     }
