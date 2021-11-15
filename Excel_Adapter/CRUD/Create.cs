@@ -34,6 +34,7 @@ using System.Threading;
 using BH.oM.Base;
 using BH.Engine.Base;
 using BH.oM.Adapters.Excel;
+using System.IO;
 
 namespace BH.Adapter.Excel
 {
@@ -46,7 +47,12 @@ namespace BH.Adapter.Excel
         protected override bool ICreate<T>(IEnumerable<T> objects, ActionConfig actionConfig = null)
         {
             string fileName = m_FileSettings.GetFullFileName();
-            XLWorkbook workbook = new XLWorkbook(fileName);
+
+            XLWorkbook workbook;
+            if (!File.Exists(fileName))
+                workbook = new XLWorkbook();
+            else
+                workbook = new XLWorkbook(fileName);
 
             if (actionConfig == null)
             {
@@ -74,12 +80,24 @@ namespace BH.Adapter.Excel
             Type type = objectTypes[0];
             if (type == typeof(Table))
             {
-                if (objects.Count() == 1)
-                    AddTable(workbook, objects.First() as Table);
-                else
+                List<Table> tables = objects.Cast<Table>().ToList();
+                if (tables.Any(x => string.IsNullOrWhiteSpace(x.Name)))
                 {
-                    BH.Engine.Reflection.Compute.RecordError("Excel Adapter can push only one table at a time.");
+                    BH.Engine.Reflection.Compute.RecordError("Creation aborted: all tables need to have non-empty name.");
                     return false;
+                }
+
+                List<string> duplicateNames = tables.GroupBy(x => x.Name).Where(x => x.Count() != 1).Select(x => x.Key).ToList();
+                if (duplicateNames.Count != 0)
+                {
+                    BH.Engine.Reflection.Compute.RecordError("Creation aborted: all tables need to have distinct names." +
+                                                            $"Following names are currently duplicate: {string.Join(", ", duplicateNames)}.");
+                    return false;
+                }
+
+                foreach (Table table in objects.Cast<Table>())
+                {
+                    CreateTable(workbook, table, config);
                 }
             }
             else
@@ -88,7 +106,7 @@ namespace BH.Adapter.Excel
                 return false;
             }
 
-            ApplyProperties(workbook, config);
+            UpdateWorkbookProperties(workbook, config.WorkbookProperties);
             workbook.SaveAs(fileName);
 
             //TODO: why is that?
@@ -101,65 +119,38 @@ namespace BH.Adapter.Excel
         /**** Private Methods                           ****/
         /***************************************************/
 
-        private bool AddTable(IXLWorkbook workbook, Table table)
+        private void CreateTable(IXLWorkbook workbook, Table table, ExcelPushConfig config)
         {
             if (table?.Data == null)
             {
-                BH.Engine.Reflection.Compute.RecordError("The input table is null or does not contain a table. Creation aborted.");
-                return false;
+                BH.Engine.Reflection.Compute.RecordError("The input table is null or does not contain a table. Creation of a table aborted.");
+                return;
             }
 
-            int sheetCount = workbook.Worksheets.Count();
-            string name = table.Name;
-            if (string.IsNullOrWhiteSpace(name))
-                table.Data.TableName = "Sheet" + sheetCount;
-
-            while (WorksheetExists(workbook, name))
+            if (string.IsNullOrWhiteSpace(table?.Name))
             {
-                if (name == "Sheet" + sheetCount)
-                    sheetCount++;
-                else
-                    BH.Engine.Reflection.Compute.RecordWarning($"Worksheet named {name} already exists in the workbook. Default name (sheet 1 etc.) used instead");
-
-                name = "Sheet" + sheetCount;
+                BH.Engine.Reflection.Compute.RecordError("The input table cannot have null name. Creation of a table aborted.");
+                return;
             }
 
-            DataTable toAdd = table.Data.DeepClone();
-            toAdd.TableName = name;
+            IXLWorksheet worksheet = workbook.Worksheets.FirstOrDefault(x => x.Name == table.Name);
+            if (worksheet == null)
+                worksheet = workbook.AddWorksheet(table.Name);
+
+            worksheet.Clear();
+
+            string startingCell = config?.StartingCell;
+            if (string.IsNullOrWhiteSpace(startingCell))
+                startingCell = "A1";
 
             try
             {
-                workbook.Worksheets.Add(toAdd);
-                return true;
+                worksheet.Cell(startingCell).InsertData(table.Data);
             }
-            catch
+            catch(Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordError("Creation of a new worksheet failed.");
-                return false;
+                BH.Engine.Reflection.Compute.RecordError($"Population of worksheet {table.Name} failed with the following error: {e.Message}");
             }
-        }
-
-        /***************************************************/
-
-        private bool WorksheetExists(IXLWorkbook workbook, string name)
-        {
-            return workbook.Worksheets.Any(x => x.Name == name);
-        }
-
-        /***************************************************/
-
-        private void ApplyProperties(IXLWorkbook workbook, ExcelPushConfig config)
-        {
-            workbook.Properties.Author = config.WorkbookProperties.Author;
-            workbook.Properties.Title = config.WorkbookProperties.Title;
-            workbook.Properties.Subject = config.WorkbookProperties.Subject;
-            workbook.Properties.Category = config.WorkbookProperties.Category;
-            workbook.Properties.Keywords = config.WorkbookProperties.Keywords;
-            workbook.Properties.Comments = config.WorkbookProperties.Comments;
-            workbook.Properties.Status = config.WorkbookProperties.Status;
-            workbook.Properties.LastModifiedBy = config.WorkbookProperties.LastModifiedBy;
-            workbook.Properties.Company = config.WorkbookProperties.Company;
-            workbook.Properties.Manager = config.WorkbookProperties.Manager;
         }
 
         /***************************************************/

@@ -1,6 +1,6 @@
 ﻿/*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2021, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2020, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -20,25 +20,46 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
+using BH.Engine.Adapter;
 using BH.oM.Adapter;
-using System.ComponentModel;
+using BH.oM.Data.Collections;
+using ClosedXML.Excel;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using BH.Engine.Data;
+using System.Reflection;
+using System.Threading;
+using BH.oM.Base;
+using BH.Engine.Base;
+using BH.oM.Adapters.Excel;
 
-namespace BH.oM.Adapters.Excel
+namespace BH.Adapter.Excel
 {
-    [Description("Configuration used for adapter interaction with Excel on Push action.")]
-    public class ExcelPushConfig : ActionConfig
+    public partial class ExcelAdapter
     {
         /***************************************************/
-        /****             Public Properties             ****/
+        /**** Private Methods                           ****/
         /***************************************************/
 
-        [Description("The first cell that will be filled with the pushed objects, i.e. top-left cell of the populated space in the spreadsheet.")]
-        public virtual string StartingCell { get; set; } = "";
-
-        [Description("Properties to apply to workbook and contents. If not null, the meta information of the workbook will be updated on push.")]
-        public virtual WorkbookProperties WorkbookProperties { get; set; } = null;
+        private void UpdateWorkbookProperties(IXLWorkbook workbook, WorkbookProperties properties)
+        {
+            if (properties != null)
+            {
+                workbook.Properties.Author = properties.Author;
+                workbook.Properties.Title = properties.Title;
+                workbook.Properties.Subject = properties.Subject;
+                workbook.Properties.Category = properties.Category;
+                workbook.Properties.Keywords = properties.Keywords;
+                workbook.Properties.Comments = properties.Comments;
+                workbook.Properties.Status = properties.Status;
+                workbook.Properties.LastModifiedBy = properties.LastModifiedBy;
+                workbook.Properties.Company = properties.Company;
+                workbook.Properties.Manager = properties.Manager;
+            }
+        }
 
         /***************************************************/
     }
 }
-
