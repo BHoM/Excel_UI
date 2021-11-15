@@ -106,12 +106,17 @@ namespace BH.Adapter.Excel
                 return false;
             }
 
-            UpdateWorkbookProperties(workbook, config.WorkbookProperties);
-            workbook.SaveAs(fileName);
-
-            //TODO: why is that?
-            Thread.Sleep(1000);
-            return true;
+            try
+            {
+                UpdateWorkbookProperties(workbook, config.WorkbookProperties);
+                workbook.SaveAs(fileName);
+                return true;
+            }
+            catch (Exception e)
+            {
+                BH.Engine.Reflection.Compute.RecordError($"Finalisation and saving of the workbook failed with the following error: {e.Message}");
+                return false;
+            }
         }
 
 
