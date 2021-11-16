@@ -60,7 +60,7 @@ namespace BH.Adapter.Excel
             if (request is ValuesRequest)
                 return ReadExcel(workbook, ((ValuesRequest)request).Worksheet, ((ValuesRequest)request).Range, true);
             else if (request is CellsRequest)
-                return ReadExcel(workbook, ((CellsRequest)request).Worksheet, ((CellsRequest)request).Range, true);
+                return ReadExcel(workbook, ((CellsRequest)request).Worksheet, ((CellsRequest)request).Range, false);
             else
             {
                 BH.Engine.Reflection.Compute.RecordError($"Requests of type {request?.GetType()} are not supported by the Excel adapter.");
