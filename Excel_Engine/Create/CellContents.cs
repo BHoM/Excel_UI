@@ -22,13 +22,14 @@
 
 using BH.oM.Adapters.Excel;
 using ClosedXML.Excel;
+using System;
 
 namespace BH.Engine.Excel
 {
     public static partial class Create
     {
         /*******************************************/
-        /**** Methods                           ****/
+        /**** Public Methods                    ****/
         /*******************************************/
 
         public static CellContents CellContents(IXLCell xLCell)
@@ -38,12 +39,36 @@ namespace BH.Engine.Excel
                 Comment = xLCell.HasComment ? xLCell.Comment.Text : "",
                 Value = xLCell.Value,
                 Address = xLCell.Address.ToString(),
-                DataType = xLCell.DataType.GetType(),
+                DataType = xLCell.DataType.SystemType(),
                 FormulaA1 = xLCell.FormulaA1,
                 FormulaR1C1 = xLCell.FormulaR1C1,
                 HyperLink = xLCell.HasHyperlink ? xLCell.Hyperlink.ExternalAddress.ToString() : "",
                 RichText = xLCell.HasRichText ? xLCell.RichText.Text : ""
             };
+        }
+
+
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
+
+        private static Type SystemType(this XLDataType dataType)
+        {
+            switch (dataType)
+            {
+                case XLDataType.Boolean:
+                    return typeof(bool);
+                case XLDataType.DateTime:
+                    return typeof(DateTime);
+                case XLDataType.Number:
+                    return typeof(double);
+                case XLDataType.Text:
+                    return typeof(string);
+                case XLDataType.TimeSpan:
+                    return typeof(TimeSpan);
+                default:
+                    return null;
+            }
         }
 
         /*******************************************/
