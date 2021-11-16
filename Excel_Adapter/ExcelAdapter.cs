@@ -41,14 +41,13 @@ namespace BH.Adapter.Excel
         {
             if (fileSettings == null)
             {
-                BH.Engine.Reflection.Compute.RecordError("Please set the File Settings correctly to enable the Excel Adapter to work correctly");
+                BH.Engine.Reflection.Compute.RecordError("Please set the File Settings to enable the Excel Adapter to work correctly.");
                 return;
             }
 
             if (!Path.HasExtension(fileSettings.FileName) || Path.GetExtension(fileSettings.FileName) != ".xlsx")
             {
-                // TODO: add error about .xlsx, check if .xls and .csv are mkay?
-                BH.Engine.Reflection.Compute.RecordError("File name must contain a file extension");
+                BH.Engine.Reflection.Compute.RecordError("File name must contain a file extension equal to either 'xls' or 'xlsx'.");
                 return;
             }
 
@@ -65,4 +64,3 @@ namespace BH.Adapter.Excel
         /***************************************************/
     }
 }
-
