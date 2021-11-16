@@ -41,14 +41,14 @@ namespace BH.Adapter.Excel
                 return false;
             }
 
-            IXLWorksheet worksheet = workbook.AddWorksheet(table.Name);
-
-            string startingCell = config?.StartingCell;
-            if (string.IsNullOrWhiteSpace(startingCell))
-                startingCell = "A1";
-
             try
             {
+                IXLWorksheet worksheet = workbook.AddWorksheet(table.Name);
+
+                string startingCell = config?.StartingCell;
+                if (string.IsNullOrWhiteSpace(startingCell))
+                    startingCell = "A1";
+
                 worksheet.Cell(startingCell).InsertData(table.Data);
                 return true;
             }
