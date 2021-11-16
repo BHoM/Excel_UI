@@ -21,8 +21,10 @@
  */
 
 using BH.oM.Adapters.Excel;
+using BH.oM.Reflection.Attributes;
 using ClosedXML.Excel;
 using System;
+using System.ComponentModel;
 
 namespace BH.Engine.Excel
 {
@@ -32,6 +34,9 @@ namespace BH.Engine.Excel
         /**** Public Methods                    ****/
         /*******************************************/
 
+        [Description("Created a BHoM wrapper for the given ClosedXML cell contents object.")]
+        [Input("xLCell", "ClosedXML cell contents object, on which the created BHoM wrapper is based.")]
+        [Output("cellContents", "BHoM wrapper for the input ClosedXML cell contents object.")]
         public static CellContents CellContents(IXLCell xLCell)
         {
             return new CellContents()
