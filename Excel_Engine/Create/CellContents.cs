@@ -39,6 +39,9 @@ namespace BH.Engine.Excel
         [Output("cellContents", "BHoM wrapper for the input ClosedXML cell contents object.")]
         public static CellContents CellContents(IXLCell xLCell)
         {
+            if (xLCell == null)
+                return null;
+
             return new CellContents()
             {
                 Comment = xLCell.HasComment ? xLCell.Comment.Text : "",
