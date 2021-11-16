@@ -45,18 +45,12 @@ namespace BH.Adapter.Excel
             if (pushType == PushType.AdapterDefault)
                 pushType = PushType.DeleteThenCreate;
 
-            // Cast action config to ExcelPushConfig, then validate it.
-            if (actionConfig == null)
-            {
-                BH.Engine.Reflection.Compute.RecordNote($"{nameof(ExcelPushConfig)} has not been provided, default config is used.");
-                actionConfig = new ExcelPushConfig();
-            }
-
+            // Cast action config to ExcelPushConfig, create new if null.
             ExcelPushConfig config = actionConfig as ExcelPushConfig;
             if (config == null)
             {
-                BH.Engine.Reflection.Compute.RecordError($"Provided {nameof(ActionConfig)} is not {nameof(ExcelPushConfig)}.");
-                return new List<object>();
+                BH.Engine.Reflection.Compute.RecordNote($"{nameof(ExcelPushConfig)} has not been provided, default config is used.");
+                config = new ExcelPushConfig();
             }
 
             // Preprocess the objects to push.
@@ -78,7 +72,17 @@ namespace BH.Adapter.Excel
                 workbook = new XLWorkbook();
             }
             else
-                workbook = new XLWorkbook(fileName);
+            {
+                try
+                {
+                    workbook = new XLWorkbook(fileName);
+                }
+                catch (Exception e)
+                {
+                    BH.Engine.Reflection.Compute.RecordError($"The existing workbook could not be accessed due to the following error: {e.Message}");
+                    return new List<object>();
+                }
+            }
 
             // Make sure that only objects to be pushed are Tables.
             List<Type> objectTypes = objects.Select(x => x.GetType()).Distinct().ToList();
@@ -115,37 +119,31 @@ namespace BH.Adapter.Excel
             }
 
             // Split the tables into collections to delete, create and update.
-            List<Table> toDelete;
-            List<Table> toCreate;
-            List<Table> toUpdate;
+            List<Table> toDelete = new List<Table>();
+            List<Table> toCreate = new List<Table>();
+            List<Table> toUpdate = new List<Table>();
             switch (pushType)
             {
                 case PushType.CreateNonExisting:
                     {
-                        toDelete = null;
-                        toCreate = tables.Where(x => workbook.Worksheets.All(y => x.Name != y.Name)).ToList();
-                        toUpdate = null;
+                        toCreate.AddRange(tables.Where(x => workbook.Worksheets.All(y => x.Name != y.Name)));
                         break;
                     }
                 case PushType.DeleteThenCreate:
                     {
-                        toDelete = tables.Where(x => workbook.Worksheets.Any(y => x.Name == y.Name)).ToList();
-                        toCreate = tables.Except(toDelete).ToList();
-                        toUpdate = null;
+                        toDelete.AddRange(tables.Where(x => workbook.Worksheets.Any(y => x.Name == y.Name)));
+                        toCreate.AddRange(tables);
                         break;
                     }
                 case PushType.UpdateOnly:
                     {
-                        toDelete = null;
-                        toCreate = null;
-                        toUpdate = tables.Where(x => workbook.Worksheets.Any(y => x.Name == y.Name)).ToList();
+                        toUpdate.AddRange(tables.Where(x => workbook.Worksheets.Any(y => x.Name == y.Name)));
                         break;
                     }
                 case PushType.UpdateOrCreateOnly:
                     {
-                        toDelete = null;
-                        toCreate = tables.Where(x => workbook.Worksheets.All(y => x.Name != y.Name)).ToList();
-                        toUpdate = tables.Except(toCreate).ToList();
+                        toCreate.AddRange(tables.Where(x => workbook.Worksheets.All(y => x.Name != y.Name)));
+                        toUpdate.AddRange(tables.Except(toCreate).ToList());
                         break;
                     }
                 default:
