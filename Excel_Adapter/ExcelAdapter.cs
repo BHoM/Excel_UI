@@ -47,7 +47,7 @@ namespace BH.Adapter.Excel
 
             if (!Path.HasExtension(fileSettings.FileName) || Path.GetExtension(fileSettings.FileName) != ".xlsx")
             {
-                BH.Engine.Reflection.Compute.RecordError("File name must contain a file extension equal to either 'xls' or 'xlsx'.");
+                BH.Engine.Reflection.Compute.RecordError("Excel adapter supports only .xlsx files.");
                 return;
             }
 
