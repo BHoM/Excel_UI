@@ -110,10 +110,10 @@ namespace BH.Adapter.Excel
                 return new List<object>();
             }
 
-            List<string> duplicateNames = tables.GroupBy(x => x.Name).Where(x => x.Count() != 1).Select(x => x.Key).ToList();
+            List<string> duplicateNames = tables.GroupBy(x => x.Name.ToLower()).Where(x => x.Count() != 1).Select(x => x.Key).ToList();
             if (duplicateNames.Count != 0)
             {
-                BH.Engine.Reflection.Compute.RecordError("Push aborted: all tables need to have distinct names." +
+                BH.Engine.Reflection.Compute.RecordError("Push failed: all tables need to have distinct names, regardless of letter casing.\n" +
                                                         $"Following names are currently duplicate: {string.Join(", ", duplicateNames)}.");
                 return new List<object>();
             }
