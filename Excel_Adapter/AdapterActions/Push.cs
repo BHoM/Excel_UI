@@ -170,7 +170,7 @@ namespace BH.Adapter.Excel
                 success &= Update(workbook, table, config);
             }
 
-            // Try to update the workbook mateinformation and then save it.
+            // Try to update the workbook properties and then save it.
             try
             {
                 UpdateWorkbookProperties(workbook, config.WorkbookProperties);
