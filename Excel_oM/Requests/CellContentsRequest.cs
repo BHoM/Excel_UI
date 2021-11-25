@@ -27,7 +27,7 @@ using System.ComponentModel;
 namespace BH.oM.Adapters.Excel
 {
     [Description("IRequest that pulls cells and their metadata from the excel file.")]
-    public class CellsRequest : IRequest
+    public class CellContentsRequest : IRequest
     {
         /***************************************************/
         /****                Properties                 ****/

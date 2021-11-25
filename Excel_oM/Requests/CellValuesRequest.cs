@@ -27,7 +27,7 @@ using System.ComponentModel;
 namespace BH.oM.Adapters.Excel
 {
     [Description("IRequest that pulls values only from the Excel file.")]
-    public class ValuesRequest : IRequest
+    public class CellValuesRequest : IRequest
     {
         /***************************************************/
         /****                Properties                 ****/
