@@ -48,7 +48,7 @@ namespace BH.Adapter.Excel
             }
             catch
             {
-
+                // No error raised here because it will get raised under if (workbook == null) below.
             }
 
             if (workbook == null)
@@ -57,10 +57,10 @@ namespace BH.Adapter.Excel
                 return new List<IBHoMObject>();
             }
 
-            if (request is ValuesRequest)
-                return ReadExcel(workbook, ((ValuesRequest)request).Worksheet, ((ValuesRequest)request).Range, true);
-            else if (request is CellsRequest)
-                return ReadExcel(workbook, ((CellsRequest)request).Worksheet, ((CellsRequest)request).Range, false);
+            if (request is CellValuesRequest)
+                return ReadExcel(workbook, ((CellValuesRequest)request).Worksheet, ((CellValuesRequest)request).Range, true);
+            else if (request is CellContentsRequest)
+                return ReadExcel(workbook, ((CellContentsRequest)request).Worksheet, ((CellContentsRequest)request).Range, false);
             else
             {
                 BH.Engine.Reflection.Compute.RecordError($"Requests of type {request?.GetType()} are not supported by the Excel adapter.");

@@ -21,34 +21,46 @@
  */
 
 using BH.oM.Base;
+using System.ComponentModel;
 
 namespace BH.oM.Adapters.Excel
 {
+    [Description("Object representing the meta information of the workbook.")]
     public class WorkbookProperties : BHoMObject
     {
         /***************************************************/
         /**** Properties                                ****/
         /***************************************************/
 
-        public virtual string Author { get; set; } = "author";
+        [Description("Author of the workbook.")]
+        public virtual string Author { get; set; } = "";
 
-        public virtual string Title { get; set; } = "title";
+        [Description("Title of the workbook.")]
+        public virtual string Title { get; set; } = "";
 
-        public virtual string Subject { get; set; } = "subject";
+        [Description("Subject of the workbook.")]
+        public virtual string Subject { get; set; } = "";
 
-        public virtual string Category { get; set; } = "category";
+        [Description("Category of the workbook.")]
+        public virtual string Category { get; set; } = "";
 
-        public virtual string Keywords { get; set; } = "keywords";
+        [Description("Keywords related to the workbook.")]
+        public virtual string Keywords { get; set; } = "";
 
-        public virtual string Comments{ get; set; } = "comments";
+        [Description("Comments applied to the workbook.")]
+        public virtual string Comments{ get; set; } = "";
 
-        public virtual string Status { get; set; } = "status";
+        [Description("Status of the workbook.")]
+        public virtual string Status { get; set; } = "";
 
-        public virtual string LastModifiedBy { get; set; } = "lastModified";
+        [Description("Last user that modified the workbook.")]
+        public virtual string LastModifiedBy { get; set; } = "";
 
-        public virtual string Company { get; set; } = "Buro Happold";
+        [Description("Company of the last user that modified the workbook.")]
+        public virtual string Company { get; set; } = "";
 
-        public virtual string Manager{ get; set; } = "manager";
+        [Description("Manager of the last user that modified the workbook.")]
+        public virtual string Manager{ get; set; } = "";
 
         /***************************************************/
     }
