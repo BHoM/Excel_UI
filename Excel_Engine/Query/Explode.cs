@@ -32,7 +32,7 @@ using System.Threading.Tasks;
 
 namespace BH.Engine.Excel
 {
-    public static class Query
+    public static partial class Query
     {
         /*******************************************/
         /**** Public Methods                    ****/
