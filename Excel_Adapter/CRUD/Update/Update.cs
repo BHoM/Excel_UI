@@ -34,7 +34,7 @@ namespace BH.Adapter.Excel
         /**** Public Methods                            ****/
         /***************************************************/
 
-        private bool Update(IXLWorkbook workbook, Table table, ExcelPushConfig config)
+        public bool Update(IXLWorkbook workbook, Table table, ExcelPushConfig config)
         {
             if (table?.Data == null)
             {

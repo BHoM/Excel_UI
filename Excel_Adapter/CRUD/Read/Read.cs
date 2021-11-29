@@ -120,7 +120,7 @@ namespace BH.Adapter.Excel
                         if (valuesOnly)
                             dataRow.Add(ixlWorksheet.Cell(row.RowNumber(), column.ColumnNumber()).GetValue<object>());
                         else
-                            dataRow.Add(BH.Engine.Excel.Create.CellContents(ixlWorksheet.Cell(row.RowNumber(), column.ColumnNumber())));
+                            dataRow.Add((ixlWorksheet.Cell(row.RowNumber(), column.ColumnNumber())).FromExcel());
                     }
 
                     table.Rows.Add(dataRow.ToArray());
