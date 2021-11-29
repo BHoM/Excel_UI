@@ -43,7 +43,7 @@ namespace BH.Engine.Excel
         [Input("includePropertyNames", "Include the name of the properties")] 
         [Input("goDeep", "Explode inner objects")] 
         [Input("transpose", "Transpose the resulting table (i.e. one object per column instead of per row)")]
-        public static object Explode(List<object> objects, bool includePropertyNames = false, bool goDeep = false, bool transpose = false)
+        public static object Explode(this List<object> objects, bool includePropertyNames = false, bool goDeep = false, bool transpose = false)
         {
             Engine.Reflection.Compute.ClearCurrentEvents();
             if (objects == null || objects.Count == 0)
