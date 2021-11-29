@@ -20,17 +20,10 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using BH.Engine.Reflection;
 using BH.oM.Adapters.Excel;
 using BH.oM.Reflection.Attributes;
-using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace BH.Engine.Excel
 {
@@ -40,11 +33,9 @@ namespace BH.Engine.Excel
         /**** Public Methods                    ****/
         /*******************************************/
 
-        //[Description("Get all properties from an object. WARNING This is an array formula and will take up more than one cell!")]
-        //[Input("objects", "Objects to explode")]
-        //[Input("includePropertyNames", "Include the name of the properties")]
-        //[Input("goDeep", "Explode inner objects")]
-        //[Input("transpose", "Transpose the resulting table (i.e. one object per column instead of per row)")]
+        [Description("Checks whether given BHoM CellAddress is valid for use in Excel adapter and raises errors if not.")]
+        [Input("address", "BHoM CellAddress to be validated.")]
+        [Output("valid", "True if the input CellAddress is valid, otherwise false.")]
         public static bool IsValid(this CellAddress address)
         {
             if (address == null)
@@ -53,15 +44,15 @@ namespace BH.Engine.Excel
                 return false;
             }
 
-            if (address.RowIndex < 1)
+            if (address.Row < 1)
             {
                 BH.Engine.Reflection.Compute.RecordError("Row index cannot lower than 1.");
                 return false;
             }
 
-            if (!m_ColumnIndexFormat.IsMatch(address.ColumnIndex))
+            if (!m_ColumnIndexFormat.IsMatch(address.Column))
             {
-                BH.Engine.Reflection.Compute.RecordError($"Column index equal to {address.ColumnIndex} is invalid, it needs to consist of capital letters only.");
+                BH.Engine.Reflection.Compute.RecordError($"Column index equal to {address.Column} is invalid, it needs to consist of capital letters only.");
                 return false;
             }
 
@@ -70,6 +61,9 @@ namespace BH.Engine.Excel
 
         /*******************************************/
 
+        [Description("Checks whether given BHoM CellRange is valid for use in Excel adapter and raises errors if not.")]
+        [Input("range", "BHoM CellRange to be validated.")]
+        [Output("valid", "True if the input CellRange is valid, otherwise false.")]
         public static bool IsValid(this CellRange range)
         {
             if (range == null)
@@ -83,6 +77,9 @@ namespace BH.Engine.Excel
 
         /*******************************************/
 
+        [Description("Checks whether given cell address in an Excel-readable string format is valid for use in Excel adapter and raises errors if not.")]
+        [Input("address", "Cell address in an Excel-readable string format to be validated.")]
+        [Output("valid", "True if the input string is valid, otherwise false.")]
         public static bool IsValidAddress(this string address)
         {
             if (address == null)
@@ -109,6 +106,9 @@ namespace BH.Engine.Excel
 
         /*******************************************/
 
+        [Description("Checks whether given cell range in an Excel-readable string format is valid for use in Excel adapter and raises errors if not.")]
+        [Input("range", "Cell range in an Excel-readable string format to be validated.")]
+        [Output("valid", "True if the input string is valid, otherwise false.")]
         public static bool IsValidRange(this string range)
         {
             if (range == null)

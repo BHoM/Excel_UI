@@ -26,16 +26,27 @@ using System.ComponentModel;
 
 namespace BH.Engine.Excel
 {
-    public static partial class Convert
+    public static partial class Create
     {
         /*******************************************/
         /**** Public Methods                    ****/
         /*******************************************/
 
-        [Description("Converts a string representing cell range in Excel-readable format to a BHoM cell range object.")]
-        [Input("excelRange", "String representing cell range in Excel-readable format to convert from.")]
-        [Output("range", "BHoM cell range object converted from the input string.")]
-        public static CellRange RangeFromExcel(string excelRange)
+        [Description("Creates a BHoM CellRange based on start and end cells in an Excel-readable string format.")]
+        [Input("from", "Top-left corner of the range in a Excel-readable string format.")]
+        [Input("to", "Bottom-right corner of the range in a Excel-readable string format.")]
+        [Output("range", "BHoM CellRange created based on the input strings.")]
+        public static CellRange CellRange(string from, string to)
+        {
+            return Create.CellRange($"{from}:{to}");
+        }
+
+        /*******************************************/
+
+        [Description("Creates a BHoM CellRange based on the given string representing cell range in Excel-readable format.")]
+        [Input("excelRange", "String representing cell range in Excel-readable format.")]
+        [Output("range", "BHoM CellRange object created based on the input string.")]
+        public static CellRange CellRange(string excelRange)
         {
             if (!excelRange.IsValidRange())
                 return null;
@@ -44,7 +55,7 @@ namespace BH.Engine.Excel
             string from = split[0];
             string to = split[1];
 
-            return new CellRange { From = AddressFromExcel(from), To = AddressFromExcel(to) };
+            return new CellRange { From = Create.CellAddress(from), To = Create.CellAddress(to) };
         }
 
         /*******************************************/

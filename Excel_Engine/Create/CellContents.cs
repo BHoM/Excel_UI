@@ -46,7 +46,7 @@ namespace BH.Engine.Excel
             {
                 Comment = xLCell.HasComment ? xLCell.Comment.Text : "",
                 Value = xLCell.Value,
-                Address = BH.Engine.Excel.Convert.AddressFromExcel(xLCell.Address.ToString()),
+                Address = BH.Engine.Excel.Create.CellAddress(xLCell.Address.ToString()),
                 DataType = xLCell.DataType.SystemType(),
                 FormulaA1 = xLCell.FormulaA1,
                 FormulaR1C1 = xLCell.FormulaR1C1,
