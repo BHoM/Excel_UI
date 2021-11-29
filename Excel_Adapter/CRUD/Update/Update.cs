@@ -20,6 +20,7 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
+using BH.Engine.Excel;
 using BH.oM.Adapters.Excel;
 using BH.oM.Data.Collections;
 using ClosedXML.Excel;
@@ -45,9 +46,9 @@ namespace BH.Adapter.Excel
             {
                 IXLWorksheet worksheet = workbook.Worksheet(table.Name);
 
-                string startingCell = config?.StartingCell;
+                string startingCell = config?.StartingCell == null ? "A1" : config.StartingCell.ToExcel();
                 if (string.IsNullOrWhiteSpace(startingCell))
-                    startingCell = "A1";
+                    return false;
 
                 worksheet.Cell(startingCell).InsertData(table.Data);
                 return true;

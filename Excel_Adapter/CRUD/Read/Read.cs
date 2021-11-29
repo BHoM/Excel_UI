@@ -21,6 +21,7 @@
  */
 
 using BH.Engine.Adapter;
+using BH.Engine.Excel;
 using BH.oM.Adapter;
 using BH.oM.Adapters.Excel;
 using BH.oM.Base;
@@ -58,7 +59,9 @@ namespace BH.Adapter.Excel
             }
 
             if (request is CellValuesRequest)
+            {
                 return ReadExcel(workbook, ((CellValuesRequest)request).Worksheet, ((CellValuesRequest)request).Range, true);
+            }
             else if (request is CellContentsRequest)
                 return ReadExcel(workbook, ((CellContentsRequest)request).Worksheet, ((CellContentsRequest)request).Range, false);
             else
@@ -71,6 +74,21 @@ namespace BH.Adapter.Excel
 
         /***************************************************/
         /**** Private Methods                           ****/
+        /***************************************************/
+
+        private List<IBHoMObject> ReadExcel(XLWorkbook workbook, string worksheet, CellRange range, bool valuesOnly)
+        {
+            string rangeString = "";
+            if (range != null)
+            {
+                rangeString = range.ToExcel();
+                if (string.IsNullOrWhiteSpace(rangeString))
+                    return new List<IBHoMObject>();
+            }
+
+            return ReadExcel(workbook, worksheet, rangeString, valuesOnly);
+        }
+
         /***************************************************/
 
         private List<IBHoMObject> ReadExcel(XLWorkbook workbook, string worksheet, string range, bool valuesOnly)

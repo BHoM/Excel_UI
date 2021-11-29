@@ -33,7 +33,7 @@ namespace BH.oM.Adapters.Excel
         /***************************************************/
 
         [Description("The first cell that will be filled with the pushed objects, i.e. top-left cell of the populated space in the spreadsheet.")]
-        public virtual string StartingCell { get; set; } = "";
+        public virtual CellAddress StartingCell { get; set; } = new CellAddress();
 
         [Description("Properties to apply to workbook and contents. If not null, the meta information of the workbook will be updated on push.")]
         public virtual WorkbookProperties WorkbookProperties { get; set; } = null;

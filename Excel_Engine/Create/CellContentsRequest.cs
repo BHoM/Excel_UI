@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of the Buildings and Habitats object Model (BHoM)
  * Copyright (c) 2015 - 2021, the respective contributors. All rights reserved.
  *
@@ -34,10 +34,10 @@ namespace BH.Engine.Excel
         /**** Public Methods                    ****/
         /*******************************************/
 
-        [Description("Created a BHoM wrapper for the given ClosedXML cell contents object.")]
-        [Input("xLCell", "ClosedXML cell contents object, on which the created BHoM wrapper is based.")]
-        [Output("cellContents", "BHoM wrapper for the input ClosedXML cell contents object.")]
-        public static CellContents CellContents(IXLCell xLCell)
+        //[Description("Created a BHoM wrapper for the given ClosedXML cell contents object.")]
+        //[Input("xLCell", "ClosedXML cell contents object, on which the created BHoM wrapper is based.")]
+        //[Output("cellContents", "BHoM wrapper for the input ClosedXML cell contents object.")]
+        public static CellContents CellContentsRequest(IXLCell xLCell)
         {
             if (xLCell == null)
                 return null;
@@ -53,30 +53,6 @@ namespace BH.Engine.Excel
                 HyperLink = xLCell.HasHyperlink ? xLCell.Hyperlink.ExternalAddress.ToString() : "",
                 RichText = xLCell.HasRichText ? xLCell.RichText.Text : ""
             };
-        }
-
-
-        /*******************************************/
-        /**** Private Methods                   ****/
-        /*******************************************/
-
-        private static Type SystemType(this XLDataType dataType)
-        {
-            switch (dataType)
-            {
-                case XLDataType.Boolean:
-                    return typeof(bool);
-                case XLDataType.DateTime:
-                    return typeof(DateTime);
-                case XLDataType.Number:
-                    return typeof(double);
-                case XLDataType.Text:
-                    return typeof(string);
-                case XLDataType.TimeSpan:
-                    return typeof(TimeSpan);
-                default:
-                    return null;
-            }
         }
 
         /*******************************************/

@@ -40,7 +40,7 @@ namespace BH.oM.Adapters.Excel
         public virtual object Value { get; set; } = null;
 
         [Description("Address of the cell.")]
-        public virtual string Address { get; set; } = "";
+        public virtual CellAddress Address { get; set; } = null;
 
         [Description("Data type of the value stored in the cell. Only 5 data types are considered: number, text, Boolean, date/time, and timespan.")]
         public virtual Type DataType { get; set; } = null;

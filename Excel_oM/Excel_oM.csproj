@@ -67,6 +67,8 @@
     <Reference Include="WindowsBase" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Address\CellAddress.cs" />
+    <Compile Include="Address\CellRange.cs" />
     <Compile Include="ClosedXML\CellContents.cs" />
     <Compile Include="Config\ExcelPushConfig.cs" />
     <Compile Include="Requests\CellContentsRequest.cs" />
@@ -77,6 +79,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(TargetPath)"  "C:\ProgramData\BHoM\Assemblies" /C /Y
