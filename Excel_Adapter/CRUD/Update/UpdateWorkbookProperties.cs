@@ -43,7 +43,7 @@ namespace BH.Adapter.Excel
         /**** Private Methods                           ****/
         /***************************************************/
 
-        private void UpdateWorkbookProperties(IXLWorkbook workbook, WorkbookProperties properties)
+        public void Update(IXLWorkbook workbook, WorkbookProperties properties)
         {
             if (properties != null)
             {

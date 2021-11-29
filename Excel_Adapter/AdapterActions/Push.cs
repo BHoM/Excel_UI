@@ -53,37 +53,6 @@ namespace BH.Adapter.Excel
                 config = new ExcelPushConfig();
             }
 
-            // Preprocess the objects to push.
-            IEnumerable<IBHoMObject> objectsToPush = ProcessObjectsForPush(objects, actionConfig);
-            if (!objectsToPush.Any())
-                return new List<object>();
-
-            // Check if the workbook exists and create it if not.
-            string fileName = m_FileSettings.GetFullFileName();
-            XLWorkbook workbook;
-            if (!File.Exists(fileName))
-            {
-                if (pushType == PushType.UpdateOnly)
-                {
-                    BH.Engine.Reflection.Compute.RecordError($"There is no workbook to update under {fileName}");
-                    return new List<object>();
-                }
-
-                workbook = new XLWorkbook();
-            }
-            else
-            {
-                try
-                {
-                    workbook = new XLWorkbook(fileName);
-                }
-                catch (Exception e)
-                {
-                    BH.Engine.Reflection.Compute.RecordError($"The existing workbook could not be accessed due to the following error: {e.Message}");
-                    return new List<object>();
-                }
-            }
-
             // Make sure that only objects to be pushed are Tables.
             List<Type> objectTypes = objects.Select(x => x.GetType()).Distinct().ToList();
             if (objectTypes.Count != 1)
@@ -116,6 +85,32 @@ namespace BH.Adapter.Excel
                 BH.Engine.Reflection.Compute.RecordError("Push failed: all tables need to have distinct names, regardless of letter casing.\n" +
                                                         $"Following names are currently duplicate: {string.Join(", ", duplicateNames)}.");
                 return new List<object>();
+            }
+
+            // Check if the workbook exists and create it if not.
+            string fileName = m_FileSettings.GetFullFileName();
+            XLWorkbook workbook;
+            if (!File.Exists(fileName))
+            {
+                if (pushType == PushType.UpdateOnly)
+                {
+                    BH.Engine.Reflection.Compute.RecordError($"There is no workbook to update under {fileName}");
+                    return new List<object>();
+                }
+
+                workbook = new XLWorkbook();
+            }
+            else
+            {
+                try
+                {
+                    workbook = new XLWorkbook(fileName);
+                }
+                catch (Exception e)
+                {
+                    BH.Engine.Reflection.Compute.RecordError($"The existing workbook could not be accessed due to the following error: {e.Message}");
+                    return new List<object>();
+                }
             }
 
             // Split the tables into collections to delete, create and update.
@@ -173,7 +168,7 @@ namespace BH.Adapter.Excel
             // Try to update the workbook properties and then save it.
             try
             {
-                UpdateWorkbookProperties(workbook, config.WorkbookProperties);
+                Update(workbook, config.WorkbookProperties);
                 workbook.SaveAs(fileName);
                 return success ? objects.ToList() : new List<object>();
             }

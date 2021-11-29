@@ -26,7 +26,7 @@ using ClosedXML.Excel;
 using System;
 using System.ComponentModel;
 
-namespace BH.Engine.Excel
+namespace BH.Adapter.Excel
 {
     public static partial class Create
     {
@@ -34,10 +34,10 @@ namespace BH.Engine.Excel
         /**** Public Methods                    ****/
         /*******************************************/
 
-        [Description("Created a BHoM wrapper for the given ClosedXML cell contents object.")]
-        [Input("xLCell", "ClosedXML cell contents object, on which the created BHoM wrapper is based.")]
-        [Output("cellContents", "BHoM wrapper for the input ClosedXML cell contents object.")]
-        public static CellContents CellContents(IXLCell xLCell)
+        [Description("Converts the given ClosedXML cell contents object to a BHoM CellContents.")]
+        [Input("xLCell", "ClosedXML cell contents object to convert from.")]
+        [Output("cellContents", "BHoM CellContents based on the input ClosedXML cell contents object.")]
+        public static CellContents FromExcel(this IXLCell xLCell)
         {
             if (xLCell == null)
                 return null;

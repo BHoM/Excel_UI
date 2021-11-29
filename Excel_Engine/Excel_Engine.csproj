@@ -74,7 +74,6 @@
     <Compile Include="Convert\ToExcel\CellAddress.cs" />
     <Compile Include="Convert\ToExcel\CellRange.cs" />
     <Compile Include="Create\CellAddress.cs" />
-    <Compile Include="Create\CellContents.cs" />
     <Compile Include="Create\CellContentsRequest.cs" />
     <Compile Include="Create\CellRange.cs" />
     <Compile Include="Create\CellValuesRequest.cs" />
