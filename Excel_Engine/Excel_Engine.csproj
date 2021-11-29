@@ -71,12 +71,16 @@
   <ItemGroup>
     <Compile Include="Compute\ParseEnum.cs" />
     <Compile Include="Compute\ListToText.cs" />
-    <Compile Include="Convert\FromExcel\CellAddress.cs" />
-    <Compile Include="Convert\FromExcel\CellRange.cs" />
     <Compile Include="Convert\ToExcel\CellAddress.cs" />
     <Compile Include="Convert\ToExcel\CellRange.cs" />
+    <Compile Include="Create\CellAddress.cs" />
     <Compile Include="Create\CellContents.cs" />
+    <Compile Include="Create\CellContentsRequest.cs" />
+    <Compile Include="Create\CellRange.cs" />
+    <Compile Include="Create\CellValuesRequest.cs" />
+    <Compile Include="Create\ExcelPushConfig.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Query\ColumnName.cs" />
     <Compile Include="Query\Explode.cs" />
     <Compile Include="Query\IsValid.cs" />
   </ItemGroup>
@@ -87,7 +91,9 @@
       <Private>False</Private>
     </ProjectReference>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Convert\FromExcel\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(TargetPath)"  "C:\ProgramData\BHoM\Assemblies" /C /Y</PostBuildEvent>

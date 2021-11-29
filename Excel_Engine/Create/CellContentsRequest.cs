@@ -22,8 +22,6 @@
 
 using BH.oM.Adapters.Excel;
 using BH.oM.Reflection.Attributes;
-using ClosedXML.Excel;
-using System;
 using System.ComponentModel;
 
 namespace BH.Engine.Excel
@@ -34,25 +32,21 @@ namespace BH.Engine.Excel
         /**** Public Methods                    ****/
         /*******************************************/
 
-        //[Description("Created a BHoM wrapper for the given ClosedXML cell contents object.")]
-        //[Input("xLCell", "ClosedXML cell contents object, on which the created BHoM wrapper is based.")]
-        //[Output("cellContents", "BHoM wrapper for the input ClosedXML cell contents object.")]
-        public static CellContents CellContentsRequest(IXLCell xLCell)
+        [Description("Creates a CellContentsRequest based on the worksheet name and range in an Excel-readable string format.")]
+        [InputFromProperty("worksheet")]
+        [Input("range", "Cell range in an Excel-readable string format.")]
+        [Output("request", "CellContentsRequest created based on the input strings.")]
+        public static CellContentsRequest CellContentsRequest(string worksheet, string range)
         {
-            if (xLCell == null)
-                return null;
-
-            return new CellContents()
+            CellRange cellRange = null;
+            if (!string.IsNullOrWhiteSpace(range))
             {
-                Comment = xLCell.HasComment ? xLCell.Comment.Text : "",
-                Value = xLCell.Value,
-                Address = BH.Engine.Excel.Convert.AddressFromExcel(xLCell.Address.ToString()),
-                DataType = xLCell.DataType.SystemType(),
-                FormulaA1 = xLCell.FormulaA1,
-                FormulaR1C1 = xLCell.FormulaR1C1,
-                HyperLink = xLCell.HasHyperlink ? xLCell.Hyperlink.ExternalAddress.ToString() : "",
-                RichText = xLCell.HasRichText ? xLCell.RichText.Text : ""
-            };
+                cellRange = Create.CellRange(range);
+                if (cellRange == null)
+                    return null;
+            }
+
+            return new CellContentsRequest { Worksheet = worksheet, Range = cellRange };
         }
 
         /*******************************************/

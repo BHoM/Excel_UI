@@ -40,7 +40,7 @@ namespace BH.Engine.Excel
             if (!bhomAddress.IsValid())
                 return "";
 
-            return $"{bhomAddress.ColumnIndex}{bhomAddress.RowIndex}";
+            return $"{bhomAddress.Column}{bhomAddress.Row}";
         }
 
         /*******************************************/

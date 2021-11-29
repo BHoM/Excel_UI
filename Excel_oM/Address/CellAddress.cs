@@ -33,10 +33,10 @@ namespace BH.oM.Adapters.Excel
         /*******************************************/
 
         [Description("Column index as string, starting from 'A'.")]
-        public virtual string ColumnIndex { get; set; } = "A";
+        public virtual string Column { get; set; } = "A";
 
         [Description("Row index as integer, starting from 1.")]
-        public virtual int RowIndex { get; set; } = 1;
+        public virtual int Row { get; set; } = 1;
 
         /*******************************************/
     }
