@@ -36,7 +36,7 @@ namespace BH.oM.Adapters.Excel
         [Description("Name of the worksheet to read from.")]
         public virtual string Worksheet { get; set; } = "";
 
-        [Description("Range to read, in standard Excel format (e.g. A1:B6). If left empty, entire extent of the spreadsheet starting from A1 is used.")]
+        [Description("Cell range to read. If left empty, entire extent of the spreadsheet starting from A1 is used.")]
         public virtual CellRange Range { get; set; } = null;
 
         /***************************************************/
