@@ -44,9 +44,10 @@ namespace BH.Engine.Excel
 
             string columnName = "";
 
+            columnIndex++;
             while (columnIndex > 0)
             {
-                int modulo = (columnIndex) % 26;
+                int modulo = (columnIndex - 1) % 26;
                 columnName = System.Convert.ToChar('A' + modulo) + columnName;
                 columnIndex = (columnIndex - modulo) / 26;
             }

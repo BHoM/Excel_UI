@@ -36,7 +36,7 @@ namespace BH.Engine.Excel
         [Description("Creates a BHoM CellAddress based on the given programmatic column and row indices, starting from column index 0 equal to A in Excel and row index 0 equal to 1 in Excel.")]
         [Input("columnIndex", "Index of the column to be used, starting from 0 equal to A in Excel.")]
         [Input("rowIndex", "Index of the row to be used, starting from 0 equal to 1 in Excel.")]
-        [Output("column", "Letter representing the column under given index.")]
+        [Output("address", "BHoM CellAddress object created based on the input indices.")]
         public static CellAddress CellAddress(int columnIndex, int rowIndex)
         {
             string column = columnIndex.ColumnName();
