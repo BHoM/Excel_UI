@@ -33,23 +33,16 @@ namespace BH.Engine.Excel
         /**** Public Methods                    ****/
         /*******************************************/
 
-        [Description("Creates a BHoM CellAddress based on the given programmatic column and row indices, starting from column index 0 equal to A in Excel and row index 0 equal to 1 in Excel.")]
-        [Input("columnIndex", "Index of the column to be used, starting from 0 equal to A in Excel.")]
-        [Input("rowIndex", "Index of the row to be used, starting from 0 equal to 1 in Excel.")]
-        [Output("address", "BHoM CellAddress object created based on the input indices.")]
-        public static CellAddress CellAddress(int columnIndex, int rowIndex)
+        [Description("Creates a BHoM CellAddress based on the given objects representing column label (or index, starting from 1 equal to 'A') and row label.")]
+        [Input("column", "Label (or index, starting from 1 equal to 'A') of the column to be used.")]
+        [Input("row", "Label of the row to be used, either as a string or an integer number.")]
+        [Output("address", "BHoM CellAddress object created based on the input objects.")]
+        public static CellAddress CellAddress(object column, object row)
         {
-            string column = columnIndex.ColumnName();
-            if (string.IsNullOrWhiteSpace(column))
+            if (!column.IsValidColumn() || !row.IsValidRow())
                 return null;
 
-            if (rowIndex < 0)
-            {
-                BH.Engine.Reflection.Compute.RecordError("Negative row index is not allowed.");
-                return null;
-            }
-
-            return new CellAddress { Column = column, Row = rowIndex + 1 };
+            return new CellAddress { Column = column.ToString(), Row = int.Parse(row.ToString()) };
         }
 
         /*******************************************/

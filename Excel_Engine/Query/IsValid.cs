@@ -20,8 +20,10 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
+using BH.Engine.Reflection;
 using BH.oM.Adapters.Excel;
 using BH.oM.Reflection.Attributes;
+using System;
 using System.ComponentModel;
 using System.Text.RegularExpressions;
 
@@ -52,7 +54,7 @@ namespace BH.Engine.Excel
 
             if (!m_ColumnIndexFormat.IsMatch(address.Column))
             {
-                BH.Engine.Reflection.Compute.RecordError($"Column index equal to {address.Column} is invalid, it needs to consist of capital letters only.");
+                BH.Engine.Reflection.Compute.RecordError($"Column label equal to {address.Column} is invalid, it needs to consist of capital letters only.");
                 return false;
             }
 
@@ -73,6 +75,71 @@ namespace BH.Engine.Excel
             }
 
             return range.From.IsValid() && range.To.IsValid();
+        }
+
+        /*******************************************/
+
+        [Description("Checks whether the given object is a valid label or index (where 1 is equal to 'A') for an Excel column.")]
+        [Input("column", "Object to be validated.")]
+        [Output("valid", "True if the input object is a valid label or index for an Excel column, otherwise false.")]
+        public static bool IsValidColumn(this object column)
+        {
+            Type columnIndexType = column.GetType();
+            if (columnIndexType != typeof(string) && !columnIndexType.IsIntegralNumericType())
+            {
+                BH.Engine.Reflection.Compute.RecordError($"The {nameof(column)} input must either be a text indicating the Excel column name (e.g. 'AA') or an integer number indicating the column index.");
+                return false;
+            }
+
+            string columnString = column.ToString();
+
+            int index;
+            if (int.TryParse(columnString, out index) && index < 1)
+            {
+                BH.Engine.Reflection.Compute.RecordError("Column index smaller than 1 is not allowed.");
+                return false;
+            }
+            else if (!m_ColumnIndexFormat.IsMatch(columnString))
+            {
+                BH.Engine.Reflection.Compute.RecordError($"Column label equal to {columnString} is invalid, it needs to consist of capital letters only.");
+                return false;
+            }
+
+            return true;
+        }
+
+        /*******************************************/
+
+        [Description("Checks whether the given object is a valid label for an Excel column.")]
+        [Input("row", "Object to be validated.")]
+        [Output("valid", "True if the input object is a valid label for an Excel column, otherwise false.")]
+        public static bool IsValidRow(this object row)
+        {
+            Type rowIndexType = row.GetType();
+            if (rowIndexType != typeof(string) && !rowIndexType.IsIntegralNumericType())
+            {
+                BH.Engine.Reflection.Compute.RecordError($"The {nameof(row)} input must either be a text or an integer number indicating the row index.");
+                return false;
+            }
+
+            string rowString = row.ToString();
+
+            int rowLabel;
+            if (int.TryParse(rowString, out rowLabel))
+            {
+                if (rowLabel < 1)
+                {
+                    BH.Engine.Reflection.Compute.RecordError("Row index smaller than 1 is not allowed.");
+                    return false;
+                }
+                else
+                    return true;
+            }
+            else
+            {
+                BH.Engine.Reflection.Compute.RecordError($"The row label is not a valid object representing an integer.");
+                return false;
+            }
         }
 
         /*******************************************/
