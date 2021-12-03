@@ -110,9 +110,9 @@ namespace BH.Engine.Excel
 
         /*******************************************/
 
-        [Description("Checks whether the given object is a valid label for an Excel column.")]
+        [Description("Checks whether the given object is a valid label for an Excel row.")]
         [Input("row", "Object to be validated.")]
-        [Output("valid", "True if the input object is a valid label for an Excel column, otherwise false.")]
+        [Output("valid", "True if the input object is a valid label for an Excel row, otherwise false.")]
         public static bool IsValidRow(this object row)
         {
             Type rowIndexType = row.GetType();
