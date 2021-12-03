@@ -84,7 +84,7 @@ namespace BH.Engine.Excel
         [Output("valid", "True if the input object is a valid label or index for an Excel column, otherwise false.")]
         public static bool IsValidColumn(this object column)
         {
-            Type columnIndexType = column.GetType();
+            Type columnIndexType = column?.GetType();
             if (columnIndexType != typeof(string) && !columnIndexType.IsIntegralNumericType())
             {
                 BH.Engine.Reflection.Compute.RecordError($"The {nameof(column)} input must either be a text indicating the Excel column name (e.g. 'AA') or an integer number indicating the column index.");
@@ -115,7 +115,7 @@ namespace BH.Engine.Excel
         [Output("valid", "True if the input object is a valid label for an Excel row, otherwise false.")]
         public static bool IsValidRow(this object row)
         {
-            Type rowIndexType = row.GetType();
+            Type rowIndexType = row?.GetType();
             if (rowIndexType != typeof(string) && !rowIndexType.IsIntegralNumericType())
             {
                 BH.Engine.Reflection.Compute.RecordError($"The {nameof(row)} input must either be a text or an integer number indicating the row index.");
