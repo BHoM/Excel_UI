@@ -45,7 +45,7 @@ namespace BH.Adapter.Excel
 
         public void Update(IXLWorkbook workbook, WorkbookProperties properties)
         {
-            if (properties != null)
+            if (workbook != null && properties != null)
             {
                 workbook.Properties.Author = properties.Author;
                 workbook.Properties.Title = properties.Title;

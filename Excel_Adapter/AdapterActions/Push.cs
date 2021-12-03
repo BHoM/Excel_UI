@@ -41,6 +41,12 @@ namespace BH.Adapter.Excel
 
         public override List<object> Push(IEnumerable<object> objects, string tag = "", PushType pushType = PushType.AdapterDefault, ActionConfig actionConfig = null)
         {
+            if (objects == null || !objects.Any())
+            {
+                BH.Engine.Reflection.Compute.RecordError("No objects were provided for Push action.");
+                return new List<object>();
+            }
+
             // If unset, set the pushType to AdapterSettings' value (base AdapterSettings default is FullCRUD).
             if (pushType == PushType.AdapterDefault)
                 pushType = PushType.DeleteThenCreate;
