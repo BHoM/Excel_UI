@@ -38,6 +38,12 @@ namespace BH.Adapter.Excel
 
         public override IEnumerable<object> Pull(IRequest request, PullType pullOption = PullType.AdapterDefault, ActionConfig actionConfig = null)
         {
+            if (request == null)
+            {
+                BH.Engine.Reflection.Compute.RecordError("The request has not been provided for Pull action.");
+                return new List<object>();
+            }
+
             if (!File.Exists(m_FileSettings.GetFullFileName()))
             {
                 BH.Engine.Reflection.Compute.RecordError("No file exists under the location specified in the settings.");
