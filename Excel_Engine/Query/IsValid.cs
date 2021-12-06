@@ -88,19 +88,20 @@ namespace BH.Engine.Excel
 
             if (column?.GetType() == typeof(string))
             {
-                // If the input is a string, check if we can parse it as a number, or if it matches the Excel column label format.
-                if (!double.TryParse(column.ToString(), out doubleIndex) && !m_ColumnIndexFormat.IsMatch(column.ToString()))
+                // If the input is a string, check that we can either parse it as a number, or it matches the Excel column string format.
+                if (!m_IsNumber.IsMatch(column.ToString()) && !m_ColumnIndexFormat.IsMatch(column.ToString()))
                 {
-                    BH.Engine.Reflection.Compute.RecordError($"Column label `{column.ToString()}` is invalid. Make sure it consists of capital letters only." +
-                        $"\nEither specify a text with the Excel column name (e.g. 'AA') or an integer > 1 indicating the column index.");
+                    BH.Engine.Reflection.Compute.RecordError($"Column label `{column.ToString()}` is invalid." +
+                        $"\nEither specify a text with the Excel column name (e.g. 'AA', only capital letters) or an integer > 1 indicating the column index.");
                     return false;
                 }
-                else
+
+                if (m_ColumnIndexFormat.IsMatch(column.ToString()))
                     return true;
             }
-            else
-                // If the input is not a string, try parsing it to a number.
-                double.TryParse(column.ToString(), out doubleIndex);
+
+            // If the input is not a string label, try parsing it to a number.
+            double.TryParse(column.ToString(), out doubleIndex);
 
 
             if (doubleIndex % 1 != 0) // it's not an integer.
@@ -218,6 +219,7 @@ namespace BH.Engine.Excel
         private static readonly Regex m_ColumnIndexFormat = new Regex(@"^[A-Z]+$");
         private static readonly Regex m_AddressFormat = new Regex(@"^[A-Z]+\d+$");
         private static readonly Regex m_RangeFormat = new Regex(@"^[A-Z]+\d+:[A-Z]+\d+$");
+        private static readonly Regex m_IsNumber = new Regex("^-?\\d*(\\.\\d+)?$");
 
         /*******************************************/
     }
