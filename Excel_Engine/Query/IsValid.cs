@@ -84,24 +84,36 @@ namespace BH.Engine.Excel
         [Output("valid", "True if the input object is a valid label or index for an Excel column, otherwise false.")]
         public static bool IsValidColumn(this object column)
         {
-            Type columnIndexType = column?.GetType();
-            if (columnIndexType != typeof(string) && !columnIndexType.IsIntegralNumericType())
+            double doubleIndex = 0;
+
+            if (column?.GetType() == typeof(string))
             {
-                BH.Engine.Reflection.Compute.RecordError($"The {nameof(column)} input must either be a text indicating the Excel column name (e.g. 'AA') or an integer number indicating the column index.");
+                // If the input is a string, check if we can parse it as a number, or if it matches the Excel column label format.
+                if (!double.TryParse(column.ToString(), out doubleIndex) && !m_ColumnIndexFormat.IsMatch(column.ToString()))
+                {
+                    BH.Engine.Reflection.Compute.RecordError($"Column label `{column.ToString()}` is invalid. Make sure it consists of capital letters only." +
+                        $"\nEither specify a text with the Excel column name (e.g. 'AA') or an integer > 1 indicating the column index.");
+                    return false;
+                }
+                else
+                    return true;
+            }
+            else
+                // If the input is not a string, try parsing it to a number.
+                double.TryParse(column.ToString(), out doubleIndex);
+
+
+            if (doubleIndex % 1 != 0) // it's not an integer.
+            {
+                BH.Engine.Reflection.Compute.RecordError($"Input `{column.ToString()}` can not be converted to an integer value indicating a column." +
+                    $"\nEither specify a text with the Excel column name (e.g. 'AA') or an integer > 1 indicating the column index.");
+
                 return false;
             }
 
-            string columnString = column.ToString();
-
-            int index;
-            if (int.TryParse(columnString, out index) && index < 1)
+            if (doubleIndex < 1)
             {
-                BH.Engine.Reflection.Compute.RecordError("Column index smaller than 1 is not allowed.");
-                return false;
-            }
-            else if (!m_ColumnIndexFormat.IsMatch(columnString))
-            {
-                BH.Engine.Reflection.Compute.RecordError($"Column label equal to {columnString} is invalid, it needs to consist of capital letters only.");
+                BH.Engine.Reflection.Compute.RecordError("Index smaller than 1 is not allowed. 1 corresponds to Excel column 'A'.");
                 return false;
             }
 
@@ -115,31 +127,32 @@ namespace BH.Engine.Excel
         [Output("valid", "True if the input object is a valid label for an Excel row, otherwise false.")]
         public static bool IsValidRow(this object row)
         {
-            Type rowIndexType = row?.GetType();
-            if (rowIndexType != typeof(string) && !rowIndexType.IsIntegralNumericType())
+            double doubleIndex = 0;
+
+            if (!double.TryParse(row.ToString(), out doubleIndex))
             {
-                BH.Engine.Reflection.Compute.RecordError($"The {nameof(row)} input must either be a text or an integer number indicating the row index.");
+                BH.Engine.Reflection.Compute.RecordError($"Row label `{row.ToString()}` is invalid." +
+                    $"The {nameof(row)} input must either be integer number or a string integer number indicating the row index.");
+
                 return false;
             }
 
-            string rowString = row.ToString();
 
-            int rowLabel;
-            if (int.TryParse(rowString, out rowLabel))
+            if (doubleIndex % 1 != 0) // it's not an integer.
             {
-                if (rowLabel < 1)
-                {
-                    BH.Engine.Reflection.Compute.RecordError("Row index smaller than 1 is not allowed.");
-                    return false;
-                }
-                else
-                    return true;
-            }
-            else
-            {
-                BH.Engine.Reflection.Compute.RecordError($"The row label is not a valid object representing an integer.");
+                BH.Engine.Reflection.Compute.RecordError($"Input `{row.ToString()}` can not be converted to an integer value indicating a row." +
+                    $"The {nameof(row)} input must either be integer number or a string integer number indicating the row index.");
+
                 return false;
             }
+
+            if (doubleIndex < 1)
+            {
+                BH.Engine.Reflection.Compute.RecordError("Index smaller than 1 is not allowed. Index 1 corresponds to the first Excel row.");
+                return false;
+            }
+
+            return true;
         }
 
         /*******************************************/
