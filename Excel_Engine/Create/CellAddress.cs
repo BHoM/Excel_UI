@@ -33,20 +33,6 @@ namespace BH.Engine.Excel
         /**** Public Methods                    ****/
         /*******************************************/
 
-        [Description("Creates a BHoM CellAddress based on the given objects representing column label (or index, starting from 1 equal to 'A') and row label.")]
-        [Input("column", "Label (or index, starting from 1 equal to 'A') of the column to be used.")]
-        [Input("row", "Label of the row to be used, either as a string or an integer number.")]
-        [Output("address", "BHoM CellAddress object created based on the input objects.")]
-        public static CellAddress CellAddress(object column, object row)
-        {
-            if (!column.IsValidColumn() || !row.IsValidRow())
-                return null;
-
-            return new CellAddress { Column = column.ToString(), Row = int.Parse(row.ToString()) };
-        }
-
-        /*******************************************/
-
         [Description("Creates a BHoM CellAddress based on the given string representing cell address in Excel-readable format.")]
         [Input("excelAddress", "String representing cell address in Excel-readable format.")]
         [Output("address", "BHoM CellAddress object created based on the input string.")]
