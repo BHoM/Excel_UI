@@ -112,10 +112,10 @@ namespace BH.UI.Excel
                 CallerFormula formula = InstantiateCaller(formulaName);
                 if (formula != null)
                 {
-                    BH.Engine.Reflection.Compute.ClearCurrentEvents();
+                    BH.Engine.Base.Compute.ClearCurrentEvents();
                     formula.Caller.Read(callerJson);
 
-                    VersioningEvent versioning = BH.Engine.Reflection.Query.CurrentEvents().OfType<VersioningEvent>().FirstOrDefault();
+                    VersioningEvent versioning = BH.Engine.Base.Query.CurrentEvents().OfType<VersioningEvent>().FirstOrDefault();
 
                     Register(formula, () =>
                     {

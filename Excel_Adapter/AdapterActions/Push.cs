@@ -43,7 +43,7 @@ namespace BH.Adapter.Excel
         {
             if (objects == null || !objects.Any())
             {
-                BH.Engine.Reflection.Compute.RecordError("No objects were provided for Push action.");
+                BH.Engine.Base.Compute.RecordError("No objects were provided for Push action.");
                 return new List<object>();
             }
 
@@ -55,7 +55,7 @@ namespace BH.Adapter.Excel
             ExcelPushConfig config = actionConfig as ExcelPushConfig;
             if (config == null)
             {
-                BH.Engine.Reflection.Compute.RecordNote($"{nameof(ExcelPushConfig)} has not been provided, default config is used.");
+                BH.Engine.Base.Compute.RecordNote($"{nameof(ExcelPushConfig)} has not been provided, default config is used.");
                 config = new ExcelPushConfig();
             }
 
@@ -66,14 +66,14 @@ namespace BH.Adapter.Excel
                 string message = "The Excel adapter only allows to push objects of a single type to a table."
                     + "\nRight now you are providing objects of the following types: "
                     + objectTypes.Select(x => x.ToString()).Aggregate((a, b) => a + ", " + b);
-                Engine.Reflection.Compute.RecordError(message);
+                Engine.Base.Compute.RecordError(message);
                 return new List<object>();
             }
 
             Type type = objectTypes[0];
             if (type != typeof(Table))
             {
-                BH.Engine.Reflection.Compute.RecordError($"Push failed: Excel Adapter can push only one objects of type {nameof(Table)}.");
+                BH.Engine.Base.Compute.RecordError($"Push failed: Excel Adapter can push only one objects of type {nameof(Table)}.");
                 return new List<object>();
             }
 
@@ -81,14 +81,14 @@ namespace BH.Adapter.Excel
             List<Table> tables = objects.Cast<Table>().ToList();
             if (tables.Any(x => string.IsNullOrWhiteSpace(x.Name)))
             {
-                BH.Engine.Reflection.Compute.RecordError("Push aborted: all tables need to have non-empty name.");
+                BH.Engine.Base.Compute.RecordError("Push aborted: all tables need to have non-empty name.");
                 return new List<object>();
             }
 
             List<string> duplicateNames = tables.GroupBy(x => x.Name.ToLower()).Where(x => x.Count() != 1).Select(x => x.Key).ToList();
             if (duplicateNames.Count != 0)
             {
-                BH.Engine.Reflection.Compute.RecordError("Push failed: all tables need to have distinct names, regardless of letter casing.\n" +
+                BH.Engine.Base.Compute.RecordError("Push failed: all tables need to have distinct names, regardless of letter casing.\n" +
                                                         $"Following names are currently duplicate: {string.Join(", ", duplicateNames)}.");
                 return new List<object>();
             }
@@ -100,7 +100,7 @@ namespace BH.Adapter.Excel
             {
                 if (pushType == PushType.UpdateOnly)
                 {
-                    BH.Engine.Reflection.Compute.RecordError($"There is no workbook to update under {fileName}");
+                    BH.Engine.Base.Compute.RecordError($"There is no workbook to update under {fileName}");
                     return new List<object>();
                 }
 
@@ -114,7 +114,7 @@ namespace BH.Adapter.Excel
                 }
                 catch (Exception e)
                 {
-                    BH.Engine.Reflection.Compute.RecordError($"The existing workbook could not be accessed due to the following error: {e.Message}");
+                    BH.Engine.Base.Compute.RecordError($"The existing workbook could not be accessed due to the following error: {e.Message}");
                     return new List<object>();
                 }
             }
@@ -149,7 +149,7 @@ namespace BH.Adapter.Excel
                     }
                 default:
                     {
-                        BH.Engine.Reflection.Compute.RecordError($"Currently Excel adapter supports only {nameof(PushType)} equal to {pushType}");
+                        BH.Engine.Base.Compute.RecordError($"Currently Excel adapter supports only {nameof(PushType)} equal to {pushType}");
                         return new List<object>();
                     }
             }
@@ -180,7 +180,7 @@ namespace BH.Adapter.Excel
             }
             catch (Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordError($"Finalisation and saving of the workbook failed with the following error: {e.Message}");
+                BH.Engine.Base.Compute.RecordError($"Finalisation and saving of the workbook failed with the following error: {e.Message}");
                 return new List<object>();
             }
         }

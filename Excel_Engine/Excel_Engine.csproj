@@ -46,11 +46,6 @@
       <HintPath>C:\ProgramData\BHoM\Assemblies\Reflection_Engine.dll</HintPath>
       <Private>False</Private>
     </Reference>
-    <Reference Include="Reflection_oM">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Reflection_oM.dll</HintPath>
-      <Private>False</Private>
-      <SpecificVersion>False</SpecificVersion>
-    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Xml.Linq" />

@@ -38,7 +38,7 @@ namespace BH.Adapter.Excel
         {
             if (table?.Data == null)
             {
-                BH.Engine.Reflection.Compute.RecordError("Creation of a table failed: input table is null or does not contain a table.");
+                BH.Engine.Base.Compute.RecordError("Creation of a table failed: input table is null or does not contain a table.");
                 return false;
             }
 
@@ -55,7 +55,7 @@ namespace BH.Adapter.Excel
             }
             catch (Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordError($"Creation of worksheet {table.Name} failed with the following error: {e.Message}");
+                BH.Engine.Base.Compute.RecordError($"Creation of worksheet {table.Name} failed with the following error: {e.Message}");
                 return false;
             }
         }

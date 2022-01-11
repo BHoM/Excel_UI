@@ -21,7 +21,7 @@
  */
 
 using BH.Engine.Reflection;
-using BH.oM.Reflection.Attributes;
+using BH.oM.Base.Attributes;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -45,7 +45,7 @@ namespace BH.Engine.Excel
         [Input("transpose", "Transpose the resulting table (i.e. one object per column instead of per row)")]
         public static object Explode(this List<object> objects, bool includePropertyNames = false, bool goDeep = false, bool transpose = false)
         {
-            Engine.Reflection.Compute.ClearCurrentEvents();
+            Engine.Base.Compute.ClearCurrentEvents();
             if (objects == null || objects.Count == 0)
                 return "No objects to explode";
 

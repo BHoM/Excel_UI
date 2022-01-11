@@ -20,7 +20,7 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using BH.oM.Reflection.Attributes;
+using BH.oM.Base.Attributes;
 using System.ComponentModel;
 
 namespace BH.Engine.Excel
@@ -38,7 +38,7 @@ namespace BH.Engine.Excel
         {
             if (columnIndex < 0)
             {
-                BH.Engine.Reflection.Compute.RecordError("Negative column index is not allowed.");
+                BH.Engine.Base.Compute.RecordError("Negative column index is not allowed.");
                 return null;
             }
 

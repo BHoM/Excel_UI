@@ -29,6 +29,7 @@ using BH.Engine.Reflection;
 using System.Linq;
 using System.Collections.Generic;
 using Microsoft.Office.Core;
+using BH.Engine.Base;
 
 namespace BH.UI.Excel.Components
 {

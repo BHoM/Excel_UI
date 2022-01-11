@@ -40,13 +40,13 @@ namespace BH.Adapter.Excel
         {
             if (request == null)
             {
-                BH.Engine.Reflection.Compute.RecordError("The request has not been provided for Pull action.");
+                BH.Engine.Base.Compute.RecordError("The request has not been provided for Pull action.");
                 return new List<object>();
             }
 
             if (!File.Exists(m_FileSettings.GetFullFileName()))
             {
-                BH.Engine.Reflection.Compute.RecordError("No file exists under the location specified in the settings.");
+                BH.Engine.Base.Compute.RecordError("No file exists under the location specified in the settings.");
                 return new List<IBHoMObject>();
             }
 

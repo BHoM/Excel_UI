@@ -63,7 +63,7 @@ namespace BH.UI.Excel
                 }
                 catch (Exception e)
                 {
-                    Engine.Reflection.Compute.RecordError(e.Message);
+                    Engine.Base.Compute.RecordError(e.Message);
                 }
             }
         }
