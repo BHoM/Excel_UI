@@ -41,7 +41,7 @@ namespace BH.Adapter.Excel
             }
             catch (Exception e)
             {
-                BH.Engine.Reflection.Compute.RecordError($"Deletion of worksheet {table.Name} failed with the following error: {e.Message}");
+                BH.Engine.Base.Compute.RecordError($"Deletion of worksheet {table.Name} failed with the following error: {e.Message}");
                 return false;
             }
         }

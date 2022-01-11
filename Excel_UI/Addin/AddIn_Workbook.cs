@@ -111,7 +111,7 @@ namespace BH.UI.Excel
                 }
                 catch (XlCallException exception)
                 {
-                    Engine.Reflection.Compute.RecordError(exception.Message);
+                    Engine.Base.Compute.RecordError(exception.Message);
                 }
             });
         }

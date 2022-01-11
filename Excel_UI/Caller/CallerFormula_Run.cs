@@ -40,7 +40,7 @@ namespace BH.UI.Excel.Templates
         public virtual object Run(object[] inputs)
         {
             //Clear current events
-            Engine.Reflection.Compute.ClearCurrentEvents();
+            Engine.Base.Compute.ClearCurrentEvents();
 
             // Run the caller
             m_DataAccessor.SetInputs(inputs.ToList(), Caller.InputParams.Select(x => x.DefaultValue).ToList());
@@ -48,7 +48,7 @@ namespace BH.UI.Excel.Templates
             object result = m_DataAccessor.GetOutputs();
 
             // Handle possible errors
-            var errors = Engine.Reflection.Query.CurrentEvents().Where(e => e.Type == oM.Reflection.Debugging.EventType.Error);
+            var errors = Engine.Base.Query.CurrentEvents().Where(e => e.Type == oM.Base.Debugging.EventType.Error);
             if (errors.Count() > 0)
                 AddIn.WriteNote(errors.Select(e => e.Message).Aggregate((a, b) => a + "\n" + b));
             else
@@ -57,7 +57,7 @@ namespace BH.UI.Excel.Templates
             // Log usage
             Application app = ExcelDnaUtil.Application as Application;
             Workbook workbook = app.ActiveWorkbook;
-            Engine.UI.Compute.LogUsage("Excel", app?.Version, InstanceId, Caller.GetType().Name, Caller.SelectedItem, Engine.Reflection.Query.CurrentEvents(), AddIn.WorkbookId(workbook), workbook.FullName);
+            Engine.UI.Compute.LogUsage("Excel", app?.Version, InstanceId, Caller.GetType().Name, Caller.SelectedItem, Engine.Base.Query.CurrentEvents(), AddIn.WorkbookId(workbook), workbook.FullName);
 
             // Return result
             return result;

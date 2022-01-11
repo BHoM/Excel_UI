@@ -33,6 +33,7 @@ using System.Linq.Expressions;
 using BH.oM.UI;
 using System.Reflection;
 using ExcelDna.Integration;
+using BH.Engine.Base;
 
 namespace BH.UI.Excel.Components
 {

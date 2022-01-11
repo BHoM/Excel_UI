@@ -22,7 +22,7 @@
 
 using BH.Adapter;
 using BH.oM.Adapters.Excel;
-using BH.oM.Reflection.Attributes;
+using BH.oM.Base.Attributes;
 using System.ComponentModel;
 using System.IO;
 
@@ -41,13 +41,13 @@ namespace BH.Adapter.Excel
         {
             if (fileSettings == null)
             {
-                BH.Engine.Reflection.Compute.RecordError("Please set the File Settings to enable the Excel Adapter to work correctly.");
+                BH.Engine.Base.Compute.RecordError("Please set the File Settings to enable the Excel Adapter to work correctly.");
                 return;
             }
 
             if (!Path.HasExtension(fileSettings.FileName) || Path.GetExtension(fileSettings.FileName) != ".xlsx")
             {
-                BH.Engine.Reflection.Compute.RecordError("Excel adapter supports only .xlsx files.");
+                BH.Engine.Base.Compute.RecordError("Excel adapter supports only .xlsx files.");
                 return;
             }
 

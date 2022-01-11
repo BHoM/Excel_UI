@@ -54,7 +54,7 @@ namespace BH.Adapter.Excel
 
             if (workbook == null)
             {
-                BH.Engine.Reflection.Compute.RecordError("The file under location specified in the settings is not a valid Excel workbook.");
+                BH.Engine.Base.Compute.RecordError("The file under location specified in the settings is not a valid Excel workbook.");
                 return new List<IBHoMObject>();
             }
 
@@ -66,7 +66,7 @@ namespace BH.Adapter.Excel
                 return ReadExcel(workbook, ((CellContentsRequest)request).Worksheet, ((CellContentsRequest)request).Range, false);
             else
             {
-                BH.Engine.Reflection.Compute.RecordError($"Requests of type {request?.GetType()} are not supported by the Excel adapter.");
+                BH.Engine.Base.Compute.RecordError($"Requests of type {request?.GetType()} are not supported by the Excel adapter.");
                 return new List<IBHoMObject>();
             }
         }
@@ -99,7 +99,7 @@ namespace BH.Adapter.Excel
                 IXLRange ixlRange = Range(ixlWorksheet, range);
                 if (ixlRange == null)
                 {
-                    Engine.Reflection.Compute.RecordError("Range provided is not in the correct format for an Excel spreadsheet.");
+                    Engine.Base.Compute.RecordError("Range provided is not in the correct format for an Excel spreadsheet.");
                     return new List<IBHoMObject>();
                 }
 
@@ -144,7 +144,7 @@ namespace BH.Adapter.Excel
                 }
                 catch
                 {
-                    BH.Engine.Reflection.Compute.RecordError("No worksheets matching the request have been found.");
+                    BH.Engine.Base.Compute.RecordError("No worksheets matching the request have been found.");
                     return new List<IXLWorksheet>();
                 }
             }

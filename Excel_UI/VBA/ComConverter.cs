@@ -32,6 +32,7 @@ using BH.Engine.Reflection;
 using System.Reflection;
 using BH.oM.Base;
 using System.Collections;
+using BH.Engine.Base;
 
 namespace BH.UI.Excel
 {
@@ -172,7 +173,7 @@ namespace BH.UI.Excel
 
             object instance = Activator.CreateInstance(type);
             foreach (string propName in obj.GetProperties())
-                Engine.Reflection.Modify.SetPropertyValue(instance, propName, obj[propName].IFromCom());
+                Engine.Base.Modify.SetPropertyValue(instance, propName, obj[propName].IFromCom());
             //prop.AssignProperty(instance, obj[prop.Name].FromCom());
 
             return instance;

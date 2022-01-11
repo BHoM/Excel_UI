@@ -63,7 +63,7 @@ namespace BH.UI.Excel
 
         public Adapter(string adapterName, Collection parameters = null)
         {
-            Type type = BH.Engine.Reflection.Query.AdapterTypeList().Where(x => x.FullName.Contains(adapterName)).FirstOrDefault();
+            Type type = BH.Engine.Base.Query.AdapterTypeList().Where(x => x.FullName.Contains(adapterName)).FirstOrDefault();
             if (type != null)
                 m_Adapter = Helpers.RunBestComMethod(type.GetConstructors(), parameters) as BHoMAdapter;
         }
@@ -72,7 +72,7 @@ namespace BH.UI.Excel
 
         public Adapter(string adapterName, string filePath, Object toolkitConfig = null)
         {
-            Type type = BH.Engine.Reflection.Query.AdapterTypeList().Where(x => x.FullName.Contains(adapterName)).FirstOrDefault();
+            Type type = BH.Engine.Base.Query.AdapterTypeList().Where(x => x.FullName.Contains(adapterName)).FirstOrDefault();
             if (type != null)
                 m_Adapter = BH.Engine.Adapter.Create.BHoMAdapter(type, filePath, toolkitConfig.FromCom(), true) as BHoMAdapter;
         }
@@ -90,14 +90,14 @@ namespace BH.UI.Excel
             oM.Adapter.PushType pt = oM.Adapter.PushType.AdapterDefault;
             if (!m_Adapter.SetupPushType(pushType.FromCom(), out pt))
             {
-                BH.Engine.Reflection.Compute.RecordError($"Invalid `{nameof(pushType)}` input.");
+                BH.Engine.Base.Compute.RecordError($"Invalid `{nameof(pushType)}` input.");
                 return new Collection();
             }
 
             ActionConfig pushConfig = null;
             if (!m_Adapter.SetupPushConfig(ComConverter.FromCom(actionConfig) as ActionConfig, out pushConfig))
             {
-                BH.Engine.Reflection.Compute.RecordError($"Invalid `{nameof(actionConfig)}` input.");
+                BH.Engine.Base.Compute.RecordError($"Invalid `{nameof(actionConfig)}` input.");
                 return new Collection();
             }
 
@@ -115,14 +115,14 @@ namespace BH.UI.Excel
             IRequest actualRequest = null;
             if (!m_Adapter.SetupPullRequest(ComConverter.FromCom(request) as IRequest, out actualRequest))
             {
-                BH.Engine.Reflection.Compute.RecordError($"Invalid `{nameof(request)}` input.");
+                BH.Engine.Base.Compute.RecordError($"Invalid `{nameof(request)}` input.");
                 return new Collection();
             }
 
             ActionConfig pullConfig = null;
             if (!m_Adapter.SetupPullConfig(ComConverter.FromCom(actionConfig) as ActionConfig, out pullConfig))
             {
-                BH.Engine.Reflection.Compute.RecordError($"Invalid `{nameof(actionConfig)}` input.");
+                BH.Engine.Base.Compute.RecordError($"Invalid `{nameof(actionConfig)}` input.");
                 return new Collection();
             }
 
@@ -137,14 +137,14 @@ namespace BH.UI.Excel
             IRequest actualRequest = null;
             if (!m_Adapter.SetupRemoveRequest(ComConverter.FromCom(request) as IRequest, out actualRequest))
             {
-                BH.Engine.Reflection.Compute.RecordError($"Invalid `{nameof(request)}` input.");
+                BH.Engine.Base.Compute.RecordError($"Invalid `{nameof(request)}` input.");
                 return 0;
             }
 
             ActionConfig removeConfig = null;
             if (!m_Adapter.SetupRemoveConfig(ComConverter.FromCom(actionConfig) as ActionConfig, out removeConfig))
             {
-                BH.Engine.Reflection.Compute.RecordError($"Invalid `{nameof(actionConfig)}` input.");
+                BH.Engine.Base.Compute.RecordError($"Invalid `{nameof(actionConfig)}` input.");
                 return 0;
             }
 

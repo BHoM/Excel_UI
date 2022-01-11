@@ -28,7 +28,7 @@ using ExcelDna.Integration;
 using System.Collections.Generic;
 using System.Collections;
 using BH.oM.Base;
-using BH.Engine.Reflection;
+using BH.Engine.Base;
 
 namespace BH.UI.Excel
 {

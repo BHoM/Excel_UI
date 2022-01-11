@@ -44,7 +44,7 @@ namespace BH.UI.Excel
 
         public Server()
         {
-            BH.Engine.Reflection.Compute.LoadAllAssemblies();
+            BH.Engine.Base.Compute.LoadAllAssemblies();
         }
 
 
@@ -61,7 +61,7 @@ namespace BH.UI.Excel
 
         public Object CreateObject(string typeName)
         {
-            Type type = BH.Engine.Reflection.Create.Type(typeName);
+            Type type = BH.Engine.Base.Create.Type(typeName);
             if (type == null)
                 return null;
 
@@ -73,7 +73,7 @@ namespace BH.UI.Excel
 
         public Enum CreateEnum(string typeName, string value)
         {
-            Type type = BH.Engine.Reflection.Create.Type(typeName);
+            Type type = BH.Engine.Base.Create.Type(typeName);
             if (type == null)
                 return null;
 
@@ -96,7 +96,7 @@ namespace BH.UI.Excel
 
         public string GetEnumName(string typeName, string value)
         {
-            Type type = BH.Engine.Reflection.Create.Type(typeName);
+            Type type = BH.Engine.Base.Create.Type(typeName);
             if (type == null)
                 return "";
 
@@ -114,7 +114,7 @@ namespace BH.UI.Excel
             string typeName = methodName.Substring(0, index);
             methodName = methodName.Substring(index + 1);
 
-            Type type = BH.Engine.Reflection.Query.EngineTypeList().Where(x => x.FullName == typeName).FirstOrDefault();
+            Type type = BH.Engine.Base.Query.EngineTypeList().Where(x => x.FullName == typeName).FirstOrDefault();
             if (type == null)
                 return null;
 
@@ -130,7 +130,7 @@ namespace BH.UI.Excel
 
         public Adapter CreateAdapter(string adapterName, Collection inputs = null)
         {
-            Type type = BH.Engine.Reflection.Query.AdapterTypeList().Where(x => x.FullName.Contains(adapterName)).FirstOrDefault();
+            Type type = BH.Engine.Base.Query.AdapterTypeList().Where(x => x.FullName.Contains(adapterName)).FirstOrDefault();
             if (type == null)
                 return null;
 
@@ -142,7 +142,7 @@ namespace BH.UI.Excel
 
         public Adapter CreateAdapter(string adapterName, string filePath, Object toolkitConfig = null)
         {
-            Type type = BH.Engine.Reflection.Query.AdapterTypeList().Where(x => x.FullName.Contains(adapterName)).FirstOrDefault();
+            Type type = BH.Engine.Base.Query.AdapterTypeList().Where(x => x.FullName.Contains(adapterName)).FirstOrDefault();
             if (type == null)
                 return null;
 
