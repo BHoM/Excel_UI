@@ -59,7 +59,10 @@ namespace BH.UI.Excel.Templates
             element.SetAttribute("getImage", "GetImage");
             element.SetAttribute("label", Caller.Name);
             element.SetAttribute("screentip", Caller.Name);
-            element.SetAttribute("supertip", Caller.Description);
+
+            if (Caller.Description != "")
+                element.SetAttribute("supertip", Caller.Description);
+
             return element.OuterXml;
         }
 
