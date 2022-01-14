@@ -45,9 +45,9 @@ namespace BH.Adapter.Excel
                 return;
             }
 
-            if (!Path.HasExtension(fileSettings.FileName) || Path.GetExtension(fileSettings.FileName) != ".xlsx")
+            if (!Path.HasExtension(fileSettings.FileName) || (Path.GetExtension(fileSettings.FileName) != ".xlsx" && Path.GetExtension(fileSettings.FileName) != ".xlsm"))
             {
-                BH.Engine.Base.Compute.RecordError("Excel adapter supports only .xlsx files.");
+                BH.Engine.Base.Compute.RecordError("Excel adapter supports only .xlsx and .xlsm files.");
                 return;
             }
 
