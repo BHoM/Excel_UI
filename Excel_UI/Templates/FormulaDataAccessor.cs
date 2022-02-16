@@ -101,25 +101,8 @@ namespace BH.UI.Excel.Templates
             }
             else if (item is object[,])
                 return (T)(GetDataList<object>(index) as dynamic); // Incase T is object or something similarly cabable of holding a list.
-            else if (type.IsEnum && item is string)
-                return Engine.Excel.Compute.ParseEnum<T>(item as string);
-            else if (type == typeof(DateTime) && item is double)
-            {
-                DateTime date = DateTime.FromOADate((double)item);
-                return (T)(date as dynamic);
-            }
-            else if (type == typeof(Guid) && item is string)
-                return (T)(Guid.Parse(item as string) as dynamic);
-            else if (type == typeof(string) && !(item is string))
-                return item.ToString() as dynamic;
             else
-            {
-                // Can't always cast directly to T from object storage type even
-                // when the actual type as castable to T. So have to use `as
-                // dynamic` so the cast is between the actual type of `item` to T.
-                return (T)(item as dynamic);
-            }
-
+                return CastItem<T>(item);
         }
 
         /*******************************************/
@@ -142,7 +125,7 @@ namespace BH.UI.Excel.Templates
                     if (IsBlankOrError<T>(o))
                         list.Add(default(T));
                     else
-                        list.Add((T)(o as dynamic));
+                        list.Add(CastItem<T>(o));
                 }
                 return list;
             }
@@ -186,7 +169,7 @@ namespace BH.UI.Excel.Templates
                         if (IsBlankOrError<T>(o))
                             list[i].Add(default(T));
                         else
-                            list[i].Add((T)(o as dynamic));
+                            list[i].Add(CastItem<T>(o));
                     }
                 }
                 return list;
@@ -196,7 +179,7 @@ namespace BH.UI.Excel.Templates
                 return (item as IEnumerable).Cast<object>()
                     .Select(o =>
                         (o is IEnumerable) ?
-                            (o as IEnumerable).Cast<object>().Select(inner => (T)(inner as dynamic)).ToList()
+                            (o as IEnumerable).Cast<object>().Select(inner => CastItem<T>(inner)).ToList()
                             : null as List<T>)
                     .ToList();
             }
@@ -252,6 +235,32 @@ namespace BH.UI.Excel.Templates
             // This will evaluate to true for "" unless T is a string
             return obj is ExcelMissing || obj is ExcelEmpty || obj is ExcelError
                 || (obj is string && typeof(T) != typeof(string) && string.IsNullOrEmpty(obj as string));
+        }
+
+        /*******************************************/
+
+        private T CastItem<T>(object item)
+        {
+            Type type = typeof(T); 
+
+            if (type.IsEnum && item is string)
+                return Engine.Excel.Compute.ParseEnum<T>(item as string);
+            else if (type == typeof(DateTime) && item is double)
+            {
+                DateTime date = DateTime.FromOADate((double)item);
+                return (T)(date as dynamic);
+            }
+            else if (type == typeof(Guid) && item is string)
+                return (T)(Guid.Parse(item as string) as dynamic);
+            else if (type == typeof(string) && !(item is string))
+                return item?.ToString() as dynamic;
+            else
+            {
+                // Can't always cast directly to T from object storage type even
+                // when the actual type as castable to T. So have to use `as
+                // dynamic` so the cast is between the actual type of `item` to T.
+                return (T)(item as dynamic);
+            }
         }
 
 
