@@ -66,7 +66,7 @@ namespace BH.UI.Excel
                         m_InternalisedData[id] = item;
 
                     // Replace cell formula with value
-                    ExcelAsyncUtil.QueueAsMacro(() => { cell.Formula = cell.Value; });
+                    ExcelAsyncUtil.QueueAsMacro(() => { cell.Formula = value; });
                 }
             }
             
