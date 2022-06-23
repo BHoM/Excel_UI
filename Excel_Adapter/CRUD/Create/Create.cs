@@ -22,6 +22,7 @@
 
 using BH.Engine.Excel;
 using BH.oM.Adapters.Excel;
+using BH.oM.Base.Debugging;
 using BH.oM.Data.Collections;
 using ClosedXML.Excel;
 using System;
@@ -41,6 +42,13 @@ namespace BH.Adapter.Excel
                 BH.Engine.Base.Compute.RecordError("Creation of a table failed: input table is null or does not contain a table.");
                 return false;
             }
+
+            if (table.Name.Length > 31)
+            {
+                BH.Engine.Base.Compute.RecordError("Creation of a table failed: input table name length is greater than Excel's limit of 31 characters.");
+                return false;
+            }
+
 
             try
             {
