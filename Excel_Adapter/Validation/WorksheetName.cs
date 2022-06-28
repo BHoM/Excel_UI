@@ -33,12 +33,9 @@ namespace BH.Adapter.Excel
         /**** Public Methods                            ****/
         /***************************************************/
 
-        
         public static string WorksheetName(string name, IXLWorkbook workbook)
         {
-            Dictionary<string, bool> nameChecks = new Dictionary<string, bool>();
-
-            string workSheetName = !IsValidName(name, workbook, out nameChecks) ? ModifyWorksheetName(name, nameChecks, workbook) : name;
+            string workSheetName = !IsValidName(name, workbook) ? ModifyWorksheetName() : name;
 
             if (workSheetName != name)
             {
@@ -48,9 +45,11 @@ namespace BH.Adapter.Excel
             return workSheetName;
         }
 
-        private static bool IsValidName(string workSheetName, IXLWorkbook workbook, out Dictionary<string, bool> nameChecks)
+        /***************************************************/
+
+        private static bool IsValidName(string workSheetName, IXLWorkbook workbook)
         {
-            nameChecks = new Dictionary<string, bool>();
+            Dictionary<string, bool> nameChecks = new Dictionary<string, bool>();
 
             bool isUnique = IsUnique(workSheetName, workbook);
             bool isWithinCharacterLimit = IsWithinCharacterLimit(workSheetName);
@@ -59,37 +58,7 @@ namespace BH.Adapter.Excel
             bool isValidCharacters = IsValidCharacters(workSheetName);
             bool isNotBeginWithInvalidCharacter = IsNotBeginOrEndWithInvalidCharacter(workSheetName);
 
-            if (!isUnique)
-            {
-                nameChecks.Add("isUnique", isUnique);
-            }
-
-            if (!isWithinCharacterLimit)
-            {
-                nameChecks.Add("isWithinCharacterLimit", isWithinCharacterLimit);
-            }
-
-            if (!isNotBlank)
-            {
-                nameChecks.Add("isNotBlank", isNotBlank);
-            }
-
-            if (!isNotReservedWord)
-            {
-                nameChecks.Add("isNotReservedWord", isNotReservedWord);
-            }
-
-            if (!isValidCharacters)
-            {
-                nameChecks.Add("isValidCharacters", isValidCharacters);
-            }
-
-            if (!isNotBeginWithInvalidCharacter)
-            {
-                nameChecks.Add("isNotBeginWithInvalidCharacter", isNotBeginWithInvalidCharacter);
-            }
-
-            return nameChecks.Count == 0;
+            return isUnique && isWithinCharacterLimit && isNotBlank && isNotReservedWord && isValidCharacters && isNotBeginWithInvalidCharacter;
         }
 
         private static bool IsNotBeginOrEndWithInvalidCharacter(string workSheetName)
