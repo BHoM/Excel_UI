@@ -36,21 +36,18 @@ namespace BH.Adapter.Excel
 
         private bool Create(IXLWorkbook workbook, Table table, ExcelPushConfig config)
         {
+
             if (table?.Data == null)
             {
                 BH.Engine.Base.Compute.RecordError("Creation of a table failed: input table is null or does not contain a table.");
                 return false;
             }
 
-            if (table.Name.Length > 31)
-            {
-                BH.Engine.Base.Compute.RecordError("Creation of a table failed: input table name length is greater than Excel's limit of 31 characters.");
-                return false;
-            }
+            string workSheetName = Validation.WorksheetName(table.Name, workbook);
 
             try
             {
-                IXLWorksheet worksheet = workbook.AddWorksheet(table.Name);
+                IXLWorksheet worksheet = workbook.AddWorksheet(workSheetName);
 
                 string startingCell = config?.StartingCell == null ? "A1" : config.StartingCell.ToExcel();
                 if (string.IsNullOrWhiteSpace(startingCell))
@@ -65,10 +62,6 @@ namespace BH.Adapter.Excel
                 return false;
             }
         }
-
         /***************************************************/
     }
 }
-
-
-
