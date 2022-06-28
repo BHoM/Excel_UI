@@ -21,6 +21,7 @@
  */
 
 using ClosedXML.Excel;
+using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -35,66 +36,174 @@ namespace BH.Adapter.Excel
 
         public static string WorksheetName(string name, IXLWorkbook workbook)
         {
-            string workSheetName = !IsValidName(name, workbook) ? ModifyWorksheetName() : name;
+            string worksheetName = name;
 
-            if (workSheetName != name)
+            List<WorksheetValidation> validationIssues = new List<WorksheetValidation>();
+
+            bool isValidName = IsValidName(worksheetName, workbook, out validationIssues);
+            while (!isValidName)
+            {
+                worksheetName = ModifyWorksheetName(worksheetName, validationIssues, workbook);
+                isValidName = IsValidName(worksheetName, workbook, out validationIssues);
+            }
+
+
+            if (worksheetName != name)
             {
                 BH.Engine.Base.Compute.RecordError("Name of worksheet has been adjusted to a name that which is compatible with Excel naming limitations.");
             }
 
-            return workSheetName;
+            return worksheetName;
         }
+
 
         /***************************************************/
 
-        private static bool IsValidName(string workSheetName, IXLWorkbook workbook)
+        private static string ModifyWorksheetName(string worksheetName, List<WorksheetValidation> validationIssues, IXLWorkbook workbook)
         {
-            Dictionary<string, bool> nameChecks = new Dictionary<string, bool>();
+            switch (validationIssues[0])
+            {
+                case WorksheetValidation.isReservedWord:
+                case WorksheetValidation.isBlank:
+                    return SetGeneralName();
 
-            bool isUnique = IsUnique(workSheetName, workbook);
-            bool isWithinCharacterLimit = IsWithinCharacterLimit(workSheetName);
-            bool isNotBlank = !string.IsNullOrWhiteSpace(workSheetName);
-            bool isNotReservedWord = IsNotReservedWord(workSheetName);
-            bool isValidCharacters = IsValidCharacters(workSheetName);
-            bool isNotBeginWithInvalidCharacter = IsNotBeginOrEndWithInvalidCharacter(workSheetName);
+                case WorksheetValidation.isNotUnique:
+                    return SetUniqueName(workbook, worksheetName);
 
-            return isUnique && isWithinCharacterLimit && isNotBlank && isNotReservedWord && isValidCharacters && isNotBeginWithInvalidCharacter;
+                case WorksheetValidation.isBeginOrEndWithInvalidCharacter:
+                    return RemoveInvalidBeginningOrEnding(worksheetName);
+
+                case WorksheetValidation.isNotValidCharacters:
+                    return RemoveInvalidCharacters(worksheetName);
+
+                case WorksheetValidation.isNotWithinCharacterLimit:
+                    return TrimName(worksheetName);
+
+                default:
+                    break;
+            }
+
+            return worksheetName;
         }
 
-        private static bool IsNotBeginOrEndWithInvalidCharacter(string workSheetName)
+        private static string TrimName(string worksheetName)
+        {
+            if (worksheetName.ToString().Contains(" "))
+            {
+                worksheetName = worksheetName.Replace(" ", "");
+                return worksheetName;
+            }
+
+            return worksheetName.Substring(0, 31);
+
+        }
+
+        private static string RemoveInvalidCharacters(string worksheetName)
+        {
+            List<char> InvalidChars = new List<char>() { '[', '/', '?', ']', '*', '\\', ':' };
+
+            InvalidChars.ForEach(c => worksheetName = worksheetName.Replace(c.ToString(), String.Empty));
+            return worksheetName;
+        }
+
+        private static string RemoveInvalidBeginningOrEnding(string worksheetName)
+        {
+            if (worksheetName.Substring(0, 1) == "\'")
+            {
+                worksheetName = worksheetName.Replace("\'", "");
+            }
+
+            if (worksheetName.Substring(worksheetName.Length - 1) == "\'")
+            {
+                worksheetName = worksheetName.Replace("\'", "");
+            }
+
+            return worksheetName;
+        }
+
+        private static string SetUniqueName(IXLWorkbook workbook, string worksheetName)
+        {
+            return DateTime.Now.ToString("ddMMyy HHmmssf") + "_" + worksheetName;
+        }
+
+        private static bool IsValidName(string workSheetName, IXLWorkbook workbook, out List<WorksheetValidation> validationIssues)
+        {
+            validationIssues = new List<WorksheetValidation>();
+
+            if (!CheckIsUnique(workSheetName, workbook))
+                validationIssues.Add(WorksheetValidation.isNotUnique);
+
+            if (!CheckIsNullOrWhitespace(workSheetName))
+                validationIssues.Add(WorksheetValidation.isBlank);
+
+            if (!CheckIsNotReservedWord(workSheetName))
+                validationIssues.Add(WorksheetValidation.isReservedWord);
+
+            if (!CheckIsValidCharacters(workSheetName))
+                validationIssues.Add(WorksheetValidation.isNotValidCharacters);
+
+            if (!CheckIsNotBeginOrEndWithInvalidCharacter(workSheetName))
+                validationIssues.Add(WorksheetValidation.isBeginOrEndWithInvalidCharacter);
+
+            if (!CheckIsWithinCharacterLimit(workSheetName))
+                validationIssues.Add(WorksheetValidation.isNotWithinCharacterLimit);
+
+            if (validationIssues.Count > 0)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        private static bool CheckIsNullOrWhitespace(string workSheetName)
+        {
+            return !string.IsNullOrWhiteSpace(workSheetName);
+        }
+
+        private static bool CheckIsNotBeginOrEndWithInvalidCharacter(string workSheetName)
         {
             return !workSheetName.StartsWith("\'") && !workSheetName.EndsWith("\'");
         }
 
-        private static bool IsValidCharacters(string workSheetName)
+        private static bool CheckIsValidCharacters(string workSheetName)
         {
             Regex r = new Regex(@"[\[/\?\]\*\\\:]");
 
             return !r.IsMatch(workSheetName);
         }
 
-        private static bool IsNotReservedWord(string workSheetName)
+        private static bool CheckIsNotReservedWord(string workSheetName)
         {
             List<string> reservedWords = new List<string> { "history" };
 
             return !reservedWords.Contains(workSheetName.ToLower());
         }
 
-        private static bool IsUnique(string workSheetName, IXLWorkbook workbook)
+        private static bool CheckIsUnique(string workSheetName, IXLWorkbook workbook)
         {
             return !workbook.Worksheets.Contains(workSheetName);
         }
 
-        private static bool IsWithinCharacterLimit(string workSheetName)
+        private static bool CheckIsWithinCharacterLimit(string workSheetName)
         {
             return workSheetName.Length <= 31;
         }
 
-        private static string ModifyWorksheetName()
+        private static string SetGeneralName()
         {
-            string workSheetName = "BHoM_Export_" + DateTime.Now.ToString("ddMMyy_HHmmss");
+            return "BHoM_Export_" + DateTime.Now.ToString("ddMMyy_HHmmss");
+        }
 
-            return workSheetName;
+        private enum WorksheetValidation
+        {
+            isNotUnique,
+            isNotWithinCharacterLimit,
+            isBlank,
+            isReservedWord,
+            isNotValidCharacters,
+            isBeginOrEndWithInvalidCharacter
         }
     }
+
 }

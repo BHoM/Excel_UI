@@ -36,7 +36,6 @@ namespace BH.Adapter.Excel
 
         private bool Create(IXLWorkbook workbook, Table table, ExcelPushConfig config)
         {
-
             if (table?.Data == null)
             {
                 BH.Engine.Base.Compute.RecordError("Creation of a table failed: input table is null or does not contain a table.");
