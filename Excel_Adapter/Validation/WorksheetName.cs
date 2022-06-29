@@ -21,7 +21,6 @@
  */
 
 using ClosedXML.Excel;
-using DocumentFormat.OpenXml.Spreadsheet;
 using System;
 using System.Collections.Generic;
 using System.Text.RegularExpressions;
@@ -38,139 +37,56 @@ namespace BH.Adapter.Excel
         {
             string worksheetName = name;
 
-            List<WorksheetValidation> validationIssues = new List<WorksheetValidation>();
-
-            bool isValidName = IsValidName(worksheetName, workbook, out validationIssues);
-            while (!isValidName)
+            WorksheetValidation issue = IsValidName(worksheetName, workbook);
+            while (issue != WorksheetValidation.Valid)
             {
-                worksheetName = ModifyWorksheetName(worksheetName, validationIssues, workbook);
-                isValidName = IsValidName(worksheetName, workbook, out validationIssues);
+                worksheetName = ModifyWorksheetName(worksheetName, issue);
+                issue = IsValidName(worksheetName, workbook);
             }
 
 
             if (worksheetName != name)
             {
-                BH.Engine.Base.Compute.RecordError("Name of worksheet has been adjusted to a name that which is compatible with Excel naming limitations.");
+                BH.Engine.Base.Compute.RecordNote($"The selected name for worksheet {name} was not valid to Excel requirements. This has been renamed to {worksheetName}.");
             }
 
             return worksheetName;
         }
 
+        /*************************************************/
+        /****             Private Methods              ***/
+        /*************************************************/
 
-        /***************************************************/
-
-        private static string ModifyWorksheetName(string worksheetName, List<WorksheetValidation> validationIssues, IXLWorkbook workbook)
+        private static WorksheetValidation IsValidName(string workSheetName, IXLWorkbook workbook)
         {
-            switch (validationIssues[0])
-            {
-                case WorksheetValidation.isReservedWord:
-                case WorksheetValidation.isBlank:
-                    return SetGeneralName();
-
-                case WorksheetValidation.isNotUnique:
-                    return SetUniqueName(workbook, worksheetName);
-
-                case WorksheetValidation.isBeginOrEndWithInvalidCharacter:
-                    return RemoveInvalidBeginningOrEnding(worksheetName);
-
-                case WorksheetValidation.isNotValidCharacters:
-                    return RemoveInvalidCharacters(worksheetName);
-
-                case WorksheetValidation.isNotWithinCharacterLimit:
-                    return TrimName(worksheetName);
-
-                default:
-                    break;
-            }
-
-            return worksheetName;
-        }
-
-        private static string TrimName(string worksheetName)
-        {
-            if (worksheetName.ToString().Contains(" "))
-            {
-                worksheetName = worksheetName.Replace(" ", "");
-                return worksheetName;
-            }
-
-            return worksheetName.Substring(0, 31);
-
-        }
-
-        private static string RemoveInvalidCharacters(string worksheetName)
-        {
-            List<char> InvalidChars = new List<char>() { '[', '/', '?', ']', '*', '\\', ':' };
-
-            InvalidChars.ForEach(c => worksheetName = worksheetName.Replace(c.ToString(), String.Empty));
-            return worksheetName;
-        }
-
-        private static string RemoveInvalidBeginningOrEnding(string worksheetName)
-        {
-            if (worksheetName.Substring(0, 1) == "\'")
-            {
-                worksheetName = worksheetName.Replace("\'", "");
-            }
-
-            if (worksheetName.Substring(worksheetName.Length - 1) == "\'")
-            {
-                worksheetName = worksheetName.Replace("\'", "");
-            }
-
-            return worksheetName;
-        }
-
-        private static string SetUniqueName(IXLWorkbook workbook, string worksheetName)
-        {
-            return DateTime.Now.ToString("ddMMyy HHmmssf") + "_" + worksheetName;
-        }
-
-        private static bool IsValidName(string workSheetName, IXLWorkbook workbook, out List<WorksheetValidation> validationIssues)
-        {
-            validationIssues = new List<WorksheetValidation>();
+            WorksheetValidation issue = WorksheetValidation.Valid;
 
             if (!CheckIsUnique(workSheetName, workbook))
-                validationIssues.Add(WorksheetValidation.isNotUnique);
+                return WorksheetValidation.NotUnique;
 
-            if (!CheckIsNullOrWhitespace(workSheetName))
-                validationIssues.Add(WorksheetValidation.isBlank);
+            if (string.IsNullOrWhiteSpace(workSheetName))
+                return WorksheetValidation.Blank;
 
             if (!CheckIsNotReservedWord(workSheetName))
-                validationIssues.Add(WorksheetValidation.isReservedWord);
+                return WorksheetValidation.ReservedWord;
 
             if (!CheckIsValidCharacters(workSheetName))
-                validationIssues.Add(WorksheetValidation.isNotValidCharacters);
+                return WorksheetValidation.NotValidCharacters;
 
             if (!CheckIsNotBeginOrEndWithInvalidCharacter(workSheetName))
-                validationIssues.Add(WorksheetValidation.isBeginOrEndWithInvalidCharacter);
+                return WorksheetValidation.BeginOrEndWithInvalidCharacter;
 
             if (!CheckIsWithinCharacterLimit(workSheetName))
-                validationIssues.Add(WorksheetValidation.isNotWithinCharacterLimit);
+                return WorksheetValidation.NotWithinCharacterLimit;
 
-            if (validationIssues.Count > 0)
-            {
-                return false;
-            }
-
-            return true;
+            return issue;
         }
 
-        private static bool CheckIsNullOrWhitespace(string workSheetName)
-        {
-            return !string.IsNullOrWhiteSpace(workSheetName);
-        }
+        /************ Checks *********************/
 
-        private static bool CheckIsNotBeginOrEndWithInvalidCharacter(string workSheetName)
+        private static bool CheckIsUnique(string workSheetName, IXLWorkbook workbook)
         {
-            return !workSheetName.StartsWith("\'") && !workSheetName.EndsWith("\'");
-        }
-
-        private static bool CheckIsValidCharacters(string workSheetName)
-        {
-            Regex r = new Regex(@"[\[/\?\]\*\\\:]");
-
-            return !r.IsMatch(workSheetName);
+            return !workbook.Worksheets.Contains(workSheetName);
         }
 
         private static bool CheckIsNotReservedWord(string workSheetName)
@@ -180,9 +96,16 @@ namespace BH.Adapter.Excel
             return !reservedWords.Contains(workSheetName.ToLower());
         }
 
-        private static bool CheckIsUnique(string workSheetName, IXLWorkbook workbook)
+        private static bool CheckIsValidCharacters(string workSheetName)
         {
-            return !workbook.Worksheets.Contains(workSheetName);
+            Regex r = new Regex(@"[\[/\?\]\*\\\:]");
+
+            return !r.IsMatch(workSheetName);
+        }
+
+        private static bool CheckIsNotBeginOrEndWithInvalidCharacter(string workSheetName)
+        {
+            return !workSheetName.StartsWith("\'") && !workSheetName.EndsWith("\'");
         }
 
         private static bool CheckIsWithinCharacterLimit(string workSheetName)
@@ -190,20 +113,85 @@ namespace BH.Adapter.Excel
             return workSheetName.Length <= 31;
         }
 
+        /************ Modifications *********************/
+        private static string ModifyWorksheetName(string worksheetName, WorksheetValidation issue)
+        {
+            switch (issue)
+            {
+                case WorksheetValidation.ReservedWord:
+                    return SetUniqueNameWithReservedName(worksheetName);
+
+                case WorksheetValidation.Blank:
+                    return SetGeneralName();
+
+                case WorksheetValidation.NotUnique:
+                    return SetUniqueName(worksheetName);
+
+                case WorksheetValidation.BeginOrEndWithInvalidCharacter:
+                    return RemoveInvalidBeginningOrEnding(worksheetName);
+
+                case WorksheetValidation.NotValidCharacters:
+                    return RemoveInvalidCharacters(worksheetName);
+
+                case WorksheetValidation.NotWithinCharacterLimit:
+                    return TrimName(worksheetName);
+
+                default:
+                case WorksheetValidation.Valid:
+                    break;
+            }
+
+            return worksheetName;
+        }
+
+        private static string SetUniqueNameWithReservedName(string worksheetName)
+        {
+            return "BHoM_" + worksheetName;
+        }
+
         private static string SetGeneralName()
         {
             return "BHoM_Export_" + DateTime.Now.ToString("ddMMyy_HHmmss");
         }
 
-        private enum WorksheetValidation
+        private static string SetUniqueName(string worksheetName)
         {
-            isNotUnique,
-            isNotWithinCharacterLimit,
-            isBlank,
-            isReservedWord,
-            isNotValidCharacters,
-            isBeginOrEndWithInvalidCharacter
+            return DateTime.Now.ToString("ddMMyy HHmmssf") + "_" + worksheetName;
+        }
+
+        private static string RemoveInvalidBeginningOrEnding(string worksheetName)
+        {
+            if (worksheetName.StartsWith("\'"))
+            {
+                worksheetName = worksheetName.Substring(1, worksheetName.Length - 1);
+            }
+
+            if (worksheetName.EndsWith("\'"))
+            {
+                worksheetName = worksheetName.Substring(0, worksheetName.Length - 2);
+            }
+
+            return worksheetName;
+        }
+
+        private static string RemoveInvalidCharacters(string worksheetName)
+        {
+            List<char> invalidChars = new List<char>() { '[', '/', '?', ']', '*', '\\', ':' };
+
+            invalidChars.ForEach(c => worksheetName = worksheetName.Replace(c.ToString(), String.Empty));
+            return worksheetName;
+        }
+
+        private static string TrimName(string worksheetName)
+        {
+            if (worksheetName.Contains(" ") || worksheetName.Contains("-") || worksheetName.Contains("_") || worksheetName.Contains(","))
+            {
+                List<char> toBeRemovedChars = new List<char>() { ' ', '-', '_', ',' };
+                toBeRemovedChars.ForEach(c => worksheetName = worksheetName.Replace(c.ToString(), String.Empty));
+                return worksheetName;
+            }
+
+            return worksheetName.Substring(0, 31);
         }
     }
-
 }
