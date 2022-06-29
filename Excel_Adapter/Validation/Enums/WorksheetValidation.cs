@@ -22,14 +22,14 @@
 
 namespace BH.Adapter.Excel
 {
-        public enum WorksheetValidation
-        {
-            NotUnique,
-            NotWithinCharacterLimit,
-            Blank,
-            ReservedWord,
-            NotValidCharacters,
-            BeginOrEndWithInvalidCharacter,
-            Valid
-        }
+    public enum WorksheetValidation
+    {
+        BeginOrEndWithInvalidCharacter,
+        Blank,
+        NotUnique,
+        NotValidCharacters,
+        NotWithinCharacterLimit,
+        ReservedWord,
+        Valid
+    }
 }

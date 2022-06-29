@@ -44,7 +44,6 @@ namespace BH.Adapter.Excel
                 issue = IsValidName(worksheetName, workbook);
             }
 
-
             if (worksheetName != name)
             {
                 BH.Engine.Base.Compute.RecordNote($"The selected name for worksheet {name} was not valid to Excel requirements. This has been renamed to {worksheetName}.");
@@ -59,8 +58,6 @@ namespace BH.Adapter.Excel
 
         private static WorksheetValidation IsValidName(string workSheetName, IXLWorkbook workbook)
         {
-            WorksheetValidation issue = WorksheetValidation.Valid;
-
             if (!CheckIsUnique(workSheetName, workbook))
                 return WorksheetValidation.NotUnique;
 
@@ -79,7 +76,7 @@ namespace BH.Adapter.Excel
             if (!CheckIsWithinCharacterLimit(workSheetName))
                 return WorksheetValidation.NotWithinCharacterLimit;
 
-            return issue;
+            return WorksheetValidation.Valid;
         }
 
         /************ Checks *********************/
@@ -163,7 +160,7 @@ namespace BH.Adapter.Excel
         {
             if (worksheetName.StartsWith("\'"))
             {
-                worksheetName = worksheetName.Substring(1, worksheetName.Length - 1);
+                worksheetName = worksheetName.Substring(1);
             }
 
             if (worksheetName.EndsWith("\'"))
