@@ -108,6 +108,7 @@
     <Compile Include="ExcelAdapter.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Validation\WorksheetName.cs" />
+    <Compile Include="Validation\Enums\WorksheetValidation.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
