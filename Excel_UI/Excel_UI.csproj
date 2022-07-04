@@ -192,18 +192,6 @@
     <None Include="Properties\ExcelDna.Build.props" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Excel_Engine\Excel_Engine.csproj">
-      <Project>{a6884466-297e-4aaa-a232-abbec42168d3}</Project>
-      <Name>Excel_Engine</Name>
-      <Private>False</Private>
-    </ProjectReference>
-    <ProjectReference Include="..\Excel_oM\Excel_oM.csproj">
-      <Project>{79fac4b0-77ec-4257-bcbe-cff37fff537c}</Project>
-      <Name>Excel_oM</Name>
-      <Private>False</Private>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -212,7 +200,12 @@
   <ItemGroup>
     <None Include="Properties\Resources\BHoM_Logo-48x48.png" />
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <ProjectReference Include="..\ExcelUI_Engine\ExcelUI_Engine.csproj">
+      <Project>{56039ed6-fbd5-4f45-936b-2116399aeec3}</Project>
+      <Name>ExcelUI_Engine</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>xcopy "$(TargetPath)"  "C:\ProgramData\BHoM\Assemblies" /Y

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of the Buildings and Habitats object Model (BHoM)
  * Copyright (c) 2015 - 2022, the respective contributors. All rights reserved.
  *
@@ -20,27 +20,49 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.      
  */
 
-using BH.oM.Data.Requests;
+using BH.Engine.Reflection;
+using BH.oM.Base.Attributes;
+using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace BH.oM.Adapters.Excel
+namespace BH.Engine.Excel
 {
-    [Description("IRequest that pulls cells and their metadata from the excel file.")]
-    public class CellContentsRequest : IRequest
+    public static partial class Compute
     {
-        /***************************************************/
-        /****                Properties                 ****/
-        /***************************************************/
+        /*******************************************/
+        /**** Public Methods                    ****/
+        /*******************************************/
 
-        [Description("Name of the worksheet to read from.")]
-        public virtual string Worksheet { get; set; } = "";
+        public static T ParseEnum<T>(string value)
+        {
+            return (T)ParseEnum(typeof(T), value);
+        }
 
-        [Description("Cell range to read. If left empty, entire extent of the spreadsheet starting from A1 is used.")]
-        public virtual CellRange Range { get; set; } = null;
+        /*******************************************/
 
-        /***************************************************/
+        public static object ParseEnum(Type enumType, string value)
+        {
+            if (Enum.IsDefined(enumType, value))
+                return Enum.Parse(enumType, value);
+            else
+            {
+                return Enum.GetValues(enumType).OfType<Enum>()
+                    .FirstOrDefault(x => {
+                        FieldInfo fi = enumType.GetField(x.ToString());
+                        DescriptionAttribute[] attributes = fi.GetCustomAttributes(typeof(DescriptionAttribute), false) as DescriptionAttribute[];
+
+                        return attributes != null && attributes.Count() > 0 && attributes.First().Description == value;
+                    });
+            }
+        }
+
+        /*******************************************/
     }
 }
-
 
