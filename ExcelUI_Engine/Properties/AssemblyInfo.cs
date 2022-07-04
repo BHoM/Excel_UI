@@ -27,8 +27,8 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Excel_UI")]
-[assembly: AssemblyDescription("Excel UI for the BHoM")]
+[assembly: AssemblyTitle("ExcelUI_Engine")]
+[assembly: AssemblyDescription("Excel UI Engine for the BHoM")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("BHoM")]
@@ -42,7 +42,7 @@ using System.Runtime.InteropServices;
 [assembly: ComVisible(false)]
 
 // The following GUID is for the ID of the typelib if this project is exposed to COM
-[assembly: Guid("0faf6feb-80c3-474a-92bb-c886424ccbc8")]
+[assembly: Guid("119988e5-0e23-4a5a-a2fa-c0336b2e68e9")]
 
 // Version information for an assembly consists of the following four values:
 //
