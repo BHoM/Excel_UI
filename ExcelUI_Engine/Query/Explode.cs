@@ -1,4 +1,4 @@
-/*
+﻿/*
  * This file is part of the Buildings and Habitats object Model (BHoM)
  * Copyright (c) 2015 - 2022, the respective contributors. All rights reserved.
  *
@@ -40,8 +40,8 @@ namespace BH.Engine.Excel
 
         [Description("Get all properties from an object. WARNING This is an array formula and will take up more than one cell!")]
         [Input("objects", "Objects to explode")]
-        [Input("includePropertyNames", "Include the name of the properties")] 
-        [Input("goDeep", "Explode inner objects")] 
+        [Input("includePropertyNames", "Include the name of the properties")]
+        [Input("goDeep", "Explode inner objects")]
         [Input("transpose", "Transpose the resulting table (i.e. one object per column instead of per row)")]
         public static object Explode(this List<object> objects, bool includePropertyNames = false, bool goDeep = false, bool transpose = false)
         {
