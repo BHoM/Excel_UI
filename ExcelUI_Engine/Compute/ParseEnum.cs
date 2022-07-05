@@ -39,6 +39,7 @@ namespace BH.Engine.Excel
         /**** Public Methods                    ****/
         /*******************************************/
 
+        [PreviousVersion("5.3", "BH.Engine.Excel.Compute.ParseEnum(System.String)")]
         public static T ParseEnum<T>(string value)
         {
             return (T)ParseEnum(typeof(T), value);
@@ -46,6 +47,7 @@ namespace BH.Engine.Excel
 
         /*******************************************/
 
+        [PreviousVersion("5.3", "BH.Engine.Excel.Compute.ParseEnum(System.Type, System.String)")]
         public static object ParseEnum(Type enumType, string value)
         {
             if (Enum.IsDefined(enumType, value))
