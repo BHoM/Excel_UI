@@ -28,7 +28,7 @@ using System.Runtime.InteropServices;
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
 [assembly: AssemblyTitle("Excel_UI")]
-[assembly: AssemblyDescription("Excel UI for the BHoM")]
+[assembly: AssemblyDescription("https://github.com/BHoM/Excel_UI")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("BHoM")]
