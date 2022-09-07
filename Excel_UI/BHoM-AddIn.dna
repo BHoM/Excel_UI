@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <DnaLibrary Name="BHoM Add-In" RuntimeVersion="v4.0" xmlns="http://schemas.excel-dna.net/addin/2020/07/dnalibrary">
-  <ExternalLibrary Path="Excel_UI.dll" ExplicitExports="false" LoadFromBytes="true" Pack="true" IncludePdb="false" ExplicitRegistration="true" />
+  <ExternalLibrary Path="Excel_UI.dll" ExplicitExports="false" LoadFromBytes="true" Pack="true" IncludePdb="false" ExplicitRegistration="true" ComServer="true"/>
 
   <!--
        The RuntimeVersion attribute above allows only the following setting:
