@@ -27,7 +27,8 @@ using System.Linq;
 using System.Collections;
 using ExcelDna.Integration;
 using Microsoft.Office.Interop.Excel;
-
+using System.Xml.Linq;
+using BH.oM.UI;
 
 namespace BH.UI.Excel.Templates
 {
@@ -57,6 +58,7 @@ namespace BH.UI.Excel.Templates
             // Log usage
             Application app = ExcelDnaUtil.Application as Application;
             Workbook workbook = app.ActiveWorkbook;
+            SetProjectID(workbook);
             Engine.UI.Compute.LogUsage("Excel", app?.Version, InstanceId, Caller.GetType().Name, Caller.SelectedItem, Engine.Base.Query.CurrentEvents(), AddIn.WorkbookId(workbook), workbook.FullName);
 
             // Return result
@@ -81,6 +83,20 @@ namespace BH.UI.Excel.Templates
         }
 
         /*******************************************/
+
+        private static void SetProjectID(Workbook workbook)
+        {
+            string projectId = workbook.Title;
+
+            if (!string.IsNullOrEmpty(projectId))
+            {
+                BH.Engine.Base.Compute.RecordEvent(new ProjectIDEvent
+                {
+                    Message = "The project ID for this file is now set to " + projectId,
+                    ProjectID = projectId
+                });
+            }
+        }
     }
 }
 
