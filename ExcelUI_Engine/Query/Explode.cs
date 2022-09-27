@@ -1,4 +1,4 @@
-﻿/*
+/*
  * This file is part of the Buildings and Habitats object Model (BHoM)
  * Copyright (c) 2015 - 2022, the respective contributors. All rights reserved.
  *
@@ -43,7 +43,6 @@ namespace BH.Engine.Excel
         [Input("includePropertyNames", "Include the name of the properties")]
         [Input("goDeep", "Explode inner objects")]
         [Input("transpose", "Transpose the resulting table (i.e. one object per column instead of per row)")]
-        [PreviousVersion("5.3", "BH.Engine.Excel.Query.Explode(System.Collections.Generic.List<System.Object>, System.Boolean, System.Boolean, System.Boolean)")]
         public static object Explode(this List<object> objects, bool includePropertyNames = false, bool goDeep = false, bool transpose = false)
         {
             Engine.Base.Compute.ClearCurrentEvents();
