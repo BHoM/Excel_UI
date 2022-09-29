@@ -36,6 +36,8 @@ using BH.oM.Base;
 using BH.UI.Excel.Components;
 using BH.oM.Versioning;
 
+using BH.Engine.Serialiser;
+
 namespace BH.UI.Excel
 {
     public partial class AddIn : IExcelAddIn
@@ -134,6 +136,8 @@ namespace BH.UI.Excel
                         if (choice is IObject)
                             IAddObject(choice);
                     }
+
+                    FUCKINGHELL(valueList.MultiChoiceCaller.SelectedItem.ToJson(), valueList.MultiChoiceCaller.Choices);
                 }
             }
         }
@@ -142,6 +146,98 @@ namespace BH.UI.Excel
         /*******************************************/
         /**** Private Methods                   ****/
         /*******************************************/
+
+        private static string FUCKINGHELL(string collectionName, List<object> choices)
+        {
+            //Update enum values in case they have changed since the last serialisation
+            var collectionNameObject = BH.Engine.Serialiser.Convert.FromJson(collectionName) as Type; //To strip out the 'BHoM_Version'
+            var nameOfCollection = collectionNameObject.Namespace + "." + collectionNameObject.Name;
+
+            var motherfuckingChoices = System.Enum.GetValues(collectionNameObject);
+
+            // Get the data sheet
+            Worksheet sheet = AddIn.Sheet("BHoM_ChoicesHidden", true, true);
+            if (sheet == null)
+                return string.Join(",", choices);
+
+            // Try to find the list of choices in the spreadsheet
+            int i = 0;
+            while (i++ < 1000) // Just for safety
+            {
+                try
+                {
+                    string name = sheet.Cells[i, 1].Value as string;
+                    if (string.IsNullOrEmpty(name))
+                    {
+                        // Need to add the choices here
+                        sheet.Cells[i, 1].Value = collectionName;
+                        for (int j = 0; j < choices.Count; j++)
+                            sheet.Cells[i, j + 2].Value = choices[j];
+                        break;
+                    }
+                    else
+                    {
+                        var sheetName = BH.Engine.Serialiser.Convert.FromJson(name) as Type;
+                        var sheetNameObject = sheetName.Namespace + "." + sheetName.Name;
+                        if (sheetNameObject == nameOfCollection)
+                            break;
+                    }
+                }
+                catch
+                {
+                    break;
+                }
+            }
+
+            // Create the range
+            Range range = sheet.Range[sheet.Cells[i, 2], sheet.Cells[i, choices.Count + 1]];
+
+            for(int x = 0; x < motherfuckingChoices.Length; x++)
+            {
+                range[1, (x + 1)] = motherfuckingChoices.GetValue(x).ToString();
+            }
+
+            var rangeValidation = $"=BHoM_ChoicesHidden!{range.Address}";
+            var rangeStart = $"=BHoM_ChoicesHidden!$B${i}:";
+            
+            Workbook workbook = ActiveWorkbook();
+            if (workbook != null)
+            {
+                foreach (Worksheet sheety in workbook.Sheets.OfType<Worksheet>().Where(x => x.Visible == XlSheetVisibility.xlSheetVisible))
+                {
+                    var usedRange = sheety.UsedRange;
+
+                    foreach(Range cell in usedRange)
+                    {
+                        Validation validation = cell.Validation;
+                        if(validation != null)
+                        {
+                            try
+                            {
+                                string f1 = validation.Formula1;
+                                string f2 = validation.Formula2;
+                                if(f1.StartsWith(rangeStart) || f2.StartsWith(rangeStart))
+                                {
+                                    validation.Delete();
+                                    validation.Add(XlDVType.xlValidateList, XlDVAlertStyle.xlValidAlertWarning, XlFormatConditionOperator.xlBetween, rangeValidation, Type.Missing);
+                                    validation.InCellDropdown = true;
+                                    validation.IgnoreBlank = true;
+                                }
+                            }
+                            catch { }
+                            /*validation.Delete();
+                            validation.Add(XlDVType.xlValidateList, XlDVAlertStyle.xlValidAlertWarning, XlFormatConditionOperator.xlBetween, formula, Type.Missing);
+                            validation.InCellDropdown = true;
+                            validation.IgnoreBlank = true;*/
+                        }
+                    }
+                }
+            }
+
+            return "fuck off";
+            
+            
+        }
 
         private static void SaveCallerToHiddenSheet(CallerFormula caller)
         {
