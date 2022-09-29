@@ -137,7 +137,7 @@ namespace BH.UI.Excel
                             IAddObject(choice);
                     }
 
-                    FUCKINGHELL(valueList.MultiChoiceCaller.SelectedItem.ToJson(), valueList.MultiChoiceCaller.Choices);
+                    UpdateEnumValues(valueList.MultiChoiceCaller.SelectedItem.ToJson());
                 }
             }
         }
@@ -147,18 +147,20 @@ namespace BH.UI.Excel
         /**** Private Methods                   ****/
         /*******************************************/
 
-        private static string FUCKINGHELL(string collectionName, List<object> choices)
+        private static void UpdateEnumValues(string collectionName)
         {
             //Update enum values in case they have changed since the last serialisation
-            var collectionNameObject = BH.Engine.Serialiser.Convert.FromJson(collectionName) as Type; //To strip out the 'BHoM_Version'
-            var nameOfCollection = collectionNameObject.Namespace + "." + collectionNameObject.Name;
-
-            var motherfuckingChoices = System.Enum.GetValues(collectionNameObject);
+            var enumType = BH.Engine.Serialiser.Convert.FromJson(collectionName) as Type; //To strip out the 'BHoM_Version'
+            if (!enumType.IsEnum)
+                return; //This method is only for enum dropdowns, not datasets, etc.
+            
+            var nameOfEnum = enumType.Namespace + "." + enumType.Name;
+            var enumChoices = System.Enum.GetValues(enumType);
 
             // Get the data sheet
-            Worksheet sheet = AddIn.Sheet("BHoM_ChoicesHidden", true, true);
-            if (sheet == null)
-                return string.Join(",", choices);
+            Worksheet choicesSheet = AddIn.Sheet("BHoM_ChoicesHidden", true, true);
+            if (choicesSheet == null)
+                return;
 
             // Try to find the list of choices in the spreadsheet
             int i = 0;
@@ -166,20 +168,20 @@ namespace BH.UI.Excel
             {
                 try
                 {
-                    string name = sheet.Cells[i, 1].Value as string;
+                    string name = choicesSheet.Cells[i, 1].Value as string;
                     if (string.IsNullOrEmpty(name))
                     {
-                        // Need to add the choices here
-                        sheet.Cells[i, 1].Value = collectionName;
-                        for (int j = 0; j < choices.Count; j++)
-                            sheet.Cells[i, j + 2].Value = choices[j];
+                        // Need to add the choices here - this should not be needed on loading a sheet, but as a safety net
+                        choicesSheet.Cells[i, 1].Value = collectionName;
+                        for (int j = 0; j < enumChoices.Length; j++)
+                            choicesSheet.Cells[i, j + 2].Value = enumChoices.GetValue(j).ToString();
                         break;
                     }
                     else
                     {
-                        var sheetName = BH.Engine.Serialiser.Convert.FromJson(name) as Type;
-                        var sheetNameObject = sheetName.Namespace + "." + sheetName.Name;
-                        if (sheetNameObject == nameOfCollection)
+                        var sheetEnumName = BH.Engine.Serialiser.Convert.FromJson(name) as Type;
+                        var sheetNameObject = sheetEnumName.Namespace + "." + sheetEnumName.Name;
+                        if (sheetNameObject == nameOfEnum)
                             break;
                     }
                 }
@@ -189,25 +191,23 @@ namespace BH.UI.Excel
                 }
             }
 
-            // Create the range
-            Range range = sheet.Range[sheet.Cells[i, 2], sheet.Cells[i, choices.Count + 1]];
+            // Obtain the range
+            Range range = choicesSheet.Range[choicesSheet.Cells[i, 2], choicesSheet.Cells[i, enumChoices.Length + 1]];
 
-            for(int x = 0; x < motherfuckingChoices.Length; x++)
-            {
-                range[1, (x + 1)] = motherfuckingChoices.GetValue(x).ToString();
-            }
+            //Update the enum values - this is in case an enum value that previously existed has been renamed, so not just checking for null elements
+            for(int x = 0; x < enumChoices.Length; x++)
+                range[1, (x + 1)] = enumChoices.GetValue(x).ToString();
 
-            var rangeValidation = $"=BHoM_ChoicesHidden!{range.Address}";
+            var rangeValidationFormula = $"=BHoM_ChoicesHidden!{range.Address}";
             var rangeStart = $"=BHoM_ChoicesHidden!$B${i}:";
             
+            //Update all existing validation items to use the new range
             Workbook workbook = ActiveWorkbook();
             if (workbook != null)
             {
-                foreach (Worksheet sheety in workbook.Sheets.OfType<Worksheet>().Where(x => x.Visible == XlSheetVisibility.xlSheetVisible))
+                foreach (Worksheet sheet in workbook.Sheets.OfType<Worksheet>().Where(x => x.Visible == XlSheetVisibility.xlSheetVisible))
                 {
-                    var usedRange = sheety.UsedRange;
-
-                    foreach(Range cell in usedRange)
+                    foreach(Range cell in sheet.UsedRange)
                     {
                         Validation validation = cell.Validation;
                         if(validation != null)
@@ -219,24 +219,19 @@ namespace BH.UI.Excel
                                 if(f1.StartsWith(rangeStart) || f2.StartsWith(rangeStart))
                                 {
                                     validation.Delete();
-                                    validation.Add(XlDVType.xlValidateList, XlDVAlertStyle.xlValidAlertWarning, XlFormatConditionOperator.xlBetween, rangeValidation, Type.Missing);
+                                    validation.Add(XlDVType.xlValidateList, XlDVAlertStyle.xlValidAlertWarning, XlFormatConditionOperator.xlBetween, rangeValidationFormula, Type.Missing);
                                     validation.InCellDropdown = true;
                                     validation.IgnoreBlank = true;
                                 }
                             }
-                            catch { }
-                            /*validation.Delete();
-                            validation.Add(XlDVType.xlValidateList, XlDVAlertStyle.xlValidAlertWarning, XlFormatConditionOperator.xlBetween, formula, Type.Missing);
-                            validation.InCellDropdown = true;
-                            validation.IgnoreBlank = true;*/
+                            catch
+                            {
+                                //If the validation isn't null, but a property is, that indicates the cell did not have validation in the first place, so no need to do anything with the catch, just ignore the cell
+                            }
                         }
                     }
                 }
             }
-
-            return "fuck off";
-            
-            
         }
 
         private static void SaveCallerToHiddenSheet(CallerFormula caller)
