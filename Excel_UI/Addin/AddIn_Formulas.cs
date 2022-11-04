@@ -137,7 +137,8 @@ namespace BH.UI.Excel
                             IAddObject(choice);
                     }
 
-                    UpdateEnumValues(valueList.MultiChoiceCaller.SelectedItem.ToJson());
+                    if(valueList is CreateEnumFormula)
+                        UpdateEnumValues(valueList.MultiChoiceCaller.SelectedItem.ToJson());
                 }
             }
         }
@@ -151,7 +152,7 @@ namespace BH.UI.Excel
         {
             //Update enum values in case they have changed since the last serialisation
             var enumType = BH.Engine.Serialiser.Convert.FromJson(collectionName) as Type; //To strip out the 'BHoM_Version'
-            if (!enumType.IsEnum)
+            if (enumType == null || !enumType.IsEnum)
                 return; //This method is only for enum dropdowns, not datasets, etc.
             
             var nameOfEnum = enumType.Namespace + "." + enumType.Name;
