@@ -58,7 +58,6 @@ namespace BH.UI.Excel.Templates
             // Log usage
             Application app = ExcelDnaUtil.Application as Application;
             Workbook workbook = app.ActiveWorkbook;
-            SetProjectID(workbook, AddIn.WorkbookId(workbook));
             Engine.UI.Compute.LogUsage("Excel", app?.Version, InstanceId, Caller.GetType().Name, Caller.SelectedItem, Engine.Base.Query.CurrentEvents(), AddIn.WorkbookId(workbook), workbook.FullName);
 
             // Return result
@@ -83,21 +82,6 @@ namespace BH.UI.Excel.Templates
         }
 
         /*******************************************/
-
-        private static void SetProjectID(Workbook workbook, string fileID)
-        {
-            string projectId = workbook.Title;
-
-            if (!string.IsNullOrEmpty(projectId))
-            {
-                BH.Engine.Base.Compute.RecordEvent(new ProjectIDEvent
-                {
-                    Message = "The project ID for this file is now set to " + projectId,
-                    ProjectID = projectId,
-                    FileID = fileID
-                });
-            }
-        }
     }
 }
 
