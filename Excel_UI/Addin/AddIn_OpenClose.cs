@@ -148,8 +148,11 @@ namespace BH.UI.Excel
             try
             {
                 BH.UI.Base.Global.DocumentListener.OnDocumentClosing(workbook.FullName);
-                ClearObjects();
-            }
+                workbook.Application.Quit();
+                workbook = null;
+				ClearObjects();
+
+			}
             catch (Exception e)
             {
                 Debug.WriteLine(e.Message);
