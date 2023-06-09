@@ -55,8 +55,8 @@ namespace BH.UI.Excel.Addin
             </group>
             <group id='help' label='Help'>
                 <button id='xlwiki' onAction='OpenLink' size='large' label='BHoM Excel Wiki' imageMso='Help' tag='https://github.com/BHoM/Excel_Toolkit/wiki' supertip='Go to the BHoM Excel plugin wiki to view help documentation relating to this plugin.' />
-                <button id='mainwiki' onAction='OpenLink' label='BHoM Wiki' imageMso='Help' tag='https://bhom.xyz/documentation/' supertip='Go to the core BHoM wiki to view documentation relating the BHoM.' />
-                <button id='bhomxyz' onAction='OpenLink' imageMso='GetExternalDataFromWeb' label='bhom.xyz' tag='https://bhom.xyz' supertip='Visit the BHoM website.' />
+                <button id='mainwiki' onAction='OpenLink' label='BHoM Wiki' imageMso='Help' tag='{Engine.Base.Query.DocumentationURL()}' supertip='Go to the core BHoM wiki to view documentation relating the BHoM.' />
+                <button id='bhomxyz' onAction='OpenLink' imageMso='GetExternalDataFromWeb' label='bhom.xyz' tag='{Engine.Base.Query.BHoMWebsiteURL()}' supertip='Visit the BHoM website.' />
             </group>
           </tab>
         </tabs>
