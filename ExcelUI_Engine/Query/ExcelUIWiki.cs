@@ -32,7 +32,7 @@ namespace BH.Engine.Excel
         /***************************************************/
 
         [Description("Generates the Excel UI wiki URL for a provided page.")]
-        [Input("page", "An optional page in the wiki to link to. If no page is provided, the root URL is returned.")]
+        [Input("page", "An optional page to link to in the wiki. If no page is provided, the root URL is returned.")]
         [Output("url", "Fully qualified URL for the Excel UI wiki.")]
         public static string ExcelUIWiki(string page = null)
         {
