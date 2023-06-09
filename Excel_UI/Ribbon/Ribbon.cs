@@ -20,6 +20,7 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
+using BH.Engine.Excel;
 using BH.UI.Excel.Templates;
 using ExcelDna.Integration.CustomUI;
 using System;
@@ -54,7 +55,7 @@ namespace BH.UI.Excel.Addin
                 <button id='internalise' onAction='Internalise' label='Internalise data' imageMso='RecordsSaveRecord' supertip='Save the value of the selected cells so that the values will be available when the file is reopened.' />
             </group>
             <group id='help' label='Help'>
-                <button id='xlwiki' onAction='OpenLink' size='large' label='BHoM Excel Wiki' imageMso='Help' tag='https://github.com/BHoM/Excel_Toolkit/wiki' supertip='Go to the BHoM Excel plugin wiki to view help documentation relating to this plugin.' />
+                <button id='xlwiki' onAction='OpenLink' size='large' label='BHoM Excel Wiki' imageMso='Help' tag='{BH.Engine.Excel.Query.ExcelToolkitWiki()}' supertip='Go to the BHoM Excel plugin wiki to view help documentation relating to this plugin.' />
                 <button id='mainwiki' onAction='OpenLink' label='BHoM Wiki' imageMso='Help' tag='{Engine.Base.Query.DocumentationURL()}' supertip='Go to the core BHoM wiki to view documentation relating the BHoM.' />
                 <button id='bhomxyz' onAction='OpenLink' imageMso='GetExternalDataFromWeb' label='bhom.xyz' tag='{Engine.Base.Query.BHoMWebsiteURL()}' supertip='Visit the BHoM website.' />
             </group>
