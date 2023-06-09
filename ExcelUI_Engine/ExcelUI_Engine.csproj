@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="Compute\ParseEnum.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Query\ExcelUIWiki.cs" />
     <Compile Include="Query\Explode.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
