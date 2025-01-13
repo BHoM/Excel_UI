@@ -73,7 +73,7 @@ namespace BH.UI.Excel
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < height; j++)
-                    evaluated[j, i] = FromExcel(input[j, i]);
+                    evaluated[j, i] = FromExcel(input[j, i] is ExcelEmpty ? null : input[j, i]);
             }
             return evaluated;
         }
