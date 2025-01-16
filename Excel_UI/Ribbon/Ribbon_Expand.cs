@@ -55,22 +55,60 @@ namespace BH.UI.Excel.Addin
         public static object Expand(object item, bool transpose = false)
         {
             item = AddIn.FromExcel(item);
+            dynamic result;
 
-            object[] result;
             if (item is IEnumerable)
-                result = ((IEnumerable)item).Cast<object>().ToArray();
-            else
-                result = new object[] { item };
+            {
+                try
+                {
+                    
+                    var nestedList = ((IEnumerable)item).Cast<List<object>>().ToArray();
 
-            if (transpose)
-                return AddIn.ToExcel(result);
+                    int height = nestedList.Length;
+                    int width = nestedList[0].Count;
+
+                    for (int i = 0; i < height; i++)
+                    {
+                        width = (nestedList[i].Count > width) ? nestedList[i].Count : width;
+                    }
+
+                    result = new object[height, width];
+
+                    for (int i = 0; i<nestedList.Length; i++)
+                    {
+                        for(int j = 0; j < nestedList[i].Count; j++) { result[i,j] = nestedList[i][j]; }
+                    }
+                }
+                catch
+                {
+                    result = ((IEnumerable)item).Cast<object>().ToArray();
+                }                
+            }
             else
-            { 
+            {
+                result = new object[] { item };
+            }
+
+            if (transpose && (result is object[,] ))
+            {
+                object[,] transposed = new object[result.GetLength(1), result.GetLength(0)];
+                for (int i = 0; i < result.GetLength(0); i++)
+                {
+                    for (int j = 0; j < result.GetLength(1); j++)
+                        transposed[j, i] = result[i, j];
+                }
+                return AddIn.ToExcel(transposed);
+            }
+
+            if (!transpose && (result is object[]))
+            {
                 object[,] transposed = new object[result.Length, 1];
                 for (int i = 0; i < result.Length; i++)
                     transposed[i, 0] = result[i];
                 return AddIn.ToExcel(transposed);
-            } 
+            }
+
+            return AddIn.ToExcel(result);
         }
 
         /*******************************************/
