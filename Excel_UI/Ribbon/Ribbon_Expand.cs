@@ -20,18 +20,11 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using BH.UI.Excel.Templates;
 using ExcelDna.Integration;
 using ExcelDna.Integration.CustomUI;
-using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
 using System.Linq;
-using System.Runtime.InteropServices;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
 
 namespace BH.UI.Excel.Addin
 {
@@ -60,8 +53,7 @@ namespace BH.UI.Excel.Addin
             if (item is IEnumerable)
             {
                 try
-                {
-                    
+                {                    
                     var nestedList = ((IEnumerable)item).Cast<List<object>>().ToArray();
 
                     int height = nestedList.Length;
