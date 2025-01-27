@@ -52,10 +52,11 @@ namespace BH.UI.Excel.Addin
 
             if (item is IEnumerable)
             {
-                try
-                {                    
-                    var nestedList = ((IEnumerable)item).Cast<List<object>>().ToArray();
+                 
+                var nestedList = item as List<object>[];
 
+                if(nestedList != null)
+                {
                     int height = nestedList.Length;
                     int width = nestedList[0].Count;
 
@@ -71,7 +72,7 @@ namespace BH.UI.Excel.Addin
                         for(int j = 0; j < nestedList[i].Count; j++) { result[i,j] = nestedList[i][j]; }
                     }
                 }
-                catch
+                else
                 {
                     result = ((IEnumerable)item).Cast<object>().ToArray();
                 }                
