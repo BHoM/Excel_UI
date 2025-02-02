@@ -69,17 +69,17 @@ namespace BH.UI.Excel.Addin
                 && matrix.GetLength(0) > 1
                 && matrix.GetLength(1) > 1)
             {
-                var listResult = new List<object>();
+                List<List<object>> listResult = new List<List<object>>();
 
                 for (int i = 0; i < matrix.GetLength(0); i++)
                 {
                     List<object> row = Enumerable
                         .Range(0, matrix.GetLength(1))
-                        .Select(x => matrix[i, x]).ToList();
-                    listResult.Add(AddIn.FromExcel(row));
+                        .Select(x => AddIn.FromExcel(matrix[i, x])).ToList();
+                    listResult.Add(row);
                 }
 
-                result = AddIn.FromExcel(listResult);
+                result = listResult;
                 return AddIn.ToExcel(result);
             }
 

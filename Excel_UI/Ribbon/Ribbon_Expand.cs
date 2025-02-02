@@ -20,6 +20,7 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
+using BH.Engine.Base;
 using ExcelDna.Integration;
 using ExcelDna.Integration.CustomUI;
 using System.Collections;
@@ -48,41 +49,27 @@ namespace BH.UI.Excel.Addin
         public static object Expand(object item, bool transpose = false)
         {
             item = AddIn.FromExcel(item);
-            dynamic result;
+            object[,] result;
 
-            if (item is IEnumerable)
+            if (item is IEnumerable array)
             {
-                 
-                var nestedList = item as List<object>[];
-
-                if(nestedList != null)
-                {
-                    int height = nestedList.Length;
-                    int width = nestedList[0].Count;
-
-                    for (int i = 0; i < height; i++)
-                    {
-                        width = (nestedList[i].Count > width) ? nestedList[i].Count : width;
-                    }
-
-                    result = new object[height, width];
-
-                    for (int i = 0; i<nestedList.Length; i++)
-                    {
-                        for(int j = 0; j < nestedList[i].Count; j++) { result[i,j] = nestedList[i][j]; }
-                    }
-                }
+                List<object> content = array.OfType<object>().ToList();
+                if (content.All(x => x is IEnumerable))
+                    result = AddIn.ToExcel(content.OfType<IEnumerable>().Select(x => x.OfType<object>().ToList()).ToList());
                 else
                 {
-                    result = ((IEnumerable)item).Cast<object>().ToArray();
-                }                
+                    int count = content.Count();
+                    result = new object[count, 1];
+                    for (int i = 0; i < count; i++)
+                        result[i, 0] = AddIn.ToExcel(content[i]);
+                }
             }
             else
             {
-                result = new object[] { item };
+                result = new object[,] { { item } };
             }
 
-            if (transpose && (result is object[,] ))
+            if (transpose)
             {
                 object[,] transposed = new object[result.GetLength(1), result.GetLength(0)];
                 for (int i = 0; i < result.GetLength(0); i++)
@@ -90,14 +77,6 @@ namespace BH.UI.Excel.Addin
                     for (int j = 0; j < result.GetLength(1); j++)
                         transposed[j, i] = result[i, j];
                 }
-                return AddIn.ToExcel(transposed);
-            }
-
-            if (!transpose && (result is object[]))
-            {
-                object[,] transposed = new object[result.Length, 1];
-                for (int i = 0; i < result.Length; i++)
-                    transposed[i, 0] = result[i];
                 return AddIn.ToExcel(transposed);
             }
 

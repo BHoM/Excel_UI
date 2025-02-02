@@ -155,13 +155,15 @@ namespace BH.UI.Excel
                 return new object[,] { { ExcelError.ExcelErrorNull } };
 
             int height = input.Count;
-            int width = input.Select(x => x.Count).Min();
+            int width = input.Select(x => x.Count).Max();
 
             object[,] evaluated = new object[height, width];
-            for (int i = 0; i < width; i++)
+            for (int i = 0; i < height; i++)  
             {
-                for (int j = 0; j < height; j++)
-                    evaluated[j, i] = ToExcel(input[j][i]);
+                for (int j = 0; j < input[i].Count; j++)
+                    evaluated[i, j] = ToExcel(input[i][j]);
+                for (int j = input[i].Count; j < width; j++)
+                    evaluated[i, j] = "";
             }
             return evaluated;
         }
