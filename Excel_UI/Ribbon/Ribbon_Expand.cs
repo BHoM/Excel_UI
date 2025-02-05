@@ -51,7 +51,7 @@ namespace BH.UI.Excel.Addin
             item = AddIn.FromExcel(item);
             object[,] result;
 
-            if (item is IEnumerable array)
+            if (item is IEnumerable<object> array)
             {
                 List<object> content = array.Cast<object>().ToList();
                 if (content.All(x => x is IEnumerable<object>))
