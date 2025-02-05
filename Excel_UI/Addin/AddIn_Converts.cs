@@ -87,7 +87,7 @@ namespace BH.UI.Excel
         {
             try
             {
-                if (data == null || data is ExcelEmpty)
+                if (data == null || data is ExcelEmpty || data is ExcelError.ExcelErrorNull)
                     return ExcelError.ExcelErrorNull;
                 else if (data.GetType().IsPrimitive || data is string || data is object[,])
                     return data;

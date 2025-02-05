@@ -53,7 +53,7 @@ namespace BH.UI.Excel.Addin
 
             if (item is IEnumerable array)
             {
-                List<object> content = array.OfType<object>().ToList();
+                List<object> content = array.Cast<object>().ToList();
                 if (content.All(x => x is IEnumerable<object>))
                 {
                     result = AddIn.ToExcel(content.OfType<IEnumerable>().Select(x => x.OfType<object>().ToList()).ToList());
