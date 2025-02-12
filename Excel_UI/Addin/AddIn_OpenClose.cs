@@ -126,7 +126,7 @@ namespace BH.UI.Excel
             BH.UI.Base.Global.DocumentListener.OnDocumentBeginOpening(workbook.FullName);
             RestoreData();
             RestoreFormulas();
-            BH.UI.Base.Global.DocumentListener.OnDocumentEndOpening(workbook.FullName);
+            BH.UI.Base.Global.DocumentListener.OnDocumentEndOpening(workbook.FullName, "Excel", WorkbookId(workbook));
 
             // Initialise the BHoM Addin and run first calculation
             ExcelAsyncUtil.QueueAsMacro(() =>
