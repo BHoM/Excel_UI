@@ -46,7 +46,7 @@ namespace BH.UI.Excel.Addin
         /*******************************************/
 
         [ExcelFunction(Name = "BHoM.Expand", Description = "Take a list stored in a single cell and expand over multiple cells (one cell per item in the list).", Category = "UI")]
-        public static object Expand(object item, bool transpose = false)
+        public static object Expand(object item, bool transpose = false, bool onlyExpandFirstDimension = false)
         {
             item = AddIn.FromExcel(item);
             object[,] result;
@@ -54,11 +54,10 @@ namespace BH.UI.Excel.Addin
             if (item is IEnumerable<object> array)
             {
                 List<object> content = array.Cast<object>().ToList();
-                if (content.All(x => x is IEnumerable<object>))
+                if (!onlyExpandFirstDimension && content.All(x => x is IEnumerable<object>))
                 {
                     result = AddIn.ToExcel(content.OfType<IEnumerable>().Select(x => x.OfType<object>().ToList()).ToList());
-                }
-                    
+                }  
                 else
                 {
                     int count = content.Count();
