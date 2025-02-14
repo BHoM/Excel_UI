@@ -51,10 +51,44 @@ namespace BH.UI.Excel.Addin
         /*******************************************/
 
         [ExcelFunction(Name = "BHoM.Condense", Description = "Take a group of cells and store their content as a list in a single cell.", Category = "UI")]
-        public static object Condense(object[] items)
+        public static object Condense(object item)
         {
-            items = AddIn.FromExcel(items.Where(x => !(x is ExcelEmpty)).ToArray());
-            return AddIn.ToExcel(items.ToList());
+            object result = new object();
+            if (item is object[,] array
+                && (array.GetLength(0) == 1 || array.GetLength(1) == 1))
+            {
+                var filteredItems = array
+                    .Cast<object>()
+                    .Where(x => !(x is ExcelEmpty))
+                    .ToArray();
+                result = AddIn.FromExcel(filteredItems).ToList();
+                return AddIn.ToExcel(result);
+            }
+
+            if (item is object[,] matrix
+                && matrix.GetLength(0) > 1
+                && matrix.GetLength(1) > 1)
+            {
+                List<List<object>> listResult = new List<List<object>>();
+
+                for (int i = 0; i < matrix.GetLength(0); i++)
+                {
+                    List<object> row = Enumerable
+                        .Range(0, matrix.GetLength(1))
+                        .Select(x => AddIn.FromExcel(matrix[i, x])).ToList();
+                    listResult.Add(row);
+                }
+
+                result = listResult;
+                return AddIn.ToExcel(result);
+            }
+
+            else
+            {
+                result = AddIn.FromExcel(item);
+                return AddIn.ToExcel(result);
+            }
+
         }
 
         /*******************************************/
