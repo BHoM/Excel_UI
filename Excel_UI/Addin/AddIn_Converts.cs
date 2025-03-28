@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -73,7 +73,7 @@ namespace BH.UI.Excel
             for (int i = 0; i < width; i++)
             {
                 for (int j = 0; j < height; j++)
-                    evaluated[j, i] = FromExcel(input[j, i]);
+                    evaluated[j, i] = FromExcel(input[j, i] is ExcelEmpty ? null : input[j, i]);
             }
             return evaluated;
         }
@@ -87,7 +87,7 @@ namespace BH.UI.Excel
         {
             try
             {
-                if (data == null)
+                if (data == null || data is ExcelEmpty || data is ExcelError.ExcelErrorNull)
                     return ExcelError.ExcelErrorNull;
                 else if (data.GetType().IsPrimitive || data is string || data is object[,])
                     return data;
@@ -155,13 +155,15 @@ namespace BH.UI.Excel
                 return new object[,] { { ExcelError.ExcelErrorNull } };
 
             int height = input.Count;
-            int width = input.Select(x => x.Count).Min();
+            int width = input.Select(x => x.Count).Max();
 
             object[,] evaluated = new object[height, width];
-            for (int i = 0; i < width; i++)
+            for (int i = 0; i < height; i++)  
             {
-                for (int j = 0; j < height; j++)
-                    evaluated[j, i] = ToExcel(input[j][i]);
+                for (int j = 0; j < input[i].Count; j++)
+                    evaluated[i, j] = ToExcel(input[i][j]);
+                for (int j = input[i].Count; j < width; j++)
+                    evaluated[i, j] = "";
             }
             return evaluated;
         }
@@ -169,6 +171,7 @@ namespace BH.UI.Excel
         /*******************************************/
     }
 }
+
 
 
 

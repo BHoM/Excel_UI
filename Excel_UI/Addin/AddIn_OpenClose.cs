@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2024, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -126,7 +126,7 @@ namespace BH.UI.Excel
             BH.UI.Base.Global.DocumentListener.OnDocumentBeginOpening(workbook.FullName);
             RestoreData();
             RestoreFormulas();
-            BH.UI.Base.Global.DocumentListener.OnDocumentEndOpening(workbook.FullName);
+            BH.UI.Base.Global.DocumentListener.OnDocumentEndOpening(workbook.FullName, "Excel", WorkbookId(workbook));
 
             // Initialise the BHoM Addin and run first calculation
             ExcelAsyncUtil.QueueAsMacro(() =>
@@ -167,6 +167,7 @@ namespace BH.UI.Excel
         /*******************************************/
     }
 }
+
 
 
 
