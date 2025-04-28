@@ -144,9 +144,9 @@ namespace BH.UI.Excel
             // Extrat dictionary from json
             try
             {
-                CustomObject custom = Engine.Serialiser.Convert.FromJson(json) as CustomObject; // This is because the serialiser engine deserilaise top Dictionary<string, object> as CostomObject at the moment
+                Dictionary<string, object> custom = Engine.Serialiser.Convert.FromJson(json) as Dictionary<string, object>; // This is because the serialiser engine deserilaise top Dictionary<string, object> as CostomObject at the moment
                 if (custom != null)
-                    return custom.CustomData;
+                    return custom;
             }
             catch { }
 
