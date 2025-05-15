@@ -41,7 +41,7 @@ namespace BH.UI.Excel.Addin
         public override string GetCustomUI(string RibbonID)
         {
             string ribbonxml = $@"
-      <customUI xmlns='http://schemas.microsoft.com/office/2006/01/customui' loadImage='LoadImage'>
+    <customUI xmlns='http://schemas.microsoft.com/office/2009/07/customui' onLoad='Ribbon_Load'>
       <ribbon>
         <tabs>
           <tab id='bhomTab' label='BHoM'>
@@ -55,6 +55,15 @@ namespace BH.UI.Excel.Addin
                 <button id='xlwiki' onAction='OpenLink' size='large' label='BHoM Excel Wiki' imageMso='Help' tag='{BH.Engine.Excel.Query.ExcelUIWiki()}' supertip='Go to the BHoM Excel plugin wiki to view help documentation relating to this plugin.' />
                 <button id='mainwiki' onAction='OpenLink' label='BHoM Wiki' imageMso='Help' tag='{Engine.Base.Query.DocumentationURL()}' supertip='Go to the core BHoM wiki to view documentation relating the BHoM.' />
                 <button id='bhomxyz' onAction='OpenLink' imageMso='GetExternalDataFromWeb' label='bhom.xyz' tag='{Engine.Base.Query.BHoMWebsiteURL()}' supertip='Visit the BHoM website.' />
+            </group>
+            <group id='quick' label='Quick Commands'>
+                <button id='select' onAction='Select' size='large' label='Select BHoMObject' imageMso='ObjectsMultiSelect' supertip='Select BHoM Object on Connected Application UI.' />
+                <button id='isolate' onAction='Isolate' size='large' label='Isolate BHoMObject' imageMso='MarginsAdjust' supertip='Isolate selectable BHoMObject on Connected Application UI.'/>
+                <button id='directPull' onAction='Pull' size='large' label='Direct Pull From App' imageMso='MarkToDownloadMessageCopy' supertip='Quick pull elements from External Application.'/>
+                <box id='adapterBox' boxStyle='horizontal'>
+                    <button id='setAdapter' size='normal' label='Adapter' onAction='SetAdapter' imageMso='ManageQuickSteps' supertip='Establish connection configuration to External Application. Select Cell of Adapter Object' />
+                    <editBox  id='adapterName' getText='GetAdapterName' enabled='false' supertip='Adapter in current use' />
+                </box>
             </group>
           </tab>
         </tabs>
@@ -183,6 +192,17 @@ namespace BH.UI.Excel.Addin
         {
             System.Diagnostics.Process.Start(control.Tag);
         }
+
+        /*******************************************/
+
+        public void Ribbon_Load(IRibbonUI ribbonUI)
+        {
+            _ribbon = ribbonUI;
+        }
+
+        /*******************************************/
+
+        private static IRibbonUI _ribbon;
 
         /*******************************************/
     }
