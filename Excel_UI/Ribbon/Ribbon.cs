@@ -51,20 +51,22 @@ namespace BH.UI.Excel.Addin
                 <button id='condense' onAction='RunCondense' label='Condense cells' imageMso='CollapseAll' supertip='Take a group of cells and store their content as a list in a single cell.'/>
                 <button id='internalise' onAction='Internalise' label='Internalise data' imageMso='RecordsSaveRecord' supertip='Save the value of the selected cells so that the values will be available when the file is reopened.' />
             </group>
+            <group id='quick' label='Quick Commands'>
+                <button id='select' onAction='Select' size='large' label='Select BHoMObject' imageMso='ObjectsMultiSelect' supertip='Select BHoM Object on Connected Application UI.' />
+                <button id='isolate' onAction='Isolate' size='large' label='Isolate BHoMObject' imageMso='MarginsAdjust' supertip='Isolate selectable BHoMObject on Connected Application UI.'/>
+                <button id='directPull' onAction='DirectPull' size='large' label='Direct Pull From App' imageMso='MarkToDownloadMessageCopy' supertip='Quick pull elements from External Application.'/>
+                <button id='directPush' onAction='DirectPush' size='large' label='Direct Push To App' imageMso='BlogPublishMenu' supertip='Quick push BHoMObjects to External Application.'/>
+                <box id='adapterBox' boxStyle='horizontal'>
+                    <button id='setAdapter' size='normal' label='Adapter' onAction='SetAdapter' imageMso='SetupClassicOffline' supertip='Establish connection configuration to External Application. Select Cell of Adapter Object' />
+                    <editBox  id='adapterName' getText='GetAdapterName' enabled='false' supertip='Adapter in current use' />
+                </box>
+            </group>
             <group id='help' label='Help'>
                 <button id='xlwiki' onAction='OpenLink' size='large' label='BHoM Excel Wiki' imageMso='Help' tag='{BH.Engine.Excel.Query.ExcelUIWiki()}' supertip='Go to the BHoM Excel plugin wiki to view help documentation relating to this plugin.' />
                 <button id='mainwiki' onAction='OpenLink' label='BHoM Wiki' imageMso='Help' tag='{Engine.Base.Query.DocumentationURL()}' supertip='Go to the core BHoM wiki to view documentation relating the BHoM.' />
                 <button id='bhomxyz' onAction='OpenLink' imageMso='GetExternalDataFromWeb' label='bhom.xyz' tag='{Engine.Base.Query.BHoMWebsiteURL()}' supertip='Visit the BHoM website.' />
             </group>
-            <group id='quick' label='Quick Commands'>
-                <button id='select' onAction='Select' size='large' label='Select BHoMObject' imageMso='ObjectsMultiSelect' supertip='Select BHoM Object on Connected Application UI.' />
-                <button id='isolate' onAction='Isolate' size='large' label='Isolate BHoMObject' imageMso='MarginsAdjust' supertip='Isolate selectable BHoMObject on Connected Application UI.'/>
-                <button id='directPull' onAction='Pull' size='large' label='Direct Pull From App' imageMso='MarkToDownloadMessageCopy' supertip='Quick pull elements from External Application.'/>
-                <box id='adapterBox' boxStyle='horizontal'>
-                    <button id='setAdapter' size='normal' label='Adapter' onAction='SetAdapter' imageMso='ManageQuickSteps' supertip='Establish connection configuration to External Application. Select Cell of Adapter Object' />
-                    <editBox  id='adapterName' getText='GetAdapterName' enabled='false' supertip='Adapter in current use' />
-                </box>
-            </group>
+
           </tab>
         </tabs>
       </ribbon>
