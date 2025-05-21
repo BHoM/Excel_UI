@@ -131,6 +131,30 @@ namespace BH.UI.Excel
             m_Adapter.Execute(customCommand);
         }
 
+        public static string Execute(string command)
+        {
+            BH.oM.Adapter.Commands.CustomCommand customCommand = new oM.Adapter.Commands.CustomCommand();
+            customCommand.Command = command;
+            customCommand.Parameters = new Dictionary<string, object>();
+
+            var output = m_Adapter.Execute(customCommand);
+            if (output == null || output.Item1 == null|| output.Item1.Count == 0)
+            {
+                return null;
+            }
+            
+            object result = ToExcel(output.Item1);
+
+            if (output.Item1 != null)
+            {                
+                string id = GetId(result as string);
+                m_InternalisedData[id] = output.Item1;
+                WriteJsonToSheet("BHoM_DataHidden", m_InternalisedData);
+            }
+
+            return (string) result;
+        }
+
         /*******************************************/
         /**** Private Fields                   *****/
         /*******************************************/

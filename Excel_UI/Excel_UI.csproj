@@ -136,7 +136,7 @@
     <Compile Include="Addin\AddIn.cs" />
     <Compile Include="Caller\CallerFormula_MethodCall.cs" />
     <Compile Include="Components\Engine\GetEvents.cs" />
-    <Compile Include="Ribbon\Commands\Ribbon_Pull.cs" />
+    <Compile Include="Ribbon\Commands\Ribbon_DIrectPull.cs" />
     <Compile Include="Ribbon\Commands\Ribbon_SetAdapter.cs" />
     <Compile Include="Ribbon\Commands\Ribbon_Isolate.cs" />
     <Compile Include="Ribbon\Commands\Ribbon_Select.cs" />
