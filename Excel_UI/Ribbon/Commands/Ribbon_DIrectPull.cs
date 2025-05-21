@@ -44,11 +44,12 @@ namespace BH.UI.Excel.Addin
         public void DirectPull(IRibbonControl control)
         {
             Application app = ExcelDnaUtil.Application as Application;
+            Range target = (app.Selection as Range)[1];
             string command = "DirectPull";
             string result = AddIn.Execute(command);
             ExcelAsyncUtil.QueueAsMacro(() =>
             {
-                AddIn.WriteFormula($"=BHoM.Expand({result})");
+                ((dynamic) target).Formula2 = $"=BHoM.Expand(\"{result}\")";
             });
         }
 
