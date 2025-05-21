@@ -138,6 +138,7 @@
     <Compile Include="Components\Engine\GetEvents.cs" />
     <Compile Include="Ribbon\Commands\Ribbon_DirectPull.cs" />
     <Compile Include="Ribbon\Commands\Ribbon_DirectPush.cs" />
+    <Compile Include="Ribbon\Commands\Ribbon_CleanCache.cs" />
     <Compile Include="Ribbon\Commands\Ribbon_SetAdapter.cs" />
     <Compile Include="Ribbon\Commands\Ribbon_Isolate.cs" />
     <Compile Include="Ribbon\Commands\Ribbon_Select.cs" />
