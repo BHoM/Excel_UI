@@ -45,12 +45,6 @@ namespace BH.UI.Excel.Addin
       <ribbon>
         <tabs>
           <tab id='bhomTab' label='BHoM'>
-            {GetRibbonXml()}
-            <group id='ui' label='UI'>
-                <button id='expand' onAction='RunExpand' label='Expand list' imageMso='OutlineExpandAll' supertip='Take a list stored in a single cell and expand over multiple cells (one cell per item in the list).'/>
-                <button id='condense' onAction='RunCondense' label='Condense cells' imageMso='CollapseAll' supertip='Take a group of cells and store their content as a list in a single cell.'/>
-                <button id='internalise' onAction='Internalise' label='Internalise data' imageMso='RecordsSaveRecord' supertip='Save the value of the selected cells so that the values will be available when the file is reopened.' />
-            </group>
             <group id='quick' label='Quick Commands'>
                 <button id='select' onAction='Select' size='large' label='Select BHoMObject' imageMso='ObjectsMultiSelect' supertip='Select BHoM Object on Connected Application UI.' />
                 <button id='isolate' onAction='Isolate' size='large' label='Isolate BHoMObject' imageMso='MarginsAdjust' supertip='Isolate selectable BHoMObject on Connected Application UI.'/>
@@ -60,6 +54,12 @@ namespace BH.UI.Excel.Addin
                     <button id='setAdapter' size='normal' label='Adapter' onAction='SetAdapter' imageMso='SetupClassicOffline' supertip='Establish connection configuration to External Application. Select Cell of Adapter Object' />
                     <editBox  id='adapterName' getText='GetAdapterName' enabled='false' supertip='Adapter in current use' />
                 </box>
+            </group>
+            {GetRibbonXml()}
+            <group id='ui' label='UI'>
+                <button id='expand' onAction='RunExpand' label='Expand list' imageMso='OutlineExpandAll' supertip='Take a list stored in a single cell and expand over multiple cells (one cell per item in the list).'/>
+                <button id='condense' onAction='RunCondense' label='Condense cells' imageMso='CollapseAll' supertip='Take a group of cells and store their content as a list in a single cell.'/>
+                <button id='internalise' onAction='Internalise' label='Internalise data' imageMso='RecordsSaveRecord' supertip='Save the value of the selected cells so that the values will be available when the file is reopened.' />
             </group>
             <group id='help' label='Help'>
                 <button id='xlwiki' onAction='OpenLink' size='large' label='BHoM Excel Wiki' imageMso='Help' tag='{BH.Engine.Excel.Query.ExcelUIWiki()}' supertip='Go to the BHoM Excel plugin wiki to view help documentation relating to this plugin.' />

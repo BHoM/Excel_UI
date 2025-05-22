@@ -93,14 +93,11 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        public static void Execute(IExecuteCommand command, ActionConfig actionConfig = null)
-        {
-            m_Adapter.Execute(command, actionConfig);
-        }
+
 
         /*******************************************/
 
-        public static void Execute(string command, Range objects )
+        public static void Execute(string command, Range objects, bool isLazy = false )
         {
             BH.oM.Adapter.Commands.CustomCommand customCommand = new oM.Adapter.Commands.CustomCommand();
             customCommand.Command = command;
@@ -125,7 +122,8 @@ namespace BH.UI.Excel
 
             customCommand.Parameters = new Dictionary<string, object>()
             {
-                { "BHoMObjects" ,target }
+                { "BHoMObjects" ,target },
+                { "IsLazy" , isLazy }
             };
 
             m_Adapter.Execute(customCommand);
@@ -160,6 +158,12 @@ namespace BH.UI.Excel
         /*******************************************/
         private static BHoMAdapter m_Adapter;
         private static string m_AdapterName = "----";
+
+        private static void Execute(IExecuteCommand command, ActionConfig actionConfig = null)
+        {
+            m_Adapter.Execute(command, actionConfig);
+        }
+
     }
 }
 
