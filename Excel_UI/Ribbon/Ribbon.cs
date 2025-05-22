@@ -41,10 +41,20 @@ namespace BH.UI.Excel.Addin
         public override string GetCustomUI(string RibbonID)
         {
             string ribbonxml = $@"
-      <customUI xmlns='http://schemas.microsoft.com/office/2006/01/customui' loadImage='LoadImage'>
+    <customUI xmlns='http://schemas.microsoft.com/office/2009/07/customui' onLoad='Ribbon_Load'>
       <ribbon>
         <tabs>
           <tab id='bhomTab' label='BHoM'>
+            <group id='quick' label='Quick Commands'>
+                <button id='select' onAction='Select' size='large' label='Select BHoMObject' imageMso='ObjectsMultiSelect' supertip='Select BHoM Object on Connected Application UI.' />
+                <button id='isolate' onAction='Isolate' size='large' label='Isolate BHoMObject' imageMso='MarginsAdjust' supertip='Isolate selectable BHoMObject on Connected Application UI.'/>
+                <button id='directPull' onAction='DirectPull' size='large' label='Direct Pull From App' imageMso='MarkToDownloadMessageCopy' supertip='Quick pull elements from External Application.'/>
+                <button id='directPush' onAction='DirectPush' size='large' label='Direct Push To App' imageMso='BlogPublishMenu' supertip='Quick push BHoMObjects to External Application.'/>
+                <box id='adapterBox' boxStyle='horizontal'>
+                    <button id='setAdapter' size='normal' label='Adapter' onAction='SetAdapter' imageMso='SetupClassicOffline' supertip='Establish connection configuration to External Application. Select Cell of Adapter Object' />
+                    <editBox  id='adapterName' getText='GetAdapterName' enabled='false' supertip='Adapter in current use' />
+                </box>
+            </group>
             {GetRibbonXml()}
             <group id='ui' label='UI'>
                 <button id='expand' onAction='RunExpand' label='Expand list' imageMso='OutlineExpandAll' supertip='Take a list stored in a single cell and expand over multiple cells (one cell per item in the list).'/>
@@ -56,6 +66,7 @@ namespace BH.UI.Excel.Addin
                 <button id='mainwiki' onAction='OpenLink' label='BHoM Wiki' imageMso='Help' tag='{Engine.Base.Query.DocumentationURL()}' supertip='Go to the core BHoM wiki to view documentation relating the BHoM.' />
                 <button id='bhomxyz' onAction='OpenLink' imageMso='GetExternalDataFromWeb' label='bhom.xyz' tag='{Engine.Base.Query.BHoMWebsiteURL()}' supertip='Visit the BHoM website.' />
             </group>
+
           </tab>
         </tabs>
       </ribbon>
@@ -183,6 +194,17 @@ namespace BH.UI.Excel.Addin
         {
             System.Diagnostics.Process.Start(control.Tag);
         }
+
+        /*******************************************/
+
+        public void Ribbon_Load(IRibbonUI ribbonUI)
+        {
+            _ribbon = ribbonUI;
+        }
+
+        /*******************************************/
+
+        private static IRibbonUI _ribbon;
 
         /*******************************************/
     }
