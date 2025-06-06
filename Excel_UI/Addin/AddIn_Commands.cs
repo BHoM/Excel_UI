@@ -20,19 +20,20 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
-using System;
-using System.IO;
-using System.Reflection;
-using System.Linq;
-using ExcelDna.Integration;
-using System.Collections.Generic;
-using System.Collections;
-using System.Linq.Expressions;
-using BH.UI.Excel.Templates;
-using BH.oM.Adapter;
 using BH.Adapter;
+using BH.oM.Adapter;
+using BH.oM.Adapter.Commands;
 using BH.oM.Base;
+using BH.UI.Excel.Templates;
+using ExcelDna.Integration;
 using Microsoft.Office.Interop.Excel;
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Linq.Expressions;
+using System.Reflection;
 
 
 namespace BH.UI.Excel
@@ -97,7 +98,7 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        public static void Execute(string command, Range objects, bool isLazy = false )
+        public static void Execute2(string command, Range objects, bool isLazy = false )
         {
             BH.oM.Adapter.Commands.CustomCommand customCommand = new oM.Adapter.Commands.CustomCommand();
             customCommand.Command = command;
@@ -128,6 +129,37 @@ namespace BH.UI.Excel
 
             m_Adapter.Execute(customCommand);
         }
+
+        /*******************************************/
+
+        public static void Execute(string command, Range objects)
+        {
+            Type commandType = BH.Engine.Base.Create.Type($"BH.oM.Adapter.Commands.{command}");
+            List<IBHoMObject> target = new List<IBHoMObject>();
+            foreach (Range cell in objects)
+            {
+                object value = cell.Value;
+                if (value != null)
+                {
+                    // Store the item if exists
+                    string id = GetId(cell.Value as string);
+                    object item = GetObject(id);
+                    target.Add(item as IBHoMObject);
+                }
+            }
+
+            if (target.Count == 0)
+            {
+                return;
+            }
+
+            Dictionary<string, object> parameters = new Dictionary<string, object>() { { "Identifiers", target } };
+            Object runCommand = new Object(commandType, parameters);
+
+            m_Adapter.Execute(runCommand as IExecuteCommand);
+        }
+
+        /*******************************************/
 
         public static string Execute(string command)
         {

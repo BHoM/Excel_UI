@@ -45,7 +45,7 @@ namespace BH.UI.Excel.Addin
         {
             Application app = ExcelDnaUtil.Application as Application;
             string command = "DirectPush";
-            AddIn.Execute(command, app.Selection as Range, true);
+            AddIn.Execute(command, app.Selection as Range);
         }
 
         /*******************************************/
