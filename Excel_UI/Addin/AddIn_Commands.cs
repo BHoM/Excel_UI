@@ -22,18 +22,13 @@
 
 using BH.Adapter;
 using BH.oM.Adapter;
-using BH.oM.Adapter.Commands;
 using BH.oM.Base;
-using BH.UI.Excel.Templates;
 using ExcelDna.Integration;
 using Microsoft.Office.Interop.Excel;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Linq.Expressions;
-using System.Reflection;
+using BH.UI.Excel;
 
 
 namespace BH.UI.Excel
@@ -153,10 +148,12 @@ namespace BH.UI.Excel
                 return;
             }
 
-            Dictionary<string, object> parameters = new Dictionary<string, object>() { { "Identifiers", target } };
-            Object runCommand = new Object(commandType, parameters);
+            dynamic runCommand = Activator.CreateInstance(commandType);
 
-            m_Adapter.Execute(runCommand as IExecuteCommand);
+            commandType.GetProperty("Identifiers")?.SetValue(runCommand, target.Cast<IObject>().ToList());
+
+            m_Adapter.Execute(runCommand,actionConfig : null);
+
         }
 
         /*******************************************/
@@ -190,12 +187,6 @@ namespace BH.UI.Excel
         /*******************************************/
         private static BHoMAdapter m_Adapter;
         private static string m_AdapterName = "----";
-
-        private static void Execute(IExecuteCommand command, ActionConfig actionConfig = null)
-        {
-            m_Adapter.Execute(command, actionConfig);
-        }
-
     }
 }
 
