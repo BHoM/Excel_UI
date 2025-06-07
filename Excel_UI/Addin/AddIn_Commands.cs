@@ -75,6 +75,8 @@ namespace BH.UI.Excel
             }
         }
 
+        /*******************************************/
+
         public static string GetAdapterName()
         {
             if (m_Adapter != null)
@@ -89,11 +91,63 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
+        public static void Execute(string command, Range objects)
+        {
+            Type commandType = BH.Engine.Base.Create.Type($"BH.oM.Adapter.Commands.{command}");
+            dynamic runCommand = Activator.CreateInstance(commandType);
 
+            List<IBHoMObject> target = new List<IBHoMObject>();
+            foreach (Range cell in objects)
+            {
+                object value = cell.Value;
+                if (value != null)
+                {
+                    // Store the item if exists
+                    string id = GetId(cell.Value as string);
+                    object item = GetObject(id);
+                    target.Add(item as IBHoMObject);
+                }
+            }
+
+            if (target.Count == 0)
+            {
+                return;
+            }
+
+            commandType.GetProperty("Identifiers")?.SetValue(runCommand, target.Cast<IObject>().ToList());
+
+            m_Adapter.Execute(runCommand,actionConfig : null);
+
+        }
 
         /*******************************************/
 
-        public static void Execute2(string command, Range objects, bool isLazy = false )
+        public static string Execute(string command)
+        {
+            Type commandType = BH.Engine.Base.Create.Type($"BH.oM.Adapter.Commands.{command}");
+            dynamic runCommand = Activator.CreateInstance(commandType);
+            var output = m_Adapter.Execute(runCommand, actionConfig: null);
+
+            if (output == null || output.Item1 == null|| output.Item1.Count == 0)
+            {
+                return null;
+            }
+            
+            object result = ToExcel(output.Item1);
+
+            if (output.Item1 != null)
+            {                
+                string id = GetId(result as string);
+                m_InternalisedData[id] = output.Item1;
+                WriteJsonToSheet("BHoM_DataHidden", m_InternalisedData);
+            }
+
+            return (string) result;
+        }
+
+        /*******************************************/
+
+        public static void ExecuteCustomCommand(string command, Range objects)
         {
             BH.oM.Adapter.Commands.CustomCommand customCommand = new oM.Adapter.Commands.CustomCommand();
             customCommand.Command = command;
@@ -118,8 +172,7 @@ namespace BH.UI.Excel
 
             customCommand.Parameters = new Dictionary<string, object>()
             {
-                { "BHoMObjects" ,target },
-                { "IsLazy" , isLazy }
+                { "Parameters" ,target },
             };
 
             m_Adapter.Execute(customCommand);
@@ -127,60 +180,6 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        public static void Execute(string command, Range objects)
-        {
-            Type commandType = BH.Engine.Base.Create.Type($"BH.oM.Adapter.Commands.{command}");
-            List<IBHoMObject> target = new List<IBHoMObject>();
-            foreach (Range cell in objects)
-            {
-                object value = cell.Value;
-                if (value != null)
-                {
-                    // Store the item if exists
-                    string id = GetId(cell.Value as string);
-                    object item = GetObject(id);
-                    target.Add(item as IBHoMObject);
-                }
-            }
-
-            if (target.Count == 0)
-            {
-                return;
-            }
-
-            dynamic runCommand = Activator.CreateInstance(commandType);
-
-            commandType.GetProperty("Identifiers")?.SetValue(runCommand, target.Cast<IObject>().ToList());
-
-            m_Adapter.Execute(runCommand,actionConfig : null);
-
-        }
-
-        /*******************************************/
-
-        public static string Execute(string command)
-        {
-            BH.oM.Adapter.Commands.CustomCommand customCommand = new oM.Adapter.Commands.CustomCommand();
-            customCommand.Command = command;
-            customCommand.Parameters = new Dictionary<string, object>();
-
-            var output = m_Adapter.Execute(customCommand);
-            if (output == null || output.Item1 == null|| output.Item1.Count == 0)
-            {
-                return null;
-            }
-            
-            object result = ToExcel(output.Item1);
-
-            if (output.Item1 != null)
-            {                
-                string id = GetId(result as string);
-                m_InternalisedData[id] = output.Item1;
-                WriteJsonToSheet("BHoM_DataHidden", m_InternalisedData);
-            }
-
-            return (string) result;
-        }
 
         /*******************************************/
         /**** Private Fields                   *****/
