@@ -21,14 +21,13 @@
  */
 
 using BH.Adapter;
-using BH.oM.Adapter;
 using BH.oM.Base;
 using ExcelDna.Integration;
 using Microsoft.Office.Interop.Excel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using BH.UI.Excel;
+using System.Security.Cryptography;
 
 
 namespace BH.UI.Excel
@@ -85,7 +84,7 @@ namespace BH.UI.Excel
             }
             else
             {
-                return "----";
+                return string.Empty;
             }
         }
 
@@ -96,7 +95,7 @@ namespace BH.UI.Excel
             Type commandType = BH.Engine.Base.Create.Type($"BH.oM.Adapter.Commands.{command}");
             dynamic runCommand = Activator.CreateInstance(commandType);
 
-            List<IBHoMObject> target = new List<IBHoMObject>();
+            List<IObject> target = new List<IObject>();
             foreach (Range cell in objects)
             {
                 object value = cell.Value;
@@ -105,7 +104,7 @@ namespace BH.UI.Excel
                     // Store the item if exists
                     string id = GetId(cell.Value as string);
                     object item = GetObject(id);
-                    target.Add(item as IBHoMObject);
+                    target.Add(item as IObject);
                 }
             }
 
@@ -114,7 +113,7 @@ namespace BH.UI.Excel
                 return;
             }
 
-            commandType.GetProperty("Identifiers")?.SetValue(runCommand, target.Cast<IObject>().ToList());
+            commandType.GetProperty("Identifiers")?.SetValue(runCommand, target);
 
             m_Adapter.Execute(runCommand,actionConfig : null);
 
@@ -147,45 +146,22 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        public static void ExecuteCustomCommand(string command, Range objects)
+        public static void ExecuteCustomCommand(string command, Dictionary<string, object> parameters)
         {
             BH.oM.Adapter.Commands.CustomCommand customCommand = new oM.Adapter.Commands.CustomCommand();
             customCommand.Command = command;
             List<IBHoMObject> target = new List<IBHoMObject>();
 
-            foreach (Range cell in objects)
-            {
-                object value = cell.Value;
-                if (value != null)
-                {
-                    // Store the item if exists
-                    string id = GetId(cell.Value as string);
-                    object item = GetObject(id);
-                    target.Add(item as IBHoMObject);
-                }
-            }
-
-            if (target.Count == 0)
-            {
-                return;
-            }
-
-            customCommand.Parameters = new Dictionary<string, object>()
-            {
-                { "Parameters" ,target },
-            };
+            customCommand.Parameters = parameters;
 
             m_Adapter.Execute(customCommand);
         }
 
         /*******************************************/
-
-
-        /*******************************************/
         /**** Private Fields                   *****/
         /*******************************************/
         private static BHoMAdapter m_Adapter;
-        private static string m_AdapterName = "----";
+        private static string m_AdapterName = string.Empty;
     }
 }
 
