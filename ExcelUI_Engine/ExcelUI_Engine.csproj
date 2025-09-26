@@ -63,6 +63,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetPath)"  "C:\ProgramData\BHoM\Assemblies" /Y</PostBuildEvent>
+    <PostBuildEvent>xcopy "$(TargetPath)"  "$(ProgramData)\BHoM\Assemblies" /Y</PostBuildEvent>
   </PropertyGroup>
 </Project>
