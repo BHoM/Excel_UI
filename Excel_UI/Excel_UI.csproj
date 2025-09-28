@@ -34,38 +34,38 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Adapter_Engine">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Adapter_Engine.dll</HintPath>
+      <HintPath>$(ProgramData)\BHoM\Assemblies\Adapter_Engine.dll</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="Adapter_oM">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Adapter_oM.dll</HintPath>
+      <HintPath>$(ProgramData)\BHoM\Assemblies\Adapter_oM.dll</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="BHoM">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM.dll</HintPath>
+      <HintPath>$(ProgramData)\BHoM\Assemblies\BHoM.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="BHoM_Adapter">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM_Adapter.dll</HintPath>
+      <HintPath>$(ProgramData)\BHoM\Assemblies\BHoM_Adapter.dll</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="BHoM_Engine">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM_Engine.dll</HintPath>
+      <HintPath>$(ProgramData)\BHoM\Assemblies\BHoM_Engine.dll</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="BHoM_UI">
-      <HintPath>C:\ProgramData\BHoM\Assemblies\BHoM_UI.dll</HintPath>
+      <HintPath>$(ProgramData)\BHoM\Assemblies\BHoM_UI.dll</HintPath>
       <Private>False</Private>
       <SpecificVersion>False</SpecificVersion>
     </Reference>
     <Reference Include="Data_oM">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Data_oM.dll</HintPath>
+      <HintPath>$(ProgramData)\BHoM\Assemblies\Data_oM.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="ExcelDna.Integration, Version=1.1.0.0, Culture=neutral, PublicKeyToken=f225e9659857edbe, processorArchitecture=MSIL">
@@ -89,12 +89,12 @@
     <Reference Include="PresentationFramework" />
     <Reference Include="Reflection_Engine">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Reflection_Engine.dll</HintPath>
+      <HintPath>$(ProgramData)\BHoM\Assemblies\Reflection_Engine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Serialiser_Engine">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Serialiser_Engine.dll</HintPath>
+      <HintPath>$(ProgramData)\BHoM\Assemblies\Serialiser_Engine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="System" />
@@ -109,17 +109,17 @@
     <Reference Include="System.Xml" />
     <Reference Include="UI_Engine">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\ProgramData\BHoM\Assemblies\UI_Engine.dll</HintPath>
+      <HintPath>$(ProgramData)\BHoM\Assemblies\UI_Engine.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="UI_oM">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\ProgramData\BHoM\Assemblies\UI_oM.dll</HintPath>
+      <HintPath>$(ProgramData)\BHoM\Assemblies\UI_oM.dll</HintPath>
       <Private>False</Private>
     </Reference>
     <Reference Include="Versioning_oM">
       <SpecificVersion>False</SpecificVersion>
-      <HintPath>C:\ProgramData\BHoM\Assemblies\Versioning_oM.dll</HintPath>
+      <HintPath>$(ProgramData)\BHoM\Assemblies\Versioning_oM.dll</HintPath>
       <Private>False</Private>
     </Reference>
   </ItemGroup>
@@ -208,18 +208,18 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy "$(TargetPath)"  "C:\ProgramData\BHoM\Assemblies" /Y
+    <PostBuildEvent>xcopy "$(TargetPath)"  "$(ProgramData)\BHoM\Assemblies" /Y
 
-xcopy "$(TargetDir)*.xll"  "C:\ProgramData\BHoM\Assemblies" /Y
-xcopy "$(TargetDir)*.dna"  "C:\ProgramData\BHoM\Assemblies" /Y
-xcopy "$(TargetDir)ExcelDna.IntelliSense.dll"  "C:\ProgramData\BHoM\Assemblies" /Y
-xcopy "$(TargetDir)ExcelDna.Registration.dll"  "C:\ProgramData\BHoM\Assemblies" /Y
+xcopy "$(TargetDir)*.xll"  "$(ProgramData)\BHoM\Assemblies" /Y
+xcopy "$(TargetDir)*.dna"  "$(ProgramData)\BHoM\Assemblies" /Y
+xcopy "$(TargetDir)ExcelDna.IntelliSense.dll"  "$(ProgramData)\BHoM\Assemblies" /Y
+xcopy "$(TargetDir)ExcelDna.Registration.dll"  "$(ProgramData)\BHoM\Assemblies" /Y
 
 call "$(DevEnvDir)..\..\VC\Auxiliary\Build\vcvarsall.bat" x86
 call "$(DevEnvDir)..\Tools\VsDevCmd.bat"
-xcopy "$(ProjectDir)..\packages\ExcelDna.Integration.1.5.1\lib\net452\ExcelDna.Integration.dll" "C:\ProgramData\BHoM\Assemblies" /Y
-tlbexp.exe "C:\ProgramData\BHoM\Assemblies\$(TargetName)$(TargetExt)" /out:"C:\ProgramData\BHoM\Assemblies\$(TargetName).tlb"
-del "C:\ProgramData\BHoM\Assemblies\ExcelDna.Integration.dll"</PostBuildEvent>
+xcopy "$(ProjectDir)..\packages\ExcelDna.Integration.1.5.1\lib\net452\ExcelDna.Integration.dll" "$(ProgramData)\BHoM\Assemblies" /Y
+tlbexp.exe "$(ProgramData)\BHoM\Assemblies\$(TargetName)$(TargetExt)" /out:"$(ProgramData)\BHoM\Assemblies\$(TargetName).tlb"
+del "$(ProgramData)\BHoM\Assemblies\ExcelDna.Integration.dll"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
