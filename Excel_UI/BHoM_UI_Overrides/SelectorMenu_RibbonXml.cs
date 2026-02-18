@@ -66,7 +66,12 @@ namespace BH.UI.Excel.Templates
         public object GetItem(string id)
         {
             if (m_ItemLinks.ContainsKey(id))
-                return m_ItemLinks[id];
+            {
+                SearchItem searchItem = m_ItemLinks[id];
+                if (searchItem.Item == null && !string.IsNullOrEmpty(searchItem.Json))
+                    searchItem.Item = BH.Engine.Serialiser.Convert.FromJson(searchItem.Json);
+                return searchItem.Item;
+            }
             else
                 return null;
         }
@@ -83,14 +88,14 @@ namespace BH.UI.Excel.Templates
 
         /*******************************************/
 
-        protected override void AddTree(XmlElement menu, Tree<object> itemTree)
+        protected override void AddTree(XmlElement menu, Tree<SearchItem> itemTree)
         {
             AppendMenuTree(itemTree, menu);
         }
 
         /*******************************************/
 
-        private void AppendMenuTree(Tree<object> tree, XmlElement menu)
+        private void AppendMenuTree(Tree<SearchItem> tree, XmlElement menu)
         {
             XmlDocument document = menu.OwnerDocument;
             XmlElement element;
@@ -98,12 +103,12 @@ namespace BH.UI.Excel.Templates
             if (tree.Children.Count > 0)
             {
                 element = document.CreateElement("menu");
-                foreach (Tree<object> childTree in tree.Children.Values.OrderBy(x => x.Name))
+                foreach (Tree<SearchItem> childTree in tree.Children.Values.OrderBy(x => x.Name))
                     AppendMenuTree(childTree, element);
             }
             else
             {
-                object method = tree.Value;
+                SearchItem method = tree.Value;
                 element = document.CreateElement("button");
                 element.SetAttribute("onAction", "FillFormula");
                 string description = method.IDescription();
@@ -126,7 +131,7 @@ namespace BH.UI.Excel.Templates
         /**** Private Fields                    ****/
         /*******************************************/
 
-        private Dictionary<string, object> m_ItemLinks = new Dictionary<string, object>();
+        private Dictionary<string, SearchItem> m_ItemLinks = new Dictionary<string, SearchItem>();
 
         /*******************************************/
     }
