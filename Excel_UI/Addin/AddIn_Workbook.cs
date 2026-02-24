@@ -66,12 +66,12 @@ namespace BH.UI.Excel
             // Look for the sheet in the active workbook
             Worksheet sheet = null;
             if (workbook.Sheets.OfType<Worksheet>().Any(x => x.Name == name))
-                sheet = workbook.Sheets[name];
+                sheet = (Worksheet)workbook.Sheets[name];
 
             // If sheet doesn't exist, create it if requested
             if (sheet == null && addIfMissing)
             {
-                sheet = workbook.Sheets.Add();
+                sheet = (Worksheet)workbook.Sheets.Add();
                 sheet.Name = name;
 
                 if (isHidden)
@@ -155,7 +155,7 @@ namespace BH.UI.Excel
             if (workbook == null)
                 return null;
 
-            DocumentProperties properties = workbook.CustomDocumentProperties;
+            DocumentProperties properties = (DocumentProperties)workbook.CustomDocumentProperties;
             foreach (DocumentProperty prop in properties)
             {
                 if (prop.Name == "BHoM_Guid")

@@ -107,7 +107,7 @@ namespace BH.UI.Excel
             {
                 try
                 {
-                    sheet.Cells[index, 1].Value = json.Substring(i, Math.Min(characterLimit, json.Length - i));
+                    ((Range)sheet.Cells[index, 1]).Value = json.Substring(i, Math.Min(characterLimit, json.Length - i));
                     index++;
                 }
                 catch { }
@@ -129,7 +129,7 @@ namespace BH.UI.Excel
             {
                 try
                 {
-                    string segment = sheet.Cells[i, 1].Value as string;
+                    string segment = ((Range)sheet.Cells[i, 1]).Value as string;
                     if (string.IsNullOrEmpty(segment))
                         break;
                     else

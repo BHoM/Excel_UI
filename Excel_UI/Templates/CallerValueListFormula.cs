@@ -137,13 +137,13 @@ namespace BH.UI.Excel.Templates
             {
                 try
                 {
-                    string name = sheet.Cells[i,1].Value as string;
+                    string name = ((Range)sheet.Cells[i,1]).Value as string;
                     if (string.IsNullOrEmpty(name))
                     {
                         // Need to add the choices here
-                        sheet.Cells[i, 1].Value = collectionName;
+                        ((Range)sheet.Cells[i, 1]).Value = collectionName;
                         for (int j = 0; j < choices.Count; j++)
-                            sheet.Cells[i, j + 2].Value = choices[j];
+                            ((Range)sheet.Cells[i, j + 2]).Value = choices[j];
                         break;
                     } 
                     else if (collectionName == name)
