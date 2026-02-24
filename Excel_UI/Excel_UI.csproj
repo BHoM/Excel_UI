@@ -7,6 +7,7 @@
     <UseWPF>true</UseWPF>
     <ImportWindowsDesktopTargets>true</ImportWindowsDesktopTargets>
     <OutputPath>..\Build\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <FallbackCulture>en-US</FallbackCulture>
     <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
 	<Description>https://github.com/BHoM/Excel_UI</Description>

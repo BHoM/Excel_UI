@@ -4,10 +4,11 @@
     <OutputType>Library</OutputType>
     <RootNamespace>BH.Engine.Excel</RootNamespace>
     <OutputPath>..\Build\</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <AssemblyTitle>ExcelUI_Engine</AssemblyTitle>
     <Description>https://github.com/BHoM/Excel_UI</Description>
     <Product>BHoM</Product>
-    <Copyright>Copyright © https://github.com/BHoM</Copyright>
+    <Copyright>Copyright ï¿½ https://github.com/BHoM</Copyright>
     <AssemblyVersion>9.0.0.0</AssemblyVersion>
     <FileVersion>9.1.0.0</FileVersion>
   </PropertyGroup>
