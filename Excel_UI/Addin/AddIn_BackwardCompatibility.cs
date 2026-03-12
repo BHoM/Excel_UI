@@ -77,15 +77,15 @@ namespace BH.UI.Excel
                 string callerType = "";
                 try
                 {
-                    Range cell = row.Cells[1, 2];
+                    Range cell = (Range)row.Cells[1, 2];
                     callerType = cell.Value.ToString();
 
                     int col = 3;
-                    cell = row.Cells[1, col++];
+                    cell = (Range)row.Cells[1, col++];
                     while (cell.Value != null && cell.Value is string && (cell.Value as string).Length > 0)
                     {
                         str += cell.Value;
-                        cell = row.Cells[1, col++];
+                        cell = (Range)row.Cells[1, col++];
                     }
                 }
                 catch { }
