@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -104,9 +104,9 @@ namespace BH.UI.Excel
             for (int i = 2; i < 10000; i++)
             {
                 // Recover the information about the formula
-                string formulaName = sheet.Cells[i, 1].Value as string;
-                string callerJson = sheet.Cells[i, 2].Value as string;
-                string oldFunction = sheet.Cells[i, 3].Value as string;
+                string formulaName = ((Range)sheet.Cells[i, 1]).Value as string;
+                string callerJson = ((Range)sheet.Cells[i, 2]).Value as string;
+                string oldFunction = ((Range)sheet.Cells[i, 3]).Value as string;
                 if (formulaName == null || formulaName.Length == 0 || callerJson == null || callerJson.Length == 0)
                     break;
 
@@ -169,13 +169,13 @@ namespace BH.UI.Excel
             {
                 try
                 {
-                    string name = choicesSheet.Cells[i, 1].Value as string;
+                    string name = ((Range)choicesSheet.Cells[i, 1]).Value as string;
                     if (string.IsNullOrEmpty(name))
                     {
                         // Need to add the choices here - this should not be needed on loading a sheet, but as a safety net
-                        choicesSheet.Cells[i, 1].Value = collectionName;
+                        ((Range)choicesSheet.Cells[i, 1]).Value = collectionName;
                         for (int j = 0; j < enumChoices.Length; j++)
-                            choicesSheet.Cells[i, j + 2].Value = enumChoices.GetValue(j).ToString();
+                            ((Range)choicesSheet.Cells[i, j + 2]).Value = enumChoices.GetValue(j).ToString();
                         break;
                     }
                     else
@@ -247,11 +247,11 @@ namespace BH.UI.Excel
                 lock(m_Mutex)
                 {
                     // Get teh sheet ID
-                    string sheetId = sheet.Cells[1, 1].Value as string;
+                    string sheetId = ((Range)sheet.Cells[1, 1]).Value as string;
                     if (sheetId == null)
                     {
                         sheetId = ToString(Guid.NewGuid());
-                        sheet.Cells[1, 1].Value = sheetId;
+                        ((Range)sheet.Cells[1, 1]).Value = sheetId;
                     }
 
                     // Make sure there is a list of saved callers for this worksheet
@@ -264,9 +264,9 @@ namespace BH.UI.Excel
                         m_SavedOnWorkbook[sheetId].Add(caller.Function);
                         int row = m_SavedOnWorkbook[sheetId].Count + 1;
 
-                        sheet.Cells[row, 1].Value = caller.Caller.GetType().Name;
-                        sheet.Cells[row, 2].Value = caller.Caller.Write();
-                        sheet.Cells[row, 3].Value = caller.Function;
+                        ((Range)sheet.Cells[row, 1]).Value = caller.Caller.GetType().Name;
+                        ((Range)sheet.Cells[row, 2]).Value = caller.Caller.Write();
+                        ((Range)sheet.Cells[row, 3]).Value = caller.Function;
                     } 
                 } 
             });
@@ -303,6 +303,7 @@ namespace BH.UI.Excel
         /*******************************************/
     }
 }
+
 
 
 

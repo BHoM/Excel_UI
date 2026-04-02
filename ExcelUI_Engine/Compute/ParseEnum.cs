@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -39,6 +39,9 @@ namespace BH.Engine.Excel
         /**** Public Methods                    ****/
         /*******************************************/
 
+        [Description("Parses a string value to the specified enum type, matching either the enum member name or its description attribute.")]
+        [Input("value", "The string to parse into an enum value of type T.")]
+        [Output("enum", "The parsed enum value of type T, or the default value if no match is found.")]
         public static T ParseEnum<T>(string value)
         {
             return (T)ParseEnum(typeof(T), value);
@@ -46,6 +49,10 @@ namespace BH.Engine.Excel
 
         /*******************************************/
 
+        [Description("Parses a string value to the specified enum type, matching either the enum member name or its description attribute.")]
+        [Input("enumType", "The enum type to parse the string value into.")]
+        [Input("value", "The string to parse into an enum value.")]
+        [Output("enum", "The parsed enum value, or null if no match is found.")]
         public static object ParseEnum(Type enumType, string value)
         {
             if (Enum.IsDefined(enumType, value))
@@ -65,6 +72,7 @@ namespace BH.Engine.Excel
         /*******************************************/
     }
 }
+
 
 
 

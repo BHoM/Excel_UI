@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -77,15 +77,15 @@ namespace BH.UI.Excel
                 string callerType = "";
                 try
                 {
-                    Range cell = row.Cells[1, 2];
+                    Range cell = (Range)row.Cells[1, 2];
                     callerType = cell.Value.ToString();
 
                     int col = 3;
-                    cell = row.Cells[1, col++];
+                    cell = (Range)row.Cells[1, col++];
                     while (cell.Value != null && cell.Value is string && (cell.Value as string).Length > 0)
                     {
                         str += cell.Value;
-                        cell = row.Cells[1, col++];
+                        cell = (Range)row.Cells[1, col++];
                     }
                 }
                 catch { }
@@ -100,6 +100,7 @@ namespace BH.UI.Excel
         /*******************************************/
     }
 }
+
 
 
 

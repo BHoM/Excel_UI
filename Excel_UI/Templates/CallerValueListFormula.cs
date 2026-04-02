@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -137,13 +137,13 @@ namespace BH.UI.Excel.Templates
             {
                 try
                 {
-                    string name = sheet.Cells[i,1].Value as string;
+                    string name = ((Range)sheet.Cells[i,1]).Value as string;
                     if (string.IsNullOrEmpty(name))
                     {
                         // Need to add the choices here
-                        sheet.Cells[i, 1].Value = collectionName;
+                        ((Range)sheet.Cells[i, 1]).Value = collectionName;
                         for (int j = 0; j < choices.Count; j++)
-                            sheet.Cells[i, j + 2].Value = choices[j];
+                            ((Range)sheet.Cells[i, j + 2]).Value = choices[j];
                         break;
                     } 
                     else if (collectionName == name)
@@ -165,6 +165,7 @@ namespace BH.UI.Excel.Templates
         /*******************************************/
     }
 }
+
 
 
 

@@ -1,6 +1,6 @@
 /*
  * This file is part of the Buildings and Habitats object Model (BHoM)
- * Copyright (c) 2015 - 2025, the respective contributors. All rights reserved.
+ * Copyright (c) 2015 - 2026, the respective contributors. All rights reserved.
  *
  * Each contributor holds copyright over their respective contributions.
  * The project versioning (Git) records all such contribution source information.
@@ -107,7 +107,7 @@ namespace BH.UI.Excel
             {
                 try
                 {
-                    sheet.Cells[index, 1].Value = json.Substring(i, Math.Min(characterLimit, json.Length - i));
+                    ((Range)sheet.Cells[index, 1]).Value = json.Substring(i, Math.Min(characterLimit, json.Length - i));
                     index++;
                 }
                 catch { }
@@ -129,7 +129,7 @@ namespace BH.UI.Excel
             {
                 try
                 {
-                    string segment = sheet.Cells[i, 1].Value as string;
+                    string segment = ((Range)sheet.Cells[i, 1]).Value as string;
                     if (string.IsNullOrEmpty(segment))
                         break;
                     else
@@ -164,6 +164,7 @@ namespace BH.UI.Excel
         /*******************************************/
     }
 }
+
 
 
 
