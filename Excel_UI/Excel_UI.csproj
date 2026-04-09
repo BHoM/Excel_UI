@@ -13,7 +13,7 @@
 	<Description>https://github.com/BHoM/Excel_UI</Description>
     <Copyright>Copyright © https://github.com/BHoM</Copyright>
     <AssemblyVersion>9.0.0.0</AssemblyVersion>
-    <FileVersion>9.1.0.0</FileVersion>
+    <FileVersion>9.2.0.0</FileVersion>
   </PropertyGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
     <Exec Command="xcopy &quot;$(TargetPath)&quot;  &quot;$(ProgramData)\BHoM\Assemblies&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)*.xll&quot;  &quot;$(ProgramData)\BHoM\Assemblies&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)*.dna&quot;  &quot;$(ProgramData)\BHoM\Assemblies&quot; /Y&#xD;&#xA;xcopy &quot;$(TargetDir)ExcelDna.IntelliSense.dll&quot;  &quot;$(ProgramData)\BHoM\Assemblies&quot; /Y&#xD;&#xA;call &quot;$(DevEnvDir)..\..\VC\Auxiliary\Build\vcvarsall.bat&quot; x86&#xD;&#xA;call &quot;$(DevEnvDir)..\Tools\VsDevCmd.bat&quot;&#xD;&#xA;xcopy &quot;$(NuGetPackageRoot)exceldna.integration\1.9.0\lib\net462\ExcelDna.Integration.dll&quot; &quot;$(ProgramData)\BHoM\Assemblies&quot; /Y&#xD;&#xA;tlbexp.exe &quot;$(ProgramData)\BHoM\Assemblies\$(TargetName)$(TargetExt)&quot; /out:&quot;$(ProgramData)\BHoM\Assemblies\$(TargetName).tlb&quot;&#xD;&#xA;del &quot;$(ProgramData)\BHoM\Assemblies\ExcelDna.Integration.dll&quot;" />
