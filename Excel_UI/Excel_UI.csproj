@@ -89,7 +89,7 @@
     <PackageReference Include="ExcelDna.IntelliSense" Version="1.1.0" />
     <PackageReference Include="ExcelDna.Registration" Version="1.9.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Office.Interop.Excel" Version="15.0.4795.1000" EmbedInteropTypes="true" />
+    <PackageReference Include="Microsoft.Office.Interop.Excel" Version="15.0.4795.1001" EmbedInteropTypes="true" />
     <PackageReference Include="System.Data.DataSetExtensions" Version="4.5.0" />
   </ItemGroup>
   <ItemGroup>
