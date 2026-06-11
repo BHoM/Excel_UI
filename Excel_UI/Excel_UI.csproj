@@ -9,7 +9,6 @@
     <OutputPath>..\Build\</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
     <FallbackCulture>en-US</FallbackCulture>
-    <GenerateResourceUsePreserializedResources>true</GenerateResourceUsePreserializedResources>
 	<Description>https://github.com/BHoM/Excel_UI</Description>
     <Copyright>Copyright © https://github.com/BHoM</Copyright>
     <AssemblyVersion>9.0.0.0</AssemblyVersion>
@@ -84,7 +83,6 @@
       <EmbedInteropTypes>False</EmbedInteropTypes>
     </Reference>
     <PackageReference Include="ExcelDna.AddIn" Version="1.9.0" />
-    <PackageReference Include="System.Resources.Extensions" Version="9.0.0" />
     <PackageReference Include="ExcelDna.Integration" Version="1.9.0" />
     <PackageReference Include="ExcelDna.IntelliSense" Version="1.1.0" />
     <PackageReference Include="ExcelDna.Registration" Version="1.9.0" />
