@@ -87,8 +87,8 @@ namespace BH.UI.Excel.Properties {
         /// </summary>
         internal static System.Drawing.Bitmap BHoM_Logo {
             get {
-                object obj = ResourceManager.GetObject("BHoM_Logo", resourceCulture);
-                return ((System.Drawing.Bitmap)(obj));
+                byte[] bytes = (byte[])ResourceManager.GetObject("BHoM_Logo", resourceCulture);
+                return new System.Drawing.Bitmap(new System.IO.MemoryStream(bytes));
             }
         }
     }
