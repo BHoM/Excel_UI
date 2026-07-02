@@ -20,7 +20,12 @@
  * along with this code. If not, see <https://www.gnu.org/licenses/lgpl-3.0.html>.
  */
 
+using BH.Engine.Serialiser;
+using BH.oM.UI;
+using BH.UI.Base;
+using BH.UI.Excel.Global;
 using BH.UI.Excel.Templates;
+using ExcelDna.Integration;
 using ExcelDna.Integration.CustomUI;
 using System;
 using System.Collections.Generic;
@@ -40,6 +45,13 @@ namespace BH.UI.Excel.Addin
 
         public override string GetCustomUI(string RibbonID)
         {
+            IEnumerable<string> customTabNames = AddIn.CustomEntryShells.Values
+                .Select(e => e.TabName)
+                .Distinct();
+
+            string customTabsXml = string.Concat(customTabNames.Select(tabName =>
+                $"<tab id='custom_{Sanitise(tabName)}' label='{Escape(tabName)}'>{GetCustomRibbonXml(tabName)}</tab>"));
+
             string ribbonxml = $@"
       <customUI xmlns='http://schemas.microsoft.com/office/2006/01/customui' loadImage='LoadImage'>
       <ribbon>
@@ -57,6 +69,7 @@ namespace BH.UI.Excel.Addin
                 <button id='bhomxyz' onAction='OpenLink' imageMso='GetExternalDataFromWeb' label='bhom.xyz' tag='{Engine.Base.Query.BHoMWebsiteURL()}' supertip='Visit the BHoM website.' />
             </group>
           </tab>
+          {customTabsXml}
         </tabs>
       </ribbon>
     </customUI>";
@@ -143,6 +156,10 @@ namespace BH.UI.Excel.Addin
             Templates.CallerFormula caller = GetCaller(control.Id);
             if (caller != null)
                 return caller.Caller.Icon_24x24;
+
+            if (AddIn.CustomEntryShells.TryGetValue(control.Id, out CustomRibbonEntry entry))
+                return entry.Icon;
+
             return null;
         }
 
@@ -179,9 +196,128 @@ namespace BH.UI.Excel.Addin
 
         /*******************************************/
 
+        public void FillCustomFormula(IRibbonControl control)
+        {
+            if (!AddIn.CustomEntryShells.TryGetValue(control.Tag, out CustomRibbonEntry entry))
+                return;
+
+            try
+            {
+                object item = BH.Engine.Serialiser.Convert.FromJson(entry.ItemJson);
+                CallerFormula formula = AddIn.InstantiateCaller(entry.CallerType.Name, item);
+                if (formula == null)
+                    return;
+
+                ExcelAsyncUtil.QueueAsMacro(() => formula.FillFormula(AddIn.CurrentSelection()));
+            }
+            catch (Exception e)
+            {
+                BH.Engine.Base.Compute.RecordWarning(e, $"Failed to fill custom formula. Tab: {entry.TabName}, Category: {entry.Category}.");
+            }
+        }
+
+        /*******************************************/
+
         public void OpenLink(IRibbonControl control)
         {
             System.Diagnostics.Process.Start(control.Tag);
+        }
+
+        /*******************************************/
+
+        public static string GetCustomRibbonXml(string tabName)
+        {
+            Dictionary<string, XmlElement> groups = new Dictionary<string, XmlElement>();
+            Dictionary<string, Dictionary<int, XmlElement>> boxes = new Dictionary<string, Dictionary<int, XmlElement>>();
+            XmlDocument doc = new XmlDocument();
+            XmlElement root = doc.CreateElement("root");
+            doc.AppendChild(root);
+
+            foreach (KeyValuePair<string, CustomRibbonEntry> kvp in AddIn.CustomEntryShells.Where(kvp => kvp.Value.TabName == tabName))
+            {
+                string id = kvp.Key;
+                CustomRibbonEntry entry = kvp.Value;
+
+                // Resolve display name and description via a temporary Caller instance.
+                string label = entry.Category;
+                string supertip = "";
+                try
+                {
+                    Caller temp = Activator.CreateInstance(entry.CallerType) as Caller;
+                    if (temp != null)
+                    {
+                        object item = BH.Engine.Serialiser.Convert.FromJson(entry.ItemJson);
+                        temp.SetItem(item);
+                        label = temp.Name;
+                        supertip = temp.Description;
+                    }
+                }
+                catch { }
+
+                // Get or create the group for this entry's category.
+                XmlElement group;
+                if (!groups.TryGetValue(entry.Category, out group))
+                {
+                    group = (XmlElement)root.AppendChild(doc.CreateElement("group"));
+                    group.SetAttribute("id", Sanitise(tabName) + "_" + Sanitise(entry.Category));
+                    group.SetAttribute("label", entry.Category);
+                    groups[entry.Category] = group;
+                    boxes[entry.Category] = new Dictionary<int, XmlElement>();
+                }
+
+                // Get or create the vertical box for this GroupIndex.
+                if (!boxes[entry.Category].ContainsKey(entry.GroupIndex))
+                    boxes[entry.Category][entry.GroupIndex] = doc.CreateElement("box");
+
+                XmlElement box = boxes[entry.Category][entry.GroupIndex];
+                box.SetAttribute("id", Sanitise(tabName) + "_" + Sanitise(entry.Category) + "_group" + entry.GroupIndex);
+                box.SetAttribute("boxStyle", "vertical");
+
+                XmlElement btn = doc.CreateElement("button");
+                btn.SetAttribute("id", id);
+                btn.SetAttribute("tag", id);
+                btn.SetAttribute("onAction", "FillCustomFormula");
+                btn.SetAttribute("getImage", "GetImage");
+                btn.SetAttribute("label", label);
+                btn.SetAttribute("screentip", label);
+                if (!string.IsNullOrEmpty(supertip))
+                    btn.SetAttribute("supertip", supertip);
+                box.AppendChild(btn);
+            }
+
+            // Append boxes to their groups in GroupIndex order, separated by separators.
+            foreach (KeyValuePair<string, Dictionary<int, XmlElement>> kvp in boxes)
+            {
+                List<int> ordered = kvp.Value.Keys.ToList();
+                ordered.Sort();
+                foreach (int i in ordered)
+                {
+                    groups[kvp.Key].AppendChild(kvp.Value[i]);
+                    XmlElement sep = doc.CreateElement("separator");
+                    sep.SetAttribute("id", $"sep-custom-{Sanitise(tabName)}-{Sanitise(kvp.Key)}-{i}");
+                    groups[kvp.Key].AppendChild(sep);
+                }
+                groups[kvp.Key].RemoveChild(groups[kvp.Key].LastChild);
+            }
+
+            return root.InnerXml;
+        }
+
+
+        /*******************************************/
+        /**** Private Methods                   ****/
+        /*******************************************/
+
+        private static string Sanitise(string s)
+        {
+            return new string(s.Select(c => char.IsLetterOrDigit(c) ? c : '_').ToArray());
+        }
+
+        /*******************************************/
+
+        private static string Escape(string s)
+        {
+            return System.Security.SecurityElement.Escape(s);
         }
 
         /*******************************************/

@@ -28,6 +28,8 @@ using ExcelDna.Integration;
 using System.Collections.Generic;
 using System.Collections;
 using System.Linq.Expressions;
+using BH.oM.UI;
+using BH.UI.Excel.Global;
 using BH.UI.Excel.Templates;
 
 
@@ -40,6 +42,8 @@ namespace BH.UI.Excel
         /*******************************************/
 
         public static Dictionary<string, CallerFormula> CallerShells { get; private set; } = new Dictionary<string, CallerFormula>();
+
+        public static Dictionary<string, CustomRibbonEntry> CustomEntryShells { get; private set; } = new Dictionary<string, CustomRibbonEntry>();
 
         public static AddIn Instance { get; private set; } = null;
 
@@ -57,12 +61,18 @@ namespace BH.UI.Excel
 
         static AddIn()
         {
-            // Collect the callers from assemblies
+            // Collect the callers from assemblies.
+            // Side effect: constructing each CallerFormula creates a Caller, which triggers
+            // static Caller() in BHoM_UI → Initialisation.Activate() → CustomRibbonEntries populated.
             CallerShells = ExcelIntegration.GetExportedAssemblies()
                 .SelectMany(a => a.GetTypes())
                 .Where(t => t.Namespace == "BH.UI.Excel.Components" && typeof(CallerFormula).IsAssignableFrom(t))
                 .Select(t => InstantiateCaller(t))
                 .ToDictionary(o => o.Caller.GetType().Name);
+
+            // Subscribe to custom ribbon entries and replay those already loaded.
+            // Initialisation.CustomRibbonEntries is fully populated at this point.
+            CustomRibbon.Activate();
         }
 
         /*******************************************/
