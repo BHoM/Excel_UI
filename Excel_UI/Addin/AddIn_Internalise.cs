@@ -76,11 +76,11 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        public static void RestoreData()
+        public static void RestoreData(Workbook workbook = null)
         {
             // Make sure the data in the hidden sheet has been loaded to the dictionary
             if (m_InternalisedData.Count == 0)
-                m_InternalisedData = ReadJsonFromSheet("BHoM_DataHidden");
+                m_InternalisedData = ReadJsonFromSheet("BHoM_DataHidden", workbook);
 
             // Update cells of active sheets based on internalised data
             foreach (var kvp in m_InternalisedData)
@@ -116,10 +116,10 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        private static Dictionary<string, object> ReadJsonFromSheet(string sheetName)
+        private static Dictionary<string, object> ReadJsonFromSheet(string sheetName, Workbook workbook = null)
         {
             // Get the hidden worksheet
-            Worksheet sheet = Sheet(sheetName, false);
+            Worksheet sheet = Sheet(sheetName, false, false, workbook);
             if (sheet == null)
                 return new Dictionary<string, object>();
 

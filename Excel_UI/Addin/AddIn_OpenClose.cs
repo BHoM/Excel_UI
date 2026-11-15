@@ -124,8 +124,10 @@ namespace BH.UI.Excel
         {
             // Restore internalised data and callers
             BH.UI.Base.Global.DocumentListener.OnDocumentBeginOpening(workbook.FullName);
-            RestoreData();
-            RestoreFormulas();
+            // Use the workbook passed by the event rather than the active one: when a file leaves Protected View
+            // ("Enable Editing"), WorkbookOpen fires before the new workbook becomes the active workbook
+            RestoreData(workbook);
+            RestoreFormulas(workbook);
             BH.UI.Base.Global.DocumentListener.OnDocumentEndOpening(workbook.FullName, "Excel", WorkbookId(workbook));
 
             // Initialise the BHoM Addin and run first calculation

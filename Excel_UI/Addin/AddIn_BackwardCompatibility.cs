@@ -38,9 +38,9 @@ namespace BH.UI.Excel
         /**** Methods                           ****/
         /*******************************************/
 
-        public static void Old_Restore()
+        public static void Old_Restore(Workbook workbook = null)
         {
-            foreach (var restored in Old_GetFormulas())
+            foreach (var restored in Old_GetFormulas(workbook))
             {
                 string json = restored.Item2;
                 string callerType = restored.Item1;
@@ -62,10 +62,10 @@ namespace BH.UI.Excel
         /**** Private Methods                   ****/
         /*******************************************/
 
-        private static List<Tuple<string, string>> Old_GetFormulas()
+        private static List<Tuple<string, string>> Old_GetFormulas(Workbook workbook = null)
         {
             // Get the old hidden page for storing the callers
-            Worksheet sheet = Sheet("BHoM_ComponetRequests", false);
+            Worksheet sheet = Sheet("BHoM_ComponetRequests", false, false, workbook);
             if (sheet == null)
                 return new List<Tuple<string, string>>();
 
