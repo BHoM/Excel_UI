@@ -84,7 +84,7 @@
     </Reference>
     <PackageReference Include="ExcelDna.AddIn" Version="1.9.0" />
     <PackageReference Include="ExcelDna.Integration" Version="1.9.0" />
-    <PackageReference Include="ExcelDna.IntelliSense" Version="1.1.0" />
+    <PackageReference Include="ExcelDna.IntelliSense" Version="1.9.0" />
     <PackageReference Include="ExcelDna.Registration" Version="1.9.0" />
     <PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
     <PackageReference Include="Microsoft.Office.Interop.Excel" Version="15.0.4795.1001" EmbedInteropTypes="true" />
