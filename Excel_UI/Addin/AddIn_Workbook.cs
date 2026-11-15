@@ -56,10 +56,11 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        public static Worksheet Sheet(string name, bool addIfMissing = true, bool isHidden = false)
+        public static Worksheet Sheet(string name, bool addIfMissing = true, bool isHidden = false, Workbook workbook = null)
         {
             // Get the workbook
-            Workbook workbook = ActiveWorkbook();
+            if (workbook == null)
+                workbook = ActiveWorkbook();
             if (workbook == null)
                 return null;
 

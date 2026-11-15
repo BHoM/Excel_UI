@@ -90,13 +90,16 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        public static void RestoreFormulas()
+        public static void RestoreFormulas(Workbook workbook = null)
         {
+            if (workbook == null)
+                workbook = ActiveWorkbook();
+
             // Get the hidden worksheet
-            Worksheet sheet = Sheet("BHoM_CallersHidden", false);
+            Worksheet sheet = Sheet("BHoM_CallersHidden", false, false, workbook);
             if (sheet == null)
             {
-                Old_Restore(); // is it an old version of an Excel file ?
+                Old_Restore(workbook); // is it an old version of an Excel file ?
                 return;
             }
 
@@ -122,7 +125,7 @@ namespace BH.UI.Excel
                     Register(formula, () =>
                     {
                         if (versioning != null && !string.IsNullOrEmpty(oldFunction))
-                            UpgradeCellsFormula(formula, oldFunction);
+                            UpgradeCellsFormula(formula, oldFunction, workbook);
                     });
                     
                 }
@@ -138,7 +141,7 @@ namespace BH.UI.Excel
                     }
 
                     if(valueList is CreateEnumFormula)
-                        UpdateEnumValues(valueList.MultiChoiceCaller.SelectedItem.ToJson());
+                        UpdateEnumValues(valueList.MultiChoiceCaller.SelectedItem.ToJson(), workbook);
                 }
             }
         }
@@ -148,8 +151,11 @@ namespace BH.UI.Excel
         /**** Private Methods                   ****/
         /*******************************************/
 
-        private static void UpdateEnumValues(string collectionName)
+        private static void UpdateEnumValues(string collectionName, Workbook workbook = null)
         {
+            if (workbook == null)
+                workbook = ActiveWorkbook();
+
             //Update enum values in case they have changed since the last serialisation
             var enumType = BH.Engine.Serialiser.Convert.FromJson(collectionName) as Type; //To strip out the 'BHoM_Version'
             if (enumType == null || !enumType.IsEnum)
@@ -159,7 +165,7 @@ namespace BH.UI.Excel
             var enumChoices = System.Enum.GetValues(enumType);
 
             // Get the data sheet
-            Worksheet choicesSheet = AddIn.Sheet("BHoM_ChoicesHidden", true, true);
+            Worksheet choicesSheet = AddIn.Sheet("BHoM_ChoicesHidden", true, true, workbook);
             if (choicesSheet == null)
                 return;
 
@@ -203,7 +209,6 @@ namespace BH.UI.Excel
             var rangeStart = $"=BHoM_ChoicesHidden!$B${i}:";
             
             //Update all existing validation items to use the new range
-            Workbook workbook = ActiveWorkbook();
             if (workbook != null)
             {
                 foreach (Worksheet sheet in workbook.Sheets.OfType<Worksheet>().Where(x => x.Visible == XlSheetVisibility.xlSheetVisible))
@@ -275,7 +280,7 @@ namespace BH.UI.Excel
 
         /*******************************************/
 
-        private static void UpgradeCellsFormula(CallerFormula formula, string oldFunction)
+        private static void UpgradeCellsFormula(CallerFormula formula, string oldFunction, Workbook workbook = null)
         {
             if (formula?.Caller?.SelectedItem == null)
                 return;
@@ -283,7 +288,8 @@ namespace BH.UI.Excel
             string oldFormula = '=' + oldFunction + '(';
             string newFormula = '=' + formula.Function + '(';
 
-            Workbook workbook = ActiveWorkbook();
+            if (workbook == null)
+                workbook = ActiveWorkbook();
             if (workbook != null)
             {
                 foreach (Worksheet sheet in workbook.Sheets.OfType<Worksheet>().Where(x => x.Visible == XlSheetVisibility.xlSheetVisible))
